@@ -1,0 +1,16 @@
+{
+  "name": "@kiro-spec-library/backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bun build src/index.ts --target=bun --outfile=dist/index.mjs",
+    "dev": "bun --watch src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@kiro-spec-library/shared": "workspace:*",
+    "elysia": "1.4.29",
+    "@elysiajs/cors": "1.4.2"
+  }
+}
