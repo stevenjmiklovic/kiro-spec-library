@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "types",
+    "composite": true,
+    "jsx": "react-jsx",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"]
+  },
+  "references": [
+    { "path": "../shared" }
+  ],
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
+}
