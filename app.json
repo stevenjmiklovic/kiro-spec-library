@@ -1,0 +1,59 @@
+{
+  "name": "kiro-spec-library",
+  "version": "0.1.0",
+  "displayName": "Spec Library",
+  "description": "Index, browse, and curate Kiro Specs across repositories with relationship mapping and AI-assisted metadata.",
+  "author": "Johns Hopkins University Sheridan Libraries",
+  "tags": ["specs", "kiro", "library", "graph", "developer-tools"],
+  "highlights": [
+    "Relationship graph canvas showing spec dependencies, supersession chains, and suggested connections",
+    "Chronological archive ledger with immutable SHA-256-verified snapshots",
+    "AI-powered relationship suggestions via TF-IDF content similarity",
+    "MCP server for searching specs and proposing metadata changes from any AI assistant",
+    "Full-text search across spec titles, content, owners, and themes"
+  ],
+  "minCrewVersion": "0.2.0",
+  "defaultEnabled": false,
+  "iconPath": "assets/icon-256.png",
+  "agents": ["agents/spectral-librarian.json"],
+  "mcpServers": {
+    "kiro-spec-library": {
+      "command": "bun",
+      "args": ["run", "mcp/src/index.ts"],
+      "disabled": false
+    }
+  },
+  "ui": {
+    "entry": "dist/app.mjs",
+    "pages": [
+      {
+        "route": "/kiro-spec-library",
+        "label": "Spec Library",
+        "icon": "Library"
+      }
+    ]
+  },
+  "backend": {
+    "entryPoint": "scripts/start-backend.sh",
+    "port": "auto",
+    "healthCheck": "/api/health",
+    "type": "exec"
+  },
+  "permissions": {
+    "api": [
+      "/api/apps/kiro-spec-library",
+      "/api/apps/kiro-spec-library/*"
+    ],
+    "storage": true,
+    "network": true
+  },
+  "dependencies": {
+    "commands": ["git", "bun"]
+  },
+  "platform": {
+    "os": ["macos", "linux"]
+  },
+  "setup": {
+    "onInstall": "bun install && cd ui && bun run build"
+  }
+}

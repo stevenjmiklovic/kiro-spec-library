@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Build output (dist/ is committed per Crew app conventions, but not TS intermediates)
+*.tsbuildinfo
+
+# Bun
+bun.lockb
+
+# OS
+.DS_Store
+
+# Env
+.env
+.env.local
+
+# App runtime data (created by backend at runtime)
+data/
+
+#Ai
+.kiro/settings/*
+
+# TypeScript intermediates outside dist/types (tsc --build artifacts)
+scripts/*.js
+scripts/*.d.ts
+scripts/*.d.ts.map
+tests/**/*.js
+tests/**/*.d.ts
+tests/**/*.d.ts.map
+playwright.config.js
+playwright.config.d.ts
+playwright.config.d.ts.map
+
+# Test output
+test-results/

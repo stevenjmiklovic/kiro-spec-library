@@ -1,0 +1,33 @@
+{
+  "name": "kiro-spec-library",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": ["shared", "backend", "ui", "mcp"],
+  "scripts": {
+    "build": "bun run --filter '*' build",
+    "typecheck": "tsc --build",
+    "test": "bun test",
+    "test:sites": "node --test poc/tests/sites-worker.test.mjs",
+    "start": "./scripts/start-backend.sh",
+    "dev": "bun run --filter backend dev",
+    "lint": "biome check .",
+    "changelog:draft": "bun run scripts/changelog.ts draft",
+    "changelog:compile": "bun run scripts/changelog.ts compile"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@happy-dom/global-registrator": "15.11.7",
+    "@playwright/test": "1.49.1",
+    "@testing-library/dom": "10.4.0",
+    "@testing-library/react": "16.1.0",
+    "@types/bun": "1.2.14",
+    "@types/react": "19.1.8",
+    "@types/react-dom": "19.1.6",
+    "fast-check": "3.22.0",
+    "happy-dom": "15.11.7",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "typescript": "5.6.3"
+  }
+}
