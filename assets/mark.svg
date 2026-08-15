@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="Kiro Spec Library">
+<defs>
+  <linearGradient id="gBodyM" x1="0" y1="0" x2="0.25" y2="1">
+    <stop offset="0" stop-color="#ffffff" stop-opacity=".97"/>
+    <stop offset=".34" stop-color="#a78bfa" stop-opacity=".94"/>
+    <stop offset=".74" stop-color="#6d4fd6" stop-opacity="0.91"/>
+    <stop offset="1" stop-color="#748ffc" stop-opacity="0.76"/>
+  </linearGradient>
+  <linearGradient id="gRimM" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#ffffff" stop-opacity=".85"/>
+    <stop offset="1" stop-color="#748ffc" stop-opacity=".12"/>
+  </linearGradient>
+  <radialGradient id="gHaloM" cx=".5" cy=".5" r=".5">
+    <stop offset="0" stop-color="#a78bfa" stop-opacity=".55"/>
+    <stop offset=".45" stop-color="#6d4fd6" stop-opacity=".22"/>
+    <stop offset="1" stop-color="#6d4fd6" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="gSheenM" cx=".5" cy=".5" r=".5">
+    <stop offset="0" stop-color="#ffffff" stop-opacity=".55"/>
+    <stop offset=".6" stop-color="#ffffff" stop-opacity=".18"/>
+    <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+<path d="M48.6 136.2C48.6 83.6 84.2 41.0 128.0 41.0C171.8 41.0 207.4 83.6 207.4 136.2L207.4 215.0Q180.9 278.5 154.5 215.0Q128.0 278.5 101.5 215.0Q75.1 278.5 48.6 215.0L48.6 136.2Z" fill="url(#gBodyM)"/><path d="M48.6 136.2C48.6 83.6 84.2 41.0 128.0 41.0C171.8 41.0 207.4 83.6 207.4 136.2L207.4 215.0Q180.9 278.5 154.5 215.0Q128.0 278.5 101.5 215.0Q75.1 278.5 48.6 215.0L48.6 136.2Z" fill="none" stroke="url(#gRimM)" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="97.8" cy="87.0" rx="25.4" ry="38.1" fill="url(#gSheenM)" transform="rotate(-18 97.8 87.0)"/><ellipse cx="98.6" cy="131.2" rx="9.8" ry="13.6" fill="#141122" opacity=".88"/><ellipse cx="95.5" cy="126.5" rx="3.0" ry="3.5" fill="#ffffff" opacity=".75"/><ellipse cx="157.4" cy="131.2" rx="9.8" ry="13.6" fill="#141122" opacity=".88"/><ellipse cx="154.2" cy="126.5" rx="3.0" ry="3.5" fill="#ffffff" opacity=".75"/><g fill="none" stroke="#fcc419" stroke-width="4.4" stroke-linecap="round" opacity=".95"><circle cx="98.6" cy="131.2" r="23.5"/><circle cx="157.4" cy="131.2" r="23.5"/><path d="M122.1 127.9Q128.0 116.6 133.9 127.9"/><path d="M75.1 128.4L50.5 120.8"/><path d="M180.9 128.4L205.5 120.8"/></g><circle cx="98.6" cy="131.2" r="21.3" fill="#fcc419" opacity=".10"/><circle cx="157.4" cy="131.2" r="21.3" fill="#fcc419" opacity=".10"/><path d="M85.7 139.4L102.2 118.3" stroke="#ffffff" stroke-width="4.0" stroke-linecap="round" opacity=".45" fill="none"/>
+</svg>
