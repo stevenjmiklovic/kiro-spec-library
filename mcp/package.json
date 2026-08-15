@@ -1,0 +1,14 @@
+{
+  "name": "@kiro-spec-library/mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bun build src/index.ts --target=bun --outfile=dist/index.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@kiro-spec-library/shared": "workspace:*",
+    "@modelcontextprotocol/sdk": "1.30.0"
+  }
+}
