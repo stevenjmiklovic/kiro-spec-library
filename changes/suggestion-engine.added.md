@@ -1,0 +1,1 @@
+Added deterministic relationship suggestion engine with TF-IDF content similarity, cosine scoring, cross-spec markdown link detection, shared tag/theme analysis, repository proximity, per-spec limits, and rejection-aware filtering.

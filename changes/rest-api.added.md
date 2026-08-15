@@ -1,0 +1,1 @@
+Added Elysia REST API with TypeBox validation covering all endpoints: spec CRUD with metadata overlays, relationships and suggestions, archive snapshots with purge, source configuration, sidecar import/export, sync triggers, audit queries, error envelopes with request IDs, and backend server lifecycle with graceful shutdown.

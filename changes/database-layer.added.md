@@ -1,0 +1,1 @@
+Added SQLite database layer with bun:sqlite in WAL mode, numbered migration runner, 12 tables (sources, specs, artifacts, metadata_overlays, relationships, suggestions, snapshots, snapshot_artifacts, scan_history, audit_events, rejections, owner_aliases), contentless FTS5 indexes, and 8 prepared-statement query modules.

@@ -1,0 +1,1 @@
+Added spec normalizer (deterministic key derivation, type/workflow/stage classification, progress calculation, title extraction) and repository scanner (single-flight scanning, remote Git refresh, timeout enforcement, error isolation per source).
