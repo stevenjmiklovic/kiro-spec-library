@@ -46,12 +46,12 @@ A [Kiro Crew](https://kiro.dev/docs/crew/apps/) app that discovers `.kiro/specs/
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    Crew Platform Shell                    │
+│                    Crew Platform Shell                  │
 ├──────────────┬──────────────────────┬───────────────────┤
 │   UI (ESM)   │   Backend (Elysia)   │   MCP Server      │
-│   React +    │   bun:sqlite WAL     │   3 tools          │
-│   @xyflow    │   FTS5 search        │   Token-protected  │
-│   TypeBox    │   21 REST endpoints  │   64 KB cap        │
+│   React +    │   bun:sqlite WAL     │   4 tools         │
+│   @xyflow    │   FTS5 search        │   Token-protected │
+│   TypeBox    │   21 REST endpoints  │   64 KB cap       │
 └──────────────┴──────────────────────┴───────────────────┘
        │                   │                    │
        │         ┌─────────┴─────────┐          │
@@ -61,7 +61,7 @@ A [Kiro Crew](https://kiro.dev/docs/crew/apps/) app that discovers `.kiro/specs/
        └───────────────────┼────────────────────┘
                            │
               ┌────────────┴────────────┐
-              │  Git Repos (local/SSH)   │
+              │  Git Repos (local/SSH)  │
               └─────────────────────────┘
 ```
 
