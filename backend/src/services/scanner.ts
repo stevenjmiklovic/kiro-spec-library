@@ -5,10 +5,14 @@ import { validatePath } from '../security/path-validator.js';
 import { validateArgs, buildFetchCommand, buildCloneCommand } from '../security/git-validator.js';
 import { normalize, type RawSpecArtifacts } from './normalizer.js';
 import { autoPopulate } from './auto-metadata.js';
-import { getOverlay, upsertOverlay } from '../db/queries/metadata.js';
+import { getOverlay, upsertOverlay, overlayRowToMetadataOverlay } from '../db/queries/metadata.js';
+import { resolveMetadata, type ResolvedMetadata } from './metadata.js';
+import { generateAll } from './suggester.js';
+import type { ArchiverService } from './archiver.js';
 import { ConfigKiroSchema } from '@kiro-spec-library/shared';
 import { insertScan, updateScan } from '../db/queries/scan-history.js';
-import { upsertSpec } from '../db/queries/specs.js';
+import { upsertSpec, syncSpecFts } from '../db/queries/specs.js';
+import { suggestionExists, createSuggestion, listAllRejections } from '../db/queries/suggestions.js';
 import { join, relative } from 'node:path';
 import { readdirSync, existsSync } from 'node:fs';
 
@@ -22,11 +26,13 @@ export interface SpecDirectory {
 export class ScannerService {
   private db: Database;
   private dataDir: string;
+  private archiver: ArchiverService;
   private inFlight: Promise<ScanResult> | null = null;
 
-  constructor(db: Database, dataDir: string) {
+  constructor(db: Database, dataDir: string, archiver: ArchiverService) {
     this.db = db;
     this.dataDir = dataDir;
+    this.archiver = archiver;
   }
 
   async triggerScan(sources: Source[]): Promise<ScanResult> {
@@ -50,17 +56,16 @@ export class ScannerService {
     const startedAt = new Date().toISOString();
     const errors: ScanError[] = [];
     let specsDiscovered = 0;
+    const allSpecs: NormalizedSpec[] = [];
+    const contentMap = new Map<string, string>();
 
     insertScan(this.db, { runId, startedAt, status: 'running' });
 
     for (const source of sources) {
       try {
-        const specs = await this.scanSource(source);
+        const specs = await this.scanSource(source, contentMap);
         specsDiscovered += specs.length;
-
-        for (const spec of specs) {
-          upsertSpec(this.db, spec);
-        }
+        allSpecs.push(...specs);
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : String(err);
         const category = this.categorizeError(err);
@@ -70,6 +75,19 @@ export class ScannerService {
           message,
           timestamp: new Date().toISOString(),
         });
+      }
+    }
+
+    // Suggestions are cross-repo, so they're generated once per scan cycle
+    // over the full corpus rather than per-source.
+    if (allSpecs.length >= 2) {
+      try {
+        this.generateSuggestions(allSpecs, contentMap);
+      } catch (err: unknown) {
+        console.warn(
+          '[scanner] Suggestion generation failed:',
+          err instanceof Error ? err.message : err,
+        );
       }
     }
 
@@ -98,7 +116,44 @@ export class ScannerService {
     };
   }
 
-  private async scanSource(source: Source): Promise<NormalizedSpec[]> {
+  /** Generate and persist cross-repo suggestions for this scan cycle's full corpus. */
+  private generateSuggestions(specs: NormalizedSpec[], contentMap: Map<string, string>): void {
+    const metadataMap = new Map<string, ResolvedMetadata>();
+    for (const spec of specs) {
+      const overlay = getOverlay(this.db, spec.key);
+      metadataMap.set(
+        spec.key,
+        resolveMetadata(spec, overlay ? overlayRowToMetadataOverlay(overlay) : null, null),
+      );
+    }
+
+    const rejections = listAllRejections(this.db).map((r) => ({
+      sourceSpecKey: r.source_spec_key,
+      targetSpecKey: r.target_spec_key,
+      type: r.type,
+      dataHash: r.data_hash,
+    }));
+
+    const suggestions = generateAll(specs, metadataMap, contentMap, rejections);
+    for (const s of suggestions) {
+      if (suggestionExists(this.db, s.sourceSpecKey, s.targetSpecKey, s.type)) continue;
+      createSuggestion(this.db, {
+        id: s.id,
+        sourceSpecKey: s.sourceSpecKey,
+        targetSpecKey: s.targetSpecKey,
+        type: s.type,
+        confidence: s.confidence,
+        reason: s.reason,
+        evidence: s.evidence,
+        dataHash: s.dataHash,
+      });
+    }
+  }
+
+  private async scanSource(
+    source: Source,
+    contentMap: Map<string, string>,
+  ): Promise<NormalizedSpec[]> {
     if (source.type === 'remote') {
       await this.refreshRemote(source);
     }
@@ -114,6 +169,12 @@ export class ScannerService {
       try {
         const raw = await this.readArtifacts(specDir, source);
         const normalized = normalize(raw, source);
+
+        // Persist the spec first — metadata_overlays.spec_key has a foreign
+        // key to specs.key, so auto-populate's upsertOverlay() below would
+        // fail on every spec's first scan (before its specs row exists)
+        // if this ran after it instead.
+        const rowid = upsertSpec(this.db, normalized);
 
         // Auto-populate metadata for specs without an existing overlay
         try {
@@ -156,6 +217,49 @@ export class ScannerService {
             `[scanner] Auto-populate failed for ${specDir.slug}:`,
             autoErr instanceof Error ? autoErr.message : autoErr,
           );
+        }
+
+        const contentText = Object.values(raw.contents).join('\n');
+        contentMap.set(normalized.key, contentText);
+
+        let resolved: ResolvedMetadata | undefined;
+        try {
+          const overlay = getOverlay(this.db, normalized.key);
+          resolved = resolveMetadata(
+            normalized,
+            overlay ? overlayRowToMetadataOverlay(overlay) : null,
+            null,
+          );
+          syncSpecFts(this.db, rowid, {
+            title: normalized.title,
+            content: contentText,
+            owner: normalized.owner,
+            theme: resolved.theme ?? '',
+            tags: resolved.tags.join(' '),
+            repository: normalized.provenance.repository,
+          });
+        } catch (ftsErr: unknown) {
+          // Search indexing is non-critical; log and continue
+          console.warn(
+            `[scanner] FTS sync failed for ${specDir.slug}:`,
+            ftsErr instanceof Error ? ftsErr.message : ftsErr,
+          );
+        }
+
+        if (normalized.stage === 'done' && resolved) {
+          try {
+            const artifactContents = Object.entries(raw.contents).map(([name, content]) => ({
+              name,
+              content,
+            }));
+            await this.archiver.maybeCreateSnapshot(normalized, resolved, artifactContents);
+          } catch (snapshotErr: unknown) {
+            // Snapshot creation is non-critical; log and continue
+            console.warn(
+              `[scanner] Snapshot auto-creation failed for ${specDir.slug}:`,
+              snapshotErr instanceof Error ? snapshotErr.message : snapshotErr,
+            );
+          }
         }
 
         results.push(normalized);

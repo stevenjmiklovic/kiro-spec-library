@@ -14,8 +14,11 @@ import type { Database } from 'bun:sqlite';
 import { createDatabase } from '../../backend/src/db/connection.js';
 import { runMigrations } from '../../backend/src/db/migrator.js';
 import { ScannerService } from '../../backend/src/services/scanner.js';
+import { ArchiverService } from '../../backend/src/services/archiver.js';
 import { listSpecs } from '../../backend/src/db/queries/specs.js';
 import { putSource } from '../../backend/src/db/queries/sources.js';
+import { listPending } from '../../backend/src/db/queries/suggestions.js';
+import { listSnapshots } from '../../backend/src/db/queries/snapshots.js';
 import type { Source } from '../../shared/src/types.js';
 
 let dataDir: string;
@@ -53,7 +56,10 @@ beforeAll(async () => {
 
   db = createDatabase(dataDir);
   await runMigrations(db);
-  scanner = new ScannerService(db, dataDir);
+  const archiveDir = join(dataDir, 'archive');
+  mkdirSync(archiveDir, { recursive: true });
+  const archiver = new ArchiverService(db, { archiveDir });
+  scanner = new ScannerService(db, dataDir, archiver);
 });
 
 afterAll(() => {
@@ -95,6 +101,58 @@ describe('Scanner integration', () => {
 
     const quick = stored.find((s) => s.key === 'local-1::.kiro/specs/quick-fix');
     expect(quick!.type).toBe('quick');
+  });
+
+  test('scan syncs specs_fts so a search term matches the scanned content', () => {
+    // Relies on the scan above having indexed agent-memory's requirements.md
+    // ("Persistent memory.") into specs_fts.
+    const results = listSpecs(db, { query: 'Persistent', limit: 10, offset: 0 });
+    const keys = results.map((s) => s.key);
+    expect(keys).toContain('local-1::.kiro/specs/agent-memory');
+    expect(keys).not.toContain('local-1::.kiro/specs/quick-fix');
+  });
+
+  test('scan generates a suggestion between proximate specs in the same cycle', () => {
+    // agent-memory and quick-fix are siblings under the same repo's
+    // .kiro/specs/ directory, so isProximate() should link them.
+    const pending = listPending(db);
+    const proximitySuggestion = pending.find(
+      (s) =>
+        s.reason === 'repository_proximity' &&
+        [s.source_spec_key, s.target_spec_key].includes('local-1::.kiro/specs/agent-memory') &&
+        [s.source_spec_key, s.target_spec_key].includes('local-1::.kiro/specs/quick-fix'),
+    );
+    expect(proximitySuggestion).toBeDefined();
+  });
+
+  test('auto-creates a snapshot for a spec that reaches the done stage', async () => {
+    const doneRepo = mkdtempSync(join(tmpdir(), 'scanner-done-'));
+    try {
+      writeSpec(doneRepo, 'finished-thing', {
+        'tasks.md': '- [x] Only task\n',
+      });
+      const source: Source = {
+        id: 'done-src',
+        type: 'local',
+        path: doneRepo,
+        addedAt: new Date().toISOString(),
+      };
+      putSource(db, source);
+      const result = await scanner.triggerScan([source]);
+      expect(result.status).toBe('completed');
+
+      const stored = listSpecs(db, { limit: 100, offset: 0 });
+      const finished = stored.find((s) => s.key === 'done-src::.kiro/specs/finished-thing');
+      expect(finished).toBeDefined();
+      expect(finished!.stage).toBe('done');
+
+      const snapshots = listSnapshots(db, { limit: 50 });
+      expect(
+        snapshots.some((s) => s.spec_key === 'done-src::.kiro/specs/finished-thing'),
+      ).toBe(true);
+    } finally {
+      rmSync(doneRepo, { recursive: true, force: true });
+    }
   });
 
   test('error isolation: one failing source does not abort the scan', async () => {

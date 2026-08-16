@@ -9,7 +9,7 @@ export type RelationshipType = "depends_on" | "blocks" | "supersedes" | "duplica
 /** Retention policy type */
 export type RetentionPolicyType = "permanent" | "project_lifetime" | "active_plus_2_years" | "custom_date";
 /** Audit operation types (content-free) */
-export type AuditOperation = "metadata_created" | "metadata_updated" | "metadata_deleted" | "relationship_created" | "relationship_deleted" | "suggestion_accepted" | "suggestion_rejected" | "snapshot_created" | "snapshot_purged";
+export type AuditOperation = "metadata_created" | "metadata_updated" | "metadata_deleted" | "relationship_created" | "relationship_deleted" | "suggestion_accepted" | "suggestion_rejected" | "snapshot_created" | "snapshot_purged" | "backup_created" | "backup_restored" | "text_export_created" | "text_export_applied";
 /** Scan error category */
 export type ScanErrorCategory = "auth" | "network" | "timeout" | "validation" | "io";
 /** Suggestion reason */
@@ -91,6 +91,8 @@ export interface MetadataOverlay {
     retentionPolicy?: RetentionPolicy;
     approvers?: string[];
     implementationRef?: string;
+    /** ISO 8601 timestamp when the spec's requirements/design passed review (grill-me). */
+    reviewedAt?: string;
     revision: number;
     /** ISO 8601 */
     updatedAt: string;
@@ -154,6 +156,8 @@ export interface MetadataProjection {
     targetRelease?: string;
     approvers: string[];
     implementationRef?: string;
+    /** ISO 8601 timestamp when the spec passed review. */
+    reviewedAt?: string;
 }
 export interface ScanResult {
     runId: string;

@@ -21,7 +21,7 @@ afterAll(() => {
 
 describe("Migration integration tests", () => {
   describe("runMigrations applies all migrations", () => {
-    test("applies all 7 migrations successfully", async () => {
+    test("applies all 10 migrations successfully", async () => {
       await runMigrations(db);
 
       const rows = db
@@ -30,7 +30,7 @@ describe("Migration integration tests", () => {
         )
         .all();
 
-      expect(rows).toHaveLength(7);
+      expect(rows).toHaveLength(10);
       expect(rows[0]!.number).toBe(1);
       expect(rows[0]!.name).toBe("core-tables");
       expect(rows[1]!.number).toBe(2);
@@ -45,6 +45,12 @@ describe("Migration integration tests", () => {
       expect(rows[5]!.name).toBe("proposals-rationale-source");
       expect(rows[6]!.number).toBe(7);
       expect(rows[6]!.name).toBe("lifecycle-stage-rename");
+      expect(rows[7]!.number).toBe(8);
+      expect(rows[7]!.name).toBe("metadata-reviewed-at");
+      expect(rows[8]!.number).toBe(9);
+      expect(rows[8]!.name).toBe("metadata-schema-completion");
+      expect(rows[9]!.number).toBe(10);
+      expect(rows[9]!.name).toBe("drop-dead-columns");
     });
 
     test("_migrations rows have applied_at timestamps", () => {
@@ -76,7 +82,6 @@ describe("Migration integration tests", () => {
       "scan_history",
       "audit_events",
       "rejections",
-      "owner_aliases",
     ];
 
     for (const table of expectedTables) {
@@ -162,6 +167,61 @@ describe("Migration integration tests", () => {
     });
   });
 
+  describe("schema verification: metadata schema completion (migration 009)", () => {
+    test("metadata_overlays has approvers and implementation_ref columns", () => {
+      const columns = db
+        .query<{ name: string }, []>("PRAGMA table_info(metadata_overlays)")
+        .all()
+        .map((c) => c.name);
+      expect(columns).toContain("approvers");
+      expect(columns).toContain("implementation_ref");
+    });
+  });
+
+  describe("schema verification: dead columns dropped (migration 010)", () => {
+    function columnsOf(table: string): string[] {
+      return db
+        .query<{ name: string }, []>(`PRAGMA table_info(${table})`)
+        .all()
+        .map((c) => c.name);
+    }
+
+    test("sources no longer has last_scan_at/last_error/last_error_at", () => {
+      const columns = columnsOf("sources");
+      expect(columns).not.toContain("last_scan_at");
+      expect(columns).not.toContain("last_error");
+      expect(columns).not.toContain("last_error_at");
+    });
+
+    test("metadata_overlays no longer has legal_hold", () => {
+      expect(columnsOf("metadata_overlays")).not.toContain("legal_hold");
+    });
+
+    test("snapshots no longer has legal_hold_active/legal_hold_reason/spec_title_at_snapshot", () => {
+      const columns = columnsOf("snapshots");
+      expect(columns).not.toContain("legal_hold_active");
+      expect(columns).not.toContain("legal_hold_reason");
+      expect(columns).not.toContain("spec_title_at_snapshot");
+    });
+
+    test("proposals no longer has submitted_by", () => {
+      expect(columnsOf("proposals")).not.toContain("submitted_by");
+    });
+
+    test("specs no longer has updated_at", () => {
+      expect(columnsOf("specs")).not.toContain("updated_at");
+    });
+
+    test("owner_aliases table no longer exists", () => {
+      const result = db
+        .query<{ name: string }, [string]>(
+          "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?"
+        )
+        .get("owner_aliases");
+      expect(result).toBeNull();
+    });
+  });
+
   describe("idempotency", () => {
     test("running runMigrations a second time applies nothing new and does not error", async () => {
       // Get state before second run
@@ -211,8 +271,8 @@ describe("Migration integration tests", () => {
         )
         .all();
 
-      expect(migrations).toHaveLength(7);
-      expect(migrations.map((m) => m.number)).toEqual([1, 2, 3, 4, 5, 6, 7]);
+      expect(migrations).toHaveLength(10);
+      expect(migrations.map((m) => m.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 
       // Verify schema is internally consistent — tables created by migration 1
       // are prerequisites for indexes in migration 3. If 1 had partially applied

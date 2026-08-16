@@ -22,7 +22,6 @@ export interface SpecDetailMetadata {
   tags: string[];
   targetRelease?: string;
   retentionPolicy?: { type: string; customDate?: string };
-  legalHold?: { active: boolean; reason?: string };
   approvers: string[];
   implementationRef?: string;
   reviewedAt?: string;
@@ -59,7 +58,6 @@ export interface MetadataPatch {
   tags?: string[];
   targetRelease?: string;
   retentionPolicy?: { type: string; customDate?: string };
-  legalHold?: { active: boolean; reason?: string };
   implementationRef?: string;
   reviewedAt?: string;
 }
@@ -120,9 +118,6 @@ function normalizeDetail(raw: unknown): SpecDetail | null {
   const retention = meta['retentionPolicy'] as
     | { type?: unknown; customDate?: unknown }
     | undefined;
-  const legal = meta['legalHold'] as
-    | { active?: unknown; reason?: unknown }
-    | undefined;
 
   const stage = str(spec['stage'], 'draft');
   const indexedAt = str(spec['indexed_at'] ?? spec['indexedAt']);
@@ -146,9 +141,6 @@ function normalizeDetail(raw: unknown): SpecDetail | null {
             type: str(retention.type, 'active_plus_2_years'),
             customDate: str(retention.customDate) || undefined,
           }
-        : undefined,
-      legalHold: legal
-        ? { active: legal.active === true, reason: str(legal.reason) || undefined }
         : undefined,
       approvers,
       implementationRef: str(meta['implementationRef']) || undefined,

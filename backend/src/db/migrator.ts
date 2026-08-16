@@ -14,6 +14,8 @@ import { migration as migration005 } from "./migrations/005-schema-improvements.
 import { migration as migration006 } from "./migrations/006-proposals-rationale-source.js";
 import { migration as migration007 } from "./migrations/007-lifecycle-stage-rename.js";
 import { migration as migration008 } from "./migrations/008-metadata-reviewed-at.js";
+import { migration as migration009 } from "./migrations/009-metadata-schema-completion.js";
+import { migration as migration010 } from "./migrations/010-drop-dead-columns.js";
 
 const migrations: Migration[] = [
   migration001,
@@ -24,6 +26,8 @@ const migrations: Migration[] = [
   migration006,
   migration007,
   migration008,
+  migration009,
+  migration010,
 ].sort((a, b) => a.number - b.number);
 
 export async function runMigrations(db: Database): Promise<void> {

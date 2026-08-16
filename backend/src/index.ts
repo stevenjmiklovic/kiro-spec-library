@@ -1,5 +1,5 @@
 // Backend entry point — server startup sequence (Task 12.1)
-import { mkdirSync } from "node:fs";
+import { mkdirSync, writeFileSync, chmodSync } from "node:fs";
 import { join } from "node:path";
 import { createDatabase } from "./db/connection.js";
 import { runMigrations } from "./db/migrator.js";
@@ -23,10 +23,17 @@ console.log("[startup] Kiro Spec Library backend starting...");
 // 1. Generate MCP token for inter-process auth
 const mcpToken = crypto.randomUUID();
 console.log(`[startup] MCP token generated: ${mcpToken.slice(0, 8)}...`);
+const enforceMcpAuth = process.env["MCP_AUTH_ENFORCE"] === "1";
 
 // 2. Ensure directories exist
 mkdirSync(dataDir, { recursive: true });
 mkdirSync(archiveDir, { recursive: true });
+
+// The MCP server runs as a separate OS process with no shared memory, so
+// the only way it can learn the real token is by reading it from disk.
+const mcpTokenPath = join(dataDir, "mcp-token");
+writeFileSync(mcpTokenPath, mcpToken, { mode: 0o600 });
+chmodSync(mcpTokenPath, 0o600);
 
 // 3. Open database connection (WAL mode, integrity check)
 console.log("[startup] Opening database...");
@@ -37,8 +44,8 @@ console.log("[startup] Running migrations...");
 runMigrations(db);
 
 // 5. Initialize services
-const scanner = new ScannerService(db, dataDir);
 const archiver = new ArchiverService(db, { archiveDir });
+const scanner = new ScannerService(db, dataDir, archiver);
 
 // 6. Readiness flag
 let isReady = false;
@@ -50,6 +57,8 @@ const app = createRouter({
   archiver,
   ready: () => isReady,
   dataDir,
+  mcpToken,
+  enforceMcpAuth,
 });
 
 const server = Bun.serve({

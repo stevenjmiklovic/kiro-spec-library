@@ -1,4 +1,5 @@
 import type { Database } from "bun:sqlite";
+import type { MetadataOverlay } from "@kiro-spec-library/shared";
 
 type Params = Record<string, string | number | bigint | boolean | null>;
 
@@ -11,8 +12,9 @@ export interface MetadataRow {
   tags: string | null;
   target_release: string | null;
   retention_policy: string | null;
-  legal_hold: string | null;
   reviewed_at: string | null;
+  approvers: string | null;
+  implementation_ref: string | null;
   revision: number;
   updated_at: string;
 }
@@ -101,6 +103,27 @@ export function upsertOverlay(
   })();
 
   return result;
+}
+
+/** Map a raw `metadata_overlays` row to the shape `resolveMetadata()` expects. */
+export function overlayRowToMetadataOverlay(overlay: MetadataRow): MetadataOverlay {
+  return {
+    specKey: overlay.spec_key,
+    title: overlay.title ?? undefined,
+    summary: overlay.summary ?? undefined,
+    owner: overlay.owner ?? undefined,
+    theme: overlay.theme ?? undefined,
+    tags: overlay.tags ? JSON.parse(overlay.tags) : undefined,
+    targetRelease: overlay.target_release ?? undefined,
+    retentionPolicy: overlay.retention_policy
+      ? JSON.parse(overlay.retention_policy)
+      : undefined,
+    approvers: overlay.approvers ? JSON.parse(overlay.approvers) : undefined,
+    implementationRef: overlay.implementation_ref ?? undefined,
+    reviewedAt: overlay.reviewed_at ?? undefined,
+    revision: overlay.revision,
+    updatedAt: overlay.updated_at,
+  };
 }
 
 export function deleteOverlay(db: Database, specKey: string): void {

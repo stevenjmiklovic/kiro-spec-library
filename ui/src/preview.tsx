@@ -21,7 +21,6 @@ const sampleSnapshots = [
     metadata_projection: JSON.stringify({ title: "Workspace semantic index", type: "quick", theme: "AI Foundations", owner: "Priya Shah", tags: ["search", "index"] }),
     provenance: JSON.stringify({ repository: "crew-platform", relativePath: ".kiro/specs/workspace-index", branch: "main", commitHash: "a1b2c3d4e5f6" }),
     retention_policy: JSON.stringify({ type: "active_plus_2_years" }),
-    legal_hold_active: 0,
   },
   {
     id: "snap-billing",
@@ -31,8 +30,7 @@ const sampleSnapshots = [
     metadata_projection: JSON.stringify({ title: "Billing export v3", type: "feature", theme: "Commerce", owner: "Lena Ortiz", tags: ["billing", "export"] }),
     provenance: JSON.stringify({ repository: "web-console", relativePath: ".kiro/specs/billing-export-v3", branch: "main", commitHash: "b2c3d4e5f600" }),
     retention_policy: JSON.stringify({ type: "permanent" }),
-    legal_hold_active: 1,
-    legal_hold_reason: "Under audit",
+    supersededBy: { specKey: "billing-export-v4", title: "Billing export v4" },
   },
   {
     id: "snap-oauth",
@@ -42,7 +40,6 @@ const sampleSnapshots = [
     metadata_projection: JSON.stringify({ title: "OAuth callback loop", type: "bugfix", theme: "Security", owner: "Theo Grant", tags: [] }),
     provenance: JSON.stringify({ repository: "identity-service", relativePath: ".kiro/specs/oauth-callback-loop", branch: "main", commitHash: "c3d4e5f60011" }),
     retention_policy: null,
-    legal_hold_active: 0,
   },
   {
     id: "snap-approval",
@@ -52,7 +49,6 @@ const sampleSnapshots = [
     metadata_projection: JSON.stringify({ title: "Agent tool approval audit", type: "feature", theme: "Governance", owner: "Maya Chen", tags: ["audit", "governance"] }),
     provenance: JSON.stringify({ repository: "crew-platform", relativePath: ".kiro/specs/agent-tool-approval-audit", branch: "main", commitHash: "d4e5f6001122" }),
     retention_policy: JSON.stringify({ type: "active_plus_2_years" }),
-    legal_hold_active: 0,
   },
 ];
 
@@ -145,7 +141,6 @@ const overrides: Partial<CrewIntegration> = {
           tags: ["kiro", s.type],
           targetRelease: "2026.09",
           retentionPolicy: { type: "active_plus_2_years" },
-          legalHold: { active: false },
           approvers: ["Maya Chen", "Daniel Kim"],
           implementationRef: "https://github.com/crew-platform/crew/pull/847",
           createdAt: "2026-07-12T09:15:00Z",
@@ -174,6 +169,45 @@ const overrides: Partial<CrewIntegration> = {
       // Archive listing.
       if (path.startsWith("/archive")) {
         return json({ snapshots: sampleSnapshots, nextCursor: null });
+      }
+      // Sources listing + manual rescan trigger.
+      if (path.startsWith("/settings/sources")) {
+        return json({ sources: [{ id: "local-1", type: "local", path: "/repos/crew-platform", addedAt: "2026-06-01T00:00:00Z" }] });
+      }
+      if (init?.method === "POST" && path.startsWith("/sync")) {
+        return json({ runId: crypto.randomUUID() }, 202);
+      }
+      // Audit log.
+      if (path.startsWith("/audit")) {
+        const params = new URLSearchParams(path.split("?")[1] ?? "");
+        const operationFilter = params.get("operation");
+        const events = [
+          {
+            id: "audit-1",
+            operation: "metadata_updated",
+            spec_key: "retention",
+            snapshot_id: null,
+            actor: "Maya Chen",
+            timestamp: "2026-08-15T09:12:00Z",
+          },
+          {
+            id: "audit-2",
+            operation: "suggestion_accepted",
+            spec_key: "retention",
+            snapshot_id: null,
+            actor: "system",
+            timestamp: "2026-08-14T16:40:00Z",
+          },
+          {
+            id: "audit-3",
+            operation: "snapshot_created",
+            spec_key: "workspace-index",
+            snapshot_id: "snap-workspace",
+            actor: "system",
+            timestamp: "2026-08-07T10:14:00Z",
+          },
+        ].filter((e) => !operationFilter || e.operation === operationFilter);
+        return json({ events, total: events.length });
       }
       // Spec listing.
       return json({ specs: sampleSpecs, total: sampleSpecs.length });
