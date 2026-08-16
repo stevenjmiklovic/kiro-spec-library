@@ -330,7 +330,12 @@ export function applyTextExportZip(db: Database, zipBytes: Uint8Array): ApplyTex
 
     // specs/<repo>/<specId>.json — the repo segment came from the export's
     // own sanitizeSegment(), so byPath (built the same way) is the exact match.
-    const repoSegment = path.split("/")[1] ?? "";
+    const pathParts = path.split("/");
+    if (pathParts.length < 3) {
+      result.errors.push(`${path}: invalid path format (expected specs/<repo>/<specId>.json)`);
+      continue;
+    }
+    const repoSegment = pathParts[1];
     const specRow = index.byPath.get(`${repoSegment}/${sanitizeSegment(sidecar.specId)}`);
 
     if (!specRow) {
