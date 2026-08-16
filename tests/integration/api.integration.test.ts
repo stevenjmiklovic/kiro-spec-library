@@ -87,6 +87,8 @@ beforeAll(async () => {
     archiver,
     ready: () => true,
     dataDir: tmpDir,
+    mcpToken: "test-mcp-token",
+    enforceMcpAuth: false,
   });
 
   // Mount sub-routes onto the same API_PREFIX'd app

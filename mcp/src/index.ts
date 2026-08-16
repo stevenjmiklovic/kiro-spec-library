@@ -1,4 +1,6 @@
 // MCP server entry point — Spec Librarian agent tools
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
@@ -10,10 +12,25 @@ import { searchSpecs, getSpecContext, submitMetadataProposal, listSources } from
 // ─── Configuration ───────────────────────────────────────────────────────────
 
 const BACKEND_PORT = Number(process.env["SPEC_LIBRARY_PORT"]) || 3100;
-const MCP_TOKEN = process.env["SPEC_LIBRARY_MCP_TOKEN"] || "";
+const DATA_DIR = process.env["SPEC_LIBRARY_DATA_DIR"] || join(process.cwd(), "data");
 const BACKEND_URL = `http://127.0.0.1:${BACKEND_PORT}`;
 
-const client = { baseUrl: BACKEND_URL, token: MCP_TOKEN };
+/**
+ * The backend and this MCP server are spawned as separate OS processes with
+ * no shared memory, so the token an env var doesn't cover falls back to the
+ * file the backend writes at startup (see backend/src/index.ts).
+ */
+function resolveMcpToken(): string {
+  const fromEnv = process.env["SPEC_LIBRARY_MCP_TOKEN"];
+  if (fromEnv) return fromEnv;
+  try {
+    return readFileSync(join(DATA_DIR, "mcp-token"), "utf-8").trim();
+  } catch {
+    return "";
+  }
+}
+
+const client = { baseUrl: BACKEND_URL, token: resolveMcpToken() };
 
 // ─── Server Setup ────────────────────────────────────────────────────────────
 

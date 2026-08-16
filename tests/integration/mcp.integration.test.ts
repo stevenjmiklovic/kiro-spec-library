@@ -27,14 +27,21 @@ import { API_PREFIX } from "../../shared/src/constants.js";
 let tmpDir: string;
 let db: Database;
 let app: ReturnType<typeof createRouter>;
+let enforcedApp: ReturnType<typeof createRouter>;
 const TEST_TOKEN = "test-mcp-token-abc123";
 const FAKE_BASE = "http://127.0.0.1:19999";
+const FAKE_BASE_ENFORCED = "http://127.0.0.1:19998";
 
 // Save the real fetch
 const realFetch = globalThis.fetch;
 
 function makeClient(token = TEST_TOKEN) {
   return { baseUrl: FAKE_BASE, token };
+}
+
+/** Client for the second app instance, built with enforceMcpAuth: true. */
+function makeEnforcedClient(token: string) {
+  return { baseUrl: FAKE_BASE_ENFORCED, token };
 }
 
 /**
@@ -138,10 +145,10 @@ function seedTestData(db: Database): void {
   const stmt = db.prepare(`
     INSERT INTO specs (key, source_id, spec_id, type, workflow, title, owner, stage, progress,
       repository, relative_path, branch, commit_hash, is_dirty, remote_url,
-      total_tasks, completed_tasks, content_digest, indexed_at)
+      total_tasks, completed_tasks, content_digest, indexed_at, updated_at)
     VALUES ($key, $source_id, $spec_id, $type, $workflow, $title, $owner, $stage, $progress,
       $repository, $relative_path, $branch, $commit_hash, $is_dirty, $remote_url,
-      $total_tasks, $completed_tasks, $content_digest, $indexed_at)
+      $total_tasks, $completed_tasks, $content_digest, $indexed_at, $indexed_at)
   `);
 
   for (const spec of specs) {
@@ -208,6 +215,8 @@ beforeAll(async () => {
     archiver: { createSnapshot: async () => ({}) } as any,
     ready: () => true,
     dataDir: tmpDir,
+    mcpToken: TEST_TOKEN,
+    enforceMcpAuth: false,
   });
 
   // Compose spec routes into the app
@@ -218,13 +227,42 @@ beforeAll(async () => {
   const proposalsPlugin = proposalRoutes({ db });
   app.use(proposalsPlugin);
 
-  // Patch global fetch to intercept requests to our fake base URL
+  // A second app instance, identical except enforceMcpAuth: true, for the
+  // Token Authentication (enforced) tests below.
+  enforcedApp = createRouter({
+    db,
+    scanner: { triggerScan: async () => {} } as any,
+    archiver: { createSnapshot: async () => ({}) } as any,
+    ready: () => true,
+    dataDir: tmpDir,
+    mcpToken: TEST_TOKEN,
+    enforceMcpAuth: true,
+  });
+  enforcedApp.use(specRoutes({ db }));
+  enforcedApp.use(proposalRoutes({ db }));
+
+  // mcp/src/tools.ts builds URLs against API_PREFIX — the *host platform's*
+  // routing prefix, rewritten down to the Elysia app's own "/api" mount
+  // before reaching it in real deployments (see api.integration.test.ts's
+  // buildUrl() for the same rewrite). Without this, every request 404s
+  // against Elysia's own routing and none of these tests exercise anything.
+  function rewriteToAppPath(path: string): string {
+    return path.startsWith(API_PREFIX) ? `/api${path.slice(API_PREFIX.length)}` : path;
+  }
+
+  // Patch global fetch to intercept requests to our fake base URLs
   globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = typeof input === "string" ? input : input instanceof URL ? input.href : (input as Request).url;
 
+    if (url.startsWith(FAKE_BASE_ENFORCED)) {
+      const path = rewriteToAppPath(url.slice(FAKE_BASE_ENFORCED.length));
+      const request = new Request(`http://localhost${path}`, init);
+      return enforcedApp.handle(request);
+    }
+
     if (url.startsWith(FAKE_BASE)) {
       // Route through Elysia app.handle()
-      const path = url.slice(FAKE_BASE.length);
+      const path = rewriteToAppPath(url.slice(FAKE_BASE.length));
       const request = new Request(`http://localhost${path}`, init);
       const response = await app.handle(request);
       return response;
@@ -579,5 +617,38 @@ describe("MCP Integration: Token Authentication", () => {
 
     expect(parsed.status).toBe("pending");
     expect(parsed.id).toBeDefined();
+  });
+});
+
+describe("MCP Integration: Token Authentication (enforced)", () => {
+  /**
+   * Exercises the same auth surface against a second app instance built with
+   * enforceMcpAuth: true (see router.ts's RouterDeps), which is how the
+   * default-off guard behaves once an operator opts in via MCP_AUTH_ENFORCE=1.
+   */
+
+  test("request WITHOUT a token is rejected", async () => {
+    await expect(
+      searchSpecs(makeEnforcedClient(""), { query: "" }),
+    ).rejects.toThrow("Search failed");
+  });
+
+  test("request with the WRONG token is rejected", async () => {
+    await expect(
+      searchSpecs(makeEnforcedClient("completely-wrong-token"), { query: "" }),
+    ).rejects.toThrow("Search failed");
+  });
+
+  test("request with the correct token succeeds", async () => {
+    const result = await searchSpecs(makeEnforcedClient(TEST_TOKEN), { query: "" });
+    const parsed = JSON.parse(result);
+
+    expect(parsed.specs).toBeDefined();
+    expect(parsed.specs.length).toBe(4);
+  });
+
+  test("/health is exempt from the token check", async () => {
+    const response = await fetch(`${FAKE_BASE_ENFORCED}${API_PREFIX}/health`);
+    expect(response.status).toBe(200);
   });
 });

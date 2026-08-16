@@ -28,6 +28,16 @@ export interface RouterDeps {
   ready: () => boolean;
   /** Application-owned storage root — needed by backup/restore for file-level DB swaps. */
   dataDir: string;
+  /** Shared secret the MCP process authenticates with via the X-MCP-Token header. */
+  mcpToken: string;
+  /**
+   * Whether to actually reject requests missing/mismatching X-MCP-Token.
+   * Defaults off: the UI and MCP currently share this port with no
+   * established way for the browser UI to obtain the token, so blanket
+   * enforcement would break it until that's addressed separately. Opt in
+   * via MCP_AUTH_ENFORCE=1.
+   */
+  enforceMcpAuth: boolean;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -62,7 +72,7 @@ function isValidationError(err: unknown): err is ValidationError {
 // ─── Factory ─────────────────────────────────────────────────────────────────
 
 export function createRouter(deps: RouterDeps) {
-  const { db, scanner, archiver, ready, dataDir } = deps;
+  const { db, scanner, archiver, ready, dataDir, mcpToken, enforceMcpAuth } = deps;
 
   const app = new Elysia({ prefix: "/api" })
     // Content-Disposition isn't in the CORS-safelisted response headers by
@@ -103,6 +113,22 @@ export function createRouter(deps: RouterDeps) {
         message: "An unexpected error occurred",
         requestId,
       } satisfies ErrorEnvelope;
+    })
+    // ─── MCP token auth ────────────────────────────────────────────────────
+    // Off by default (see RouterDeps.enforceMcpAuth) — the UI shares this
+    // port and has no established way to obtain the token yet.
+    .onBeforeHandle(({ request, path, set }) => {
+      if (!enforceMcpAuth || path.endsWith("/health")) return;
+
+      const provided = request.headers.get("x-mcp-token");
+      if (!provided || provided !== mcpToken) {
+        set.status = 401;
+        return {
+          code: "UNAUTHORIZED",
+          message: "Missing or invalid X-MCP-Token",
+          requestId: crypto.randomUUID(),
+        } satisfies ErrorEnvelope;
+      }
     })
     // ─── Health (Task 11.1) ────────────────────────────────────────────────
     .get("/health", ({ set }) => {
