@@ -2,7 +2,7 @@
   <img src="assets/kiro-icon/wordmark-horizontal.png" alt="Kiro Spec Library" width="200" />
 </p>
 
-<h1 align="center">Spec Library</h1>
+<h1 align="center">Spectral Library for Kiro Crew</h1> 
 
 <p align="center">
   <strong>Index, browse, and curate Kiro Specs across repositories with relationship mapping and AI-assisted metadata.</strong>
