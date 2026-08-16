@@ -788,6 +788,12 @@ button.archive-row:hover { background: #f5f3fb; }
 .chrome-icon-btn:hover {
   border-color: var(--canvas-accent, #9c75ff);
 }
+.chrome-icon-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+@keyframes chrome-icon-spin { to { transform: rotate(360deg); } }
+.chrome-icon-btn .is-spinning { animation: chrome-icon-spin 0.9s linear infinite; }
 
 /* Keyboard navigation hint */
 @keyframes keyboard-hint-fadeout {

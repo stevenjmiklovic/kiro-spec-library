@@ -39,7 +39,7 @@ A [Kiro Crew](https://kiro.dev/docs/crew/apps/) app that discovers `.kiro/specs/
 - **AI-powered suggestions** — TF-IDF cosine similarity, shared tags, markdown link detection, and repository proximity generate up to 5 relationship suggestions per spec.
 - **Spec Librarian agent** — restricted MCP agent that searches specs, retrieves context, and submits metadata proposals (never modifies accepted state directly).
 - **Full-text search** — FTS5 across titles, content, owners, themes, tags, and repositories with BM25 ranking.
-- **Metadata curation** — overlay priority (user > sidecar > artifact-derived), optimistic concurrency, completeness tracking, and portable `spec-library.json` import/export.
+- **Metadata curation** — overlay priority (user > sidecar > artifact-derived), optimistic concurrency, and completeness tracking.
 - **Keyboard accessible** — roving focus, arrow navigation, Enter selection, 3:1 contrast focus states, and non-color status indicators.
 
 ## Architecture
@@ -172,8 +172,6 @@ All endpoints live under `/apps/kiro-spec-library/api/v1`:
 | `POST /specs/:id/relationships` | Create typed relationship |
 | `GET /archive` | Cursor-paginated snapshots |
 | `POST /sync` | Trigger manual scan |
-| `GET /export` | Export sidecar JSON |
-| `POST /import/preview` | Preview import changes |
 
 See the [design document](.kiro/specs/spec-library-crew-app/design.md) for the full 21-endpoint specification.
 

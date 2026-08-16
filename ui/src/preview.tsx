@@ -141,7 +141,6 @@ const overrides: Partial<CrewIntegration> = {
           tags: ["kiro", s.type],
           targetRelease: "2026.09",
           retentionPolicy: { type: "active_plus_2_years" },
-          legalHold: { active: false },
           approvers: ["Maya Chen", "Daniel Kim"],
           implementationRef: "https://github.com/crew-platform/crew/pull/847",
           createdAt: "2026-07-12T09:15:00Z",
@@ -170,6 +169,13 @@ const overrides: Partial<CrewIntegration> = {
       // Archive listing.
       if (path.startsWith("/archive")) {
         return json({ snapshots: sampleSnapshots, nextCursor: null });
+      }
+      // Sources listing + manual rescan trigger.
+      if (path.startsWith("/settings/sources")) {
+        return json({ sources: [{ id: "local-1", type: "local", path: "/repos/crew-platform", addedAt: "2026-06-01T00:00:00Z" }] });
+      }
+      if (init?.method === "POST" && path.startsWith("/sync")) {
+        return json({ runId: crypto.randomUUID() }, 202);
       }
       // Audit log.
       if (path.startsWith("/audit")) {

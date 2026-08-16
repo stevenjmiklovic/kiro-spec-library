@@ -1709,6 +1709,21 @@ button.archive-row:hover {
   border-color: var(--canvas-accent, #9c75ff);
 }
 
+.chrome-icon-btn:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+@keyframes chrome-icon-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.chrome-icon-btn .is-spinning {
+  animation: chrome-icon-spin .9s linear infinite;
+}
+
 @keyframes keyboard-hint-fadeout {
   0%, 70% {
     opacity: .8;

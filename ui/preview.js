@@ -26145,8 +26145,16 @@ var __iconNode7 = [
   ]
 ];
 var Moon = createLucideIcon("moon", __iconNode7);
-// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/sun.mjs
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/refresh-cw.mjs
 var __iconNode8 = [
+  ["path", { d: "M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8", key: "v9h5vc" }],
+  ["path", { d: "M21 3v5h-5", key: "1q7to0" }],
+  ["path", { d: "M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16", key: "3uifl3" }],
+  ["path", { d: "M8 16H3v5", key: "1cv678" }]
+];
+var RefreshCw = createLucideIcon("refresh-cw", __iconNode8);
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/sun.mjs
+var __iconNode9 = [
   ["circle", { cx: "12", cy: "12", r: "4", key: "4exip2" }],
   ["path", { d: "M12 2v2", key: "tus03m" }],
   ["path", { d: "M12 20v2", key: "1lh1kg" }],
@@ -26157,22 +26165,22 @@ var __iconNode8 = [
   ["path", { d: "m6.34 17.66-1.41 1.41", key: "1m8zz5" }],
   ["path", { d: "m19.07 4.93-1.41 1.41", key: "1shlcs" }]
 ];
-var Sun = createLucideIcon("sun", __iconNode8);
+var Sun = createLucideIcon("sun", __iconNode9);
 // ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/target.mjs
-var __iconNode9 = [
+var __iconNode10 = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
   ["circle", { cx: "12", cy: "12", r: "6", key: "1vlfrh" }],
   ["circle", { cx: "12", cy: "12", r: "2", key: "1c9p78" }]
 ];
-var Target = createLucideIcon("target", __iconNode9);
+var Target = createLucideIcon("target", __iconNode10);
 // ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/x.mjs
-var __iconNode10 = [
+var __iconNode11 = [
   ["path", { d: "M18 6 6 18", key: "1bl5f8" }],
   ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
 ];
-var X = createLucideIcon("x", __iconNode10);
+var X = createLucideIcon("x", __iconNode11);
 // ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/zap.mjs
-var __iconNode11 = [
+var __iconNode12 = [
   [
     "path",
     {
@@ -26181,7 +26189,7 @@ var __iconNode11 = [
     }
   ]
 ];
-var Zap = createLucideIcon("zap", __iconNode11);
+var Zap = createLucideIcon("zap", __iconNode12);
 // src/components/NodeComponent.tsx
 var jsx_dev_runtime3 = __toESM(require_jsx_dev_runtime(), 1);
 var TYPE_GLYPHS = {
@@ -26636,7 +26644,6 @@ function normalizeDetail(raw) {
   const tags = Array.isArray(meta["tags"]) ? meta["tags"].filter((t) => typeof t === "string") : [];
   const approvers = Array.isArray(meta["approvers"]) ? meta["approvers"].filter((a) => typeof a === "string") : [];
   const retention = meta["retentionPolicy"];
-  const legal = meta["legalHold"];
   const stage = str(spec["stage"], "draft");
   const indexedAt = str(spec["indexed_at"] ?? spec["indexedAt"]);
   return {
@@ -26657,7 +26664,6 @@ function normalizeDetail(raw) {
         type: str(retention.type, "active_plus_2_years"),
         customDate: str(retention.customDate) || undefined
       } : undefined,
-      legalHold: legal ? { active: legal.active === true, reason: str(legal.reason) || undefined } : undefined,
       approvers,
       implementationRef: str(meta["implementationRef"]) || undefined,
       reviewedAt: str(meta["reviewedAt"]) || undefined
@@ -29614,14 +29620,37 @@ function AppChrome({
   onThemeChange
 }) {
   const nextTheme = themeMode === "dark" ? "light" : "dark";
+  const { api, notify } = useCrew();
   const [copyLabel, setCopyLabel] = import_react22.useState("Copy link");
   const [backupPanelOpen, setBackupPanelOpen] = import_react22.useState(false);
   const [aliasesPanelOpen, setAliasesPanelOpen] = import_react22.useState(false);
   const [auditLogPanelOpen, setAuditLogPanelOpen] = import_react22.useState(false);
+  const [rescanning, setRescanning] = import_react22.useState(false);
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
     setCopyLabel("Copied!");
     setTimeout(() => setCopyLabel("Copy link"), 1500);
+  };
+  const handleRescan = async () => {
+    setRescanning(true);
+    try {
+      const sourcesRes = await api.fetch("/settings/sources");
+      if (!sourcesRes.ok)
+        throw new Error(`Failed to load sources: ${sourcesRes.status}`);
+      const { sources } = await sourcesRes.json();
+      const syncRes = await api.fetch("/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sources })
+      });
+      if (!syncRes.ok)
+        throw new Error(`Rescan failed: ${syncRes.status}`);
+      notify.success("Rescan triggered.");
+    } catch (err) {
+      notify.error(err instanceof Error ? err.message : "Rescan failed.");
+    } finally {
+      setRescanning(false);
+    }
   };
   return /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("div", {
     className: "app-chrome",
@@ -29692,6 +29721,22 @@ function AppChrome({
                 "aria-hidden": "true"
               }, undefined, false, undefined, this),
               "Audit"
+            ]
+          }, undefined, true, undefined, this),
+          /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("button", {
+            type: "button",
+            className: "chrome-icon-btn",
+            onClick: handleRescan,
+            disabled: rescanning,
+            "aria-label": "Rescan sources now",
+            title: "Rescan sources now",
+            children: [
+              /* @__PURE__ */ jsx_dev_runtime16.jsxDEV(RefreshCw, {
+                size: 14,
+                "aria-hidden": "true",
+                className: rescanning ? "is-spinning" : undefined
+              }, undefined, false, undefined, this),
+              rescanning ? "Rescanning…" : "Rescan"
             ]
           }, undefined, true, undefined, this),
           /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("button", {
@@ -29927,7 +29972,6 @@ var overrides = {
           tags: ["kiro", s.type],
           targetRelease: "2026.09",
           retentionPolicy: { type: "active_plus_2_years" },
-          legalHold: { active: false },
           approvers: ["Maya Chen", "Daniel Kim"],
           implementationRef: "https://github.com/crew-platform/crew/pull/847",
           createdAt: "2026-07-12T09:15:00Z",
@@ -29955,6 +29999,12 @@ var overrides = {
       }
       if (path.startsWith("/archive")) {
         return json({ snapshots: sampleSnapshots, nextCursor: null });
+      }
+      if (path.startsWith("/settings/sources")) {
+        return json({ sources: [{ id: "local-1", type: "local", path: "/repos/crew-platform", addedAt: "2026-06-01T00:00:00Z" }] });
+      }
+      if (init2?.method === "POST" && path.startsWith("/sync")) {
+        return json({ runId: crypto.randomUUID() }, 202);
       }
       if (path.startsWith("/audit")) {
         const params = new URLSearchParams(path.split("?")[1] ?? "");

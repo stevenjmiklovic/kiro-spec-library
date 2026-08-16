@@ -15,7 +15,6 @@ import { archiveRoutes } from "./routes/archive.js";
 import { relationshipRoutes } from "./routes/relationships.js";
 import { proposalRoutes } from "./routes/proposals.js";
 import { auditRoutes } from "./routes/audit.js";
-import { importExportRoutes } from "./routes/import-export.js";
 import { backupRoutes } from "./routes/backup.js";
 import { textExportRoutes } from "./routes/text-export.js";
 
@@ -222,7 +221,6 @@ export function createRouter(deps: RouterDeps) {
     .use(relationshipRoutes({ db }))
     .use(proposalRoutes({ db }))
     .use(auditRoutes({ db }))
-    .use(importExportRoutes({ db }))
     .use(backupRoutes({ db, dataDir }))
     .use(textExportRoutes({ db }));
 

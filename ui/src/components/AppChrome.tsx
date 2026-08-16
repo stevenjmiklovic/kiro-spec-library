@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { DatabaseBackup, History, Link, Moon, Sun, UserCircle } from 'lucide-react';
+import { DatabaseBackup, History, Link, Moon, RefreshCw, Sun, UserCircle } from 'lucide-react';
 import type { ThemeMode, ViewMode } from '../hooks/useUrlState.js';
+import { useCrew } from '../hooks/useCrewIntegration.js';
 import { BackupPanel } from './BackupPanel.js';
 import { AliasesPanel } from './AliasesPanel.js';
 import { AuditLogPanel } from './AuditLogPanel.js';
@@ -23,15 +24,38 @@ export function AppChrome({
   onThemeChange,
 }: Props): React.ReactElement {
   const nextTheme: ThemeMode = themeMode === 'dark' ? 'light' : 'dark';
+  const { api, notify } = useCrew();
   const [copyLabel, setCopyLabel] = useState('Copy link');
   const [backupPanelOpen, setBackupPanelOpen] = useState(false);
   const [aliasesPanelOpen, setAliasesPanelOpen] = useState(false);
   const [auditLogPanelOpen, setAuditLogPanelOpen] = useState(false);
+  const [rescanning, setRescanning] = useState(false);
 
   const handleCopyLink = (): void => {
     navigator.clipboard.writeText(window.location.href);
     setCopyLabel('Copied!');
     setTimeout(() => setCopyLabel('Copy link'), 1500);
+  };
+
+  const handleRescan = async (): Promise<void> => {
+    setRescanning(true);
+    try {
+      const sourcesRes = await api.fetch('/settings/sources');
+      if (!sourcesRes.ok) throw new Error(`Failed to load sources: ${sourcesRes.status}`);
+      const { sources } = (await sourcesRes.json()) as { sources: unknown[] };
+
+      const syncRes = await api.fetch('/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sources }),
+      });
+      if (!syncRes.ok) throw new Error(`Rescan failed: ${syncRes.status}`);
+      notify.success('Rescan triggered.');
+    } catch (err) {
+      notify.error(err instanceof Error ? err.message : 'Rescan failed.');
+    } finally {
+      setRescanning(false);
+    }
   };
 
   return (
@@ -93,6 +117,18 @@ export function AppChrome({
         >
           <History size={14} aria-hidden="true" />
           Audit
+        </button>
+
+        <button
+          type="button"
+          className="chrome-icon-btn"
+          onClick={handleRescan}
+          disabled={rescanning}
+          aria-label="Rescan sources now"
+          title="Rescan sources now"
+        >
+          <RefreshCw size={14} aria-hidden="true" className={rescanning ? 'is-spinning' : undefined} />
+          {rescanning ? 'Rescanning…' : 'Rescan'}
         </button>
 
         <button
