@@ -30,7 +30,7 @@ var __toESM = (mod, isNodeMode, target) => {
 };
 var __commonJS = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
 
-// node_modules/.bun/scheduler@0.26.0/node_modules/scheduler/cjs/scheduler.development.js
+// ../node_modules/.bun/scheduler@0.26.0/node_modules/scheduler/cjs/scheduler.development.js
 var require_scheduler_development = __commonJS((exports) => {
   (function() {
     function performWorkUntilDeadline() {
@@ -285,7 +285,7 @@ var require_scheduler_development = __commonJS((exports) => {
   })();
 });
 
-// node_modules/.bun/scheduler@0.26.0/node_modules/scheduler/index.js
+// ../node_modules/.bun/scheduler@0.26.0/node_modules/scheduler/index.js
 var require_scheduler = __commonJS((exports, module) => {
   var scheduler_development = __toESM(require_scheduler_development());
   if (false) {} else {
@@ -293,7 +293,7 @@ var require_scheduler = __commonJS((exports, module) => {
   }
 });
 
-// node_modules/.bun/react@19.1.0/node_modules/react/cjs/react.development.js
+// ../node_modules/.bun/react@19.1.0/node_modules/react/cjs/react.development.js
 var require_react_development = __commonJS((exports, module) => {
   (function() {
     function defineDeprecationWarning(methodName, info) {
@@ -1080,7 +1080,7 @@ See https://react.dev/link/invalid-hook-call for tips about how to debug and fix
   })();
 });
 
-// node_modules/.bun/react@19.1.0/node_modules/react/index.js
+// ../node_modules/.bun/react@19.1.0/node_modules/react/index.js
 var require_react = __commonJS((exports, module) => {
   var react_development = __toESM(require_react_development());
   if (false) {} else {
@@ -1088,7 +1088,7 @@ var require_react = __commonJS((exports, module) => {
   }
 });
 
-// node_modules/.bun/react-dom@19.1.0+4bcfe187168658ad/node_modules/react-dom/cjs/react-dom.development.js
+// ../node_modules/.bun/react-dom@19.1.0+4bcfe187168658ad/node_modules/react-dom/cjs/react-dom.development.js
 var require_react_dom_development = __commonJS((exports) => {
   var React = __toESM(require_react());
   (function() {
@@ -1271,7 +1271,7 @@ See https://react.dev/link/invalid-hook-call for tips about how to debug and fix
   })();
 });
 
-// node_modules/.bun/react-dom@19.1.0+4bcfe187168658ad/node_modules/react-dom/index.js
+// ../node_modules/.bun/react-dom@19.1.0+4bcfe187168658ad/node_modules/react-dom/index.js
 var require_react_dom = __commonJS((exports, module) => {
   var react_dom_development = __toESM(require_react_dom_development());
   if (false) {} else {
@@ -1279,7 +1279,7 @@ var require_react_dom = __commonJS((exports, module) => {
   }
 });
 
-// node_modules/.bun/react-dom@19.1.0+4bcfe187168658ad/node_modules/react-dom/cjs/react-dom-client.development.js
+// ../node_modules/.bun/react-dom@19.1.0+4bcfe187168658ad/node_modules/react-dom/cjs/react-dom-client.development.js
 var require_react_dom_client_development = __commonJS((exports) => {
   var Scheduler = __toESM(require_scheduler());
   var React = __toESM(require_react());
@@ -15656,7 +15656,7 @@ You might need to use a local HTTP server (instead of file://): https://react.de
   })();
 });
 
-// node_modules/.bun/react-dom@19.1.0+4bcfe187168658ad/node_modules/react-dom/client.js
+// ../node_modules/.bun/react-dom@19.1.0+4bcfe187168658ad/node_modules/react-dom/client.js
 var require_client = __commonJS((exports, module) => {
   var react_dom_client_development = __toESM(require_react_dom_client_development());
   if (false) {} else {
@@ -15664,7 +15664,7 @@ var require_client = __commonJS((exports, module) => {
   }
 });
 
-// node_modules/.bun/react@19.1.0/node_modules/react/cjs/react-jsx-dev-runtime.development.js
+// ../node_modules/.bun/react@19.1.0/node_modules/react/cjs/react-jsx-dev-runtime.development.js
 var require_react_jsx_dev_runtime_development = __commonJS((exports) => {
   var React = __toESM(require_react());
   (function() {
@@ -15878,7 +15878,7 @@ React keys must be passed directly to JSX without using spread:
   })();
 });
 
-// node_modules/.bun/react@19.1.0/node_modules/react/jsx-dev-runtime.js
+// ../node_modules/.bun/react@19.1.0/node_modules/react/jsx-dev-runtime.js
 var require_jsx_dev_runtime = __commonJS((exports, module) => {
   var react_jsx_dev_runtime_development = __toESM(require_react_jsx_dev_runtime_development());
   if (false) {} else {
@@ -15886,7 +15886,7 @@ var require_jsx_dev_runtime = __commonJS((exports, module) => {
   }
 });
 
-// node_modules/.bun/react@19.1.0/node_modules/react/cjs/react-jsx-runtime.development.js
+// ../node_modules/.bun/react@19.1.0/node_modules/react/cjs/react-jsx-runtime.development.js
 var require_react_jsx_runtime_development = __commonJS((exports) => {
   var React = __toESM(require_react());
   (function() {
@@ -16104,7 +16104,7 @@ React keys must be passed directly to JSX without using spread:
   })();
 });
 
-// node_modules/.bun/react@19.1.0/node_modules/react/jsx-runtime.js
+// ../node_modules/.bun/react@19.1.0/node_modules/react/jsx-runtime.js
 var require_jsx_runtime = __commonJS((exports, module) => {
   var react_jsx_runtime_development = __toESM(require_react_jsx_runtime_development());
   if (false) {} else {
@@ -16112,7 +16112,7 @@ var require_jsx_runtime = __commonJS((exports, module) => {
   }
 });
 
-// node_modules/.bun/use-sync-external-store@1.6.0+4bcfe187168658ad/node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.development.js
+// ../node_modules/.bun/use-sync-external-store@1.6.0+4bcfe187168658ad/node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.development.js
 var require_use_sync_external_store_shim_development = __commonJS((exports) => {
   var React = __toESM(require_react());
   (function() {
@@ -16126,7 +16126,7 @@ var require_use_sync_external_store_shim_development = __commonJS((exports) => {
         var cachedValue = getSnapshot2();
         objectIs(value, cachedValue) || (console.error("The result of getSnapshot should be cached to avoid an infinite loop"), didWarnUncachedGetSnapshot = true);
       }
-      cachedValue = useState4({
+      cachedValue = useState5({
         inst: { value, getSnapshot: getSnapshot2 }
       });
       var inst = cachedValue[0].inst, forceUpdate = cachedValue[1];
@@ -16135,7 +16135,7 @@ var require_use_sync_external_store_shim_development = __commonJS((exports) => {
         inst.getSnapshot = getSnapshot2;
         checkIfSnapshotChanged(inst) && forceUpdate({ inst });
       }, [subscribe2, value, getSnapshot2]);
-      useEffect4(function() {
+      useEffect5(function() {
         checkIfSnapshotChanged(inst) && forceUpdate({ inst });
         return subscribe2(function() {
           checkIfSnapshotChanged(inst) && forceUpdate({ inst });
@@ -16158,20 +16158,20 @@ var require_use_sync_external_store_shim_development = __commonJS((exports) => {
       return getSnapshot2();
     }
     typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function" && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-    var objectIs = typeof Object.is === "function" ? Object.is : is, useState4 = React.useState, useEffect4 = React.useEffect, useLayoutEffect2 = React.useLayoutEffect, useDebugValue2 = React.useDebugValue, didWarnOld18Alpha = false, didWarnUncachedGetSnapshot = false, shim = typeof window === "undefined" || typeof window.document === "undefined" || typeof window.document.createElement === "undefined" ? useSyncExternalStore$1 : useSyncExternalStore$2;
+    var objectIs = typeof Object.is === "function" ? Object.is : is, useState5 = React.useState, useEffect5 = React.useEffect, useLayoutEffect2 = React.useLayoutEffect, useDebugValue2 = React.useDebugValue, didWarnOld18Alpha = false, didWarnUncachedGetSnapshot = false, shim = typeof window === "undefined" || typeof window.document === "undefined" || typeof window.document.createElement === "undefined" ? useSyncExternalStore$1 : useSyncExternalStore$2;
     exports.useSyncExternalStore = React.useSyncExternalStore !== undefined ? React.useSyncExternalStore : shim;
     typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop === "function" && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(Error());
   })();
 });
 
-// node_modules/.bun/use-sync-external-store@1.6.0+4bcfe187168658ad/node_modules/use-sync-external-store/shim/index.js
+// ../node_modules/.bun/use-sync-external-store@1.6.0+4bcfe187168658ad/node_modules/use-sync-external-store/shim/index.js
 var require_shim = __commonJS((exports, module) => {
   if (false) {} else {
     module.exports = require_use_sync_external_store_shim_development();
   }
 });
 
-// node_modules/.bun/use-sync-external-store@1.6.0+4bcfe187168658ad/node_modules/use-sync-external-store/cjs/use-sync-external-store-shim/with-selector.development.js
+// ../node_modules/.bun/use-sync-external-store@1.6.0+4bcfe187168658ad/node_modules/use-sync-external-store/cjs/use-sync-external-store-shim/with-selector.development.js
 var require_with_selector_development = __commonJS((exports) => {
   var React = __toESM(require_react());
   (function() {
@@ -16179,7 +16179,7 @@ var require_with_selector_development = __commonJS((exports) => {
       return x === y && (x !== 0 || 1 / x === 1 / y) || x !== x && y !== y;
     }
     typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function" && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-    var shim = require_shim(), objectIs = typeof Object.is === "function" ? Object.is : is, useSyncExternalStore2 = shim.useSyncExternalStore, useRef3 = React.useRef, useEffect4 = React.useEffect, useMemo4 = React.useMemo, useDebugValue2 = React.useDebugValue;
+    var shim = require_shim(), objectIs = typeof Object.is === "function" ? Object.is : is, useSyncExternalStore = shim.useSyncExternalStore, useRef3 = React.useRef, useEffect5 = React.useEffect, useMemo4 = React.useMemo, useDebugValue2 = React.useDebugValue;
     exports.useSyncExternalStoreWithSelector = function(subscribe2, getSnapshot2, getServerSnapshot, selector, isEqual) {
       var instRef = useRef3(null);
       if (instRef.current === null) {
@@ -16219,8 +16219,8 @@ var require_with_selector_development = __commonJS((exports) => {
           }
         ];
       }, [getSnapshot2, getServerSnapshot, selector, isEqual]);
-      var value = useSyncExternalStore2(subscribe2, instRef[0], instRef[1]);
-      useEffect4(function() {
+      var value = useSyncExternalStore(subscribe2, instRef[0], instRef[1]);
+      useEffect5(function() {
         inst.hasValue = true;
         inst.value = value;
       }, [value]);
@@ -16231,20 +16231,17 @@ var require_with_selector_development = __commonJS((exports) => {
   })();
 });
 
-// node_modules/.bun/use-sync-external-store@1.6.0+4bcfe187168658ad/node_modules/use-sync-external-store/shim/with-selector.js
+// ../node_modules/.bun/use-sync-external-store@1.6.0+4bcfe187168658ad/node_modules/use-sync-external-store/shim/with-selector.js
 var require_with_selector = __commonJS((exports, module) => {
   if (false) {} else {
     module.exports = require_with_selector_development();
   }
 });
 
-// ui/src/preview.tsx
+// src/preview.tsx
 var import_client = __toESM(require_client(), 1);
 
-// ui/src/App.tsx
-var import_react17 = __toESM(require_react(), 1);
-
-// ui/src/hooks/useCrewIntegration.tsx
+// src/hooks/useCrewIntegration.tsx
 var import_react = __toESM(require_react(), 1);
 var jsx_dev_runtime = __toESM(require_jsx_dev_runtime(), 1);
 var mockTheme = {
@@ -16259,11 +16256,8 @@ var mockTheme = {
 };
 var mockApi = {
   async fetch(path, init) {
-    console.warn(`[CrewIntegration/mock] fetch ${init?.method ?? "GET"} ${path}`);
-    return new Response(JSON.stringify({ mock: true }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" }
-    });
+    const baseUrl = `http://127.0.0.1:9150/api`;
+    return globalThis.fetch(`${baseUrl}${path}`, init);
   }
 };
 var mockNotify = {
@@ -16274,17 +16268,22 @@ var mockNotify = {
 var mockNavigate = (path) => {
   console.warn(`[CrewIntegration/mock] navigate → ${path}`);
 };
-var mockChatLauncher = {
-  open: (ctx) => {
-    console.warn(`[CrewIntegration/mock] chatLauncher.open`, ctx);
-  }
-};
+function buildChatLauncher(navigate) {
+  return {
+    open: (ctx) => {
+      const prompt = ctx?.prompt ?? `Discuss spec ${ctx?.specId ?? "unknown"}`;
+      const encoded = encodeURIComponent(prompt);
+      const agentParam = ctx?.agent ? `&agent=${encodeURIComponent(ctx.agent)}` : "";
+      navigate(`/chat?prompt=${encoded}${agentParam}`);
+    }
+  };
+}
 var defaultIntegration = {
   theme: mockTheme,
   api: mockApi,
   notify: mockNotify,
   navigate: mockNavigate,
-  chatLauncher: mockChatLauncher,
+  chatLauncher: buildChatLauncher(mockNavigate),
   ready: true,
   error: undefined
 };
@@ -16299,7 +16298,7 @@ function resolveCrewSdk() {
     const api = crewSdk.useApi?.() ?? mockApi;
     const notify = crewSdk.useNotify?.() ?? mockNotify;
     const navigate = crewSdk.useNavigate?.() ?? mockNavigate;
-    const chatLauncher = crewSdk.useChatLauncher?.() ?? mockChatLauncher;
+    const chatLauncher = crewSdk.useChatLauncher?.() ?? buildChatLauncher(navigate);
     return { theme, api, notify, navigate, chatLauncher, ready: true };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
@@ -16317,7 +16316,7 @@ function CrewProvider({ children, overrides }) {
     const merged = overrides ? { ...resolved, ...overrides } : resolved;
     setIntegration(merged);
   }, [overrides]);
-  return /* @__PURE__ */ jsx_dev_runtime.jsxDEV(CrewContext, {
+  return /* @__PURE__ */ jsx_dev_runtime.jsxDEV(CrewContext.Provider, {
     value: integration,
     children
   }, undefined, false, undefined, this);
@@ -16329,13 +16328,14 @@ function useCrewApi() {
   return import_react.useContext(CrewContext).api;
 }
 
-// ui/src/hooks/useUrlState.ts
+// src/hooks/useUrlState.ts
 var import_react2 = __toESM(require_react(), 1);
 var VIEW_PARAM = "view";
 var MODE_PARAM = "mode";
 var SELECTED_PARAM = "selected";
 var REVISION_PARAM = "revision";
 var QUERY_PARAM = "q";
+var Y_AXIS_PARAM = "yAxis";
 var FILTER_PARAMS = [
   "type",
   "stage",
@@ -16360,6 +16360,8 @@ function parseUrl() {
   const selected = params.get(SELECTED_PARAM) ?? undefined;
   const revision = params.get(REVISION_PARAM) ?? undefined;
   const query = params.get(QUERY_PARAM) ?? undefined;
+  const yAxisRaw = params.get(Y_AXIS_PARAM);
+  const yAxis = yAxisRaw === "owner" || yAxisRaw === "repository" || yAxisRaw === "type" || yAxisRaw === "theme" ? yAxisRaw : "owner";
   const filters = {};
   for (const key of FILTER_PARAMS) {
     const urlKey = key === "repository" ? REPO_URL_PARAM : key;
@@ -16368,7 +16370,7 @@ function parseUrl() {
       filters[key] = val;
     }
   }
-  return { view, themeMode, selected, revision, query, filters };
+  return { view, themeMode, yAxis, selected, revision, query, filters };
 }
 function serializeToUrl(state) {
   const params = new URLSearchParams;
@@ -16377,6 +16379,9 @@ function serializeToUrl(state) {
   }
   if (state.themeMode === "light") {
     params.set(MODE_PARAM, "light");
+  }
+  if (state.yAxis && state.yAxis !== "owner") {
+    params.set(Y_AXIS_PARAM, state.yAxis);
   }
   if (state.selected)
     params.set(SELECTED_PARAM, state.selected);
@@ -16419,12 +16424,16 @@ if (typeof window !== "undefined") {
   });
 }
 function useUrlState() {
-  const state = import_react2.useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  const [state, setState] = import_react2.useState(getSnapshot);
+  import_react2.useEffect(() => {
+    return subscribe(() => setState(getSnapshot()));
+  }, []);
   const update = import_react2.useCallback((patch) => {
     const prev = getSnapshot();
     const next = {
       view: patch.view ?? prev.view,
       themeMode: patch.themeMode ?? prev.themeMode,
+      yAxis: patch.yAxis ?? prev.yAxis,
       selected: "selected" in patch ? patch.selected : prev.selected,
       revision: "revision" in patch ? patch.revision : prev.revision,
       query: "query" in patch ? patch.query : prev.query,
@@ -16436,10 +16445,10 @@ function useUrlState() {
   return import_react2.useMemo(() => [state, update], [state, update]);
 }
 
-// ui/src/views/RelationshipView.tsx
-var import_react14 = __toESM(require_react(), 1);
+// src/views/RelationshipView.tsx
+var import_react17 = __toESM(require_react(), 1);
 
-// ui/src/hooks/useSpecData.ts
+// src/hooks/useSpecData.ts
 var import_react3 = __toESM(require_react(), 1);
 var DEBOUNCE_MS = 500;
 var MIN_QUERY_LENGTH = 2;
@@ -16581,10 +16590,10 @@ function useArchiveData(options = {}) {
   return { snapshots, nextCursor, loadMore, loading, error };
 }
 
-// ui/src/components/FilterBar.tsx
+// src/components/FilterBar.tsx
 var jsx_dev_runtime2 = __toESM(require_jsx_dev_runtime(), 1);
 var TYPES = ["spec", "design", "adr", "runbook", "reference"];
-var STAGES = ["draft", "review", "approved", "deprecated"];
+var STAGES = ["new", "scoped", "refined", "in-flight", "done"];
 var DEFAULT_FILTERS = { scope: "team" };
 function isNonDefault(filters) {
   if (filters.scope !== "team")
@@ -16934,11 +16943,11 @@ function FilterBar({ filters, options, onChange, resultCount }) {
   }, undefined, true, undefined, this);
 }
 
-// node_modules/.bun/@xyflow+react@12.11.3+8468e999e7891f1b/node_modules/@xyflow/react/dist/esm/index.js
+// ../node_modules/.bun/@xyflow+react@12.11.3+8468e999e7891f1b/node_modules/@xyflow/react/dist/esm/index.js
 var import_jsx_runtime = __toESM(require_jsx_runtime(), 1);
 var import_react5 = __toESM(require_react(), 1);
 
-// node_modules/.bun/classcat@5.0.5/node_modules/classcat/index.js
+// ../node_modules/.bun/classcat@5.0.5/node_modules/classcat/index.js
 function cc(names) {
   if (typeof names === "string" || typeof names === "number")
     return "" + names;
@@ -16958,7 +16967,7 @@ function cc(names) {
   return out;
 }
 
-// node_modules/.bun/d3-dispatch@3.0.1/node_modules/d3-dispatch/src/dispatch.js
+// ../node_modules/.bun/d3-dispatch@3.0.1/node_modules/d3-dispatch/src/dispatch.js
 var noop = { value: () => {} };
 function dispatch() {
   for (var i = 0, n = arguments.length, _ = {}, t;i < n; ++i) {
@@ -17043,7 +17052,7 @@ function set(type, name, callback) {
   return type;
 }
 var dispatch_default = dispatch;
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/matcher.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/matcher.js
 function matcher_default(selector) {
   return function() {
     return this.matches(selector);
@@ -17054,7 +17063,7 @@ function childMatcher(selector) {
     return node.matches(selector);
   };
 }
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/namespaces.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/namespaces.js
 var xhtml = "http://www.w3.org/1999/xhtml";
 var namespaces_default = {
   svg: "http://www.w3.org/2000/svg",
@@ -17064,14 +17073,14 @@ var namespaces_default = {
   xmlns: "http://www.w3.org/2000/xmlns/"
 };
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/namespace.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/namespace.js
 function namespace_default(name) {
   var prefix = name += "", i = prefix.indexOf(":");
   if (i >= 0 && (prefix = name.slice(0, i)) !== "xmlns")
     name = name.slice(i + 1);
   return namespaces_default.hasOwnProperty(prefix) ? { space: namespaces_default[prefix], local: name } : name;
 }
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/sourceEvent.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/sourceEvent.js
 function sourceEvent_default(event) {
   let sourceEvent;
   while (sourceEvent = event.sourceEvent)
@@ -17079,7 +17088,7 @@ function sourceEvent_default(event) {
   return event;
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/pointer.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/pointer.js
 function pointer_default(event, node) {
   event = sourceEvent_default(event);
   if (node === undefined)
@@ -17099,7 +17108,7 @@ function pointer_default(event, node) {
   }
   return [event.pageX, event.pageY];
 }
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selector.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selector.js
 function none() {}
 function selector_default(selector) {
   return selector == null ? none : function() {
@@ -17107,7 +17116,7 @@ function selector_default(selector) {
   };
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/select.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/select.js
 function select_default(select) {
   if (typeof select !== "function")
     select = selector_default(select);
@@ -17123,12 +17132,12 @@ function select_default(select) {
   return new Selection(subgroups, this._parents);
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/array.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/array.js
 function array(x) {
   return x == null ? [] : Array.isArray(x) ? x : Array.from(x);
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selectorAll.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selectorAll.js
 function empty() {
   return [];
 }
@@ -17138,7 +17147,7 @@ function selectorAll_default(selector) {
   };
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/selectAll.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/selectAll.js
 function arrayAll(select) {
   return function() {
     return array(select.apply(this, arguments));
@@ -17160,7 +17169,7 @@ function selectAll_default(select) {
   return new Selection(subgroups, parents);
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/selectChild.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/selectChild.js
 var find = Array.prototype.find;
 function childFind(match) {
   return function() {
@@ -17174,7 +17183,7 @@ function selectChild_default(match) {
   return this.select(match == null ? childFirst : childFind(typeof match === "function" ? match : childMatcher(match)));
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/selectChildren.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/selectChildren.js
 var filter = Array.prototype.filter;
 function children() {
   return Array.from(this.children);
@@ -17188,7 +17197,7 @@ function selectChildren_default(match) {
   return this.selectAll(match == null ? children : childrenFilter(typeof match === "function" ? match : childMatcher(match)));
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/filter.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/filter.js
 function filter_default(match) {
   if (typeof match !== "function")
     match = matcher_default(match);
@@ -17202,12 +17211,12 @@ function filter_default(match) {
   return new Selection(subgroups, this._parents);
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/sparse.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/sparse.js
 function sparse_default(update) {
   return new Array(update.length);
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/enter.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/enter.js
 function enter_default() {
   return new Selection(this._enter || this._groups.map(sparse_default), this._parents);
 }
@@ -17234,14 +17243,14 @@ EnterNode.prototype = {
   }
 };
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/constant.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/constant.js
 function constant_default(x) {
   return function() {
     return x;
   };
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/data.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/data.js
 function bindIndex(parent, group, enter, update, exit, data) {
   var i = 0, node, groupLength = group.length, dataLength = data.length;
   for (;i < dataLength; ++i) {
@@ -17317,12 +17326,12 @@ function arraylike(data) {
   return typeof data === "object" && "length" in data ? data : Array.from(data);
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/exit.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/exit.js
 function exit_default() {
   return new Selection(this._exit || this._groups.map(sparse_default), this._parents);
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/join.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/join.js
 function join_default(onenter, onupdate, onexit) {
   var enter = this.enter(), update = this, exit = this.exit();
   if (typeof onenter === "function") {
@@ -17344,7 +17353,7 @@ function join_default(onenter, onupdate, onexit) {
   return enter && update ? enter.merge(update).order() : update;
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/merge.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/merge.js
 function merge_default(context) {
   var selection = context.selection ? context.selection() : context;
   for (var groups0 = this._groups, groups1 = selection._groups, m0 = groups0.length, m1 = groups1.length, m = Math.min(m0, m1), merges = new Array(m0), j = 0;j < m; ++j) {
@@ -17360,7 +17369,7 @@ function merge_default(context) {
   return new Selection(merges, this._parents);
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/order.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/order.js
 function order_default() {
   for (var groups = this._groups, j = -1, m = groups.length;++j < m; ) {
     for (var group = groups[j], i = group.length - 1, next = group[i], node;--i >= 0; ) {
@@ -17374,7 +17383,7 @@ function order_default() {
   return this;
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/sort.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/sort.js
 function sort_default(compare) {
   if (!compare)
     compare = ascending;
@@ -17395,7 +17404,7 @@ function ascending(a, b) {
   return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/call.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/call.js
 function call_default() {
   var callback = arguments[0];
   arguments[0] = this;
@@ -17403,12 +17412,12 @@ function call_default() {
   return this;
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/nodes.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/nodes.js
 function nodes_default() {
   return Array.from(this);
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/node.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/node.js
 function node_default() {
   for (var groups = this._groups, j = 0, m = groups.length;j < m; ++j) {
     for (var group = groups[j], i = 0, n = group.length;i < n; ++i) {
@@ -17420,7 +17429,7 @@ function node_default() {
   return null;
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/size.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/size.js
 function size_default() {
   let size = 0;
   for (const node of this)
@@ -17428,12 +17437,12 @@ function size_default() {
   return size;
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/empty.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/empty.js
 function empty_default() {
   return !this.node();
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/each.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/each.js
 function each_default(callback) {
   for (var groups = this._groups, j = 0, m = groups.length;j < m; ++j) {
     for (var group = groups[j], i = 0, n = group.length, node;i < n; ++i) {
@@ -17444,7 +17453,7 @@ function each_default(callback) {
   return this;
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/attr.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/attr.js
 function attrRemove(name) {
   return function() {
     this.removeAttribute(name);
@@ -17492,12 +17501,12 @@ function attr_default(name, value) {
   return this.each((value == null ? fullname.local ? attrRemoveNS : attrRemove : typeof value === "function" ? fullname.local ? attrFunctionNS : attrFunction : fullname.local ? attrConstantNS : attrConstant)(fullname, value));
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/window.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/window.js
 function window_default(node) {
   return node.ownerDocument && node.ownerDocument.defaultView || node.document && node || node.defaultView;
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/style.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/style.js
 function styleRemove(name) {
   return function() {
     this.style.removeProperty(name);
@@ -17524,7 +17533,7 @@ function styleValue(node, name) {
   return node.style.getPropertyValue(name) || window_default(node).getComputedStyle(node, null).getPropertyValue(name);
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/property.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/property.js
 function propertyRemove(name) {
   return function() {
     delete this[name];
@@ -17548,7 +17557,7 @@ function property_default(name, value) {
   return arguments.length > 1 ? this.each((value == null ? propertyRemove : typeof value === "function" ? propertyFunction : propertyConstant)(name, value)) : this.node()[name];
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/classed.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/classed.js
 function classArray(string) {
   return string.trim().split(/^|\s+/);
 }
@@ -17615,7 +17624,7 @@ function classed_default(name, value) {
   return this.each((typeof value === "function" ? classedFunction : value ? classedTrue : classedFalse)(names, value));
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/text.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/text.js
 function textRemove() {
   this.textContent = "";
 }
@@ -17634,7 +17643,7 @@ function text_default(value) {
   return arguments.length ? this.each(value == null ? textRemove : (typeof value === "function" ? textFunction : textConstant)(value)) : this.node().textContent;
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/html.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/html.js
 function htmlRemove() {
   this.innerHTML = "";
 }
@@ -17653,7 +17662,7 @@ function html_default(value) {
   return arguments.length ? this.each(value == null ? htmlRemove : (typeof value === "function" ? htmlFunction : htmlConstant)(value)) : this.node().innerHTML;
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/raise.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/raise.js
 function raise() {
   if (this.nextSibling)
     this.parentNode.appendChild(this);
@@ -17662,7 +17671,7 @@ function raise_default() {
   return this.each(raise);
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/lower.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/lower.js
 function lower() {
   if (this.previousSibling)
     this.parentNode.insertBefore(this, this.parentNode.firstChild);
@@ -17671,7 +17680,7 @@ function lower_default() {
   return this.each(lower);
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/creator.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/creator.js
 function creatorInherit(name) {
   return function() {
     var document2 = this.ownerDocument, uri = this.namespaceURI;
@@ -17688,7 +17697,7 @@ function creator_default(name) {
   return (fullname.local ? creatorFixed : creatorInherit)(fullname);
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/append.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/append.js
 function append_default(name) {
   var create = typeof name === "function" ? name : creator_default(name);
   return this.select(function() {
@@ -17696,7 +17705,7 @@ function append_default(name) {
   });
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/insert.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/insert.js
 function constantNull() {
   return null;
 }
@@ -17707,7 +17716,7 @@ function insert_default(name, before) {
   });
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/remove.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/remove.js
 function remove() {
   var parent = this.parentNode;
   if (parent)
@@ -17717,7 +17726,7 @@ function remove_default() {
   return this.each(remove);
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/clone.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/clone.js
 function selection_cloneShallow() {
   var clone = this.cloneNode(false), parent = this.parentNode;
   return parent ? parent.insertBefore(clone, this.nextSibling) : clone;
@@ -17730,12 +17739,12 @@ function clone_default(deep) {
   return this.select(deep ? selection_cloneDeep : selection_cloneShallow);
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/datum.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/datum.js
 function datum_default(value) {
   return arguments.length ? this.property("__data__", value) : this.node().__data__;
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/on.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/on.js
 function contextListener(listener) {
   return function(event) {
     listener.call(this, event, this.__data__);
@@ -17807,7 +17816,7 @@ function on_default(typename, value, options) {
   return this;
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/dispatch.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/dispatch.js
 function dispatchEvent(node, type, params) {
   var window2 = window_default(node), event = window2.CustomEvent;
   if (typeof event === "function") {
@@ -17835,7 +17844,7 @@ function dispatch_default2(type, params) {
   return this.each((typeof params === "function" ? dispatchFunction : dispatchConstant)(type, params));
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/iterator.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/iterator.js
 function* iterator_default() {
   for (var groups = this._groups, j = 0, m = groups.length;j < m; ++j) {
     for (var group = groups[j], i = 0, n = group.length, node;i < n; ++i) {
@@ -17845,7 +17854,7 @@ function* iterator_default() {
   }
 }
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/index.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/selection/index.js
 var root = [null];
 function Selection(groups, parents) {
   this._groups = groups;
@@ -17897,11 +17906,11 @@ Selection.prototype = selection.prototype = {
 };
 var selection_default = selection;
 
-// node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/select.js
+// ../node_modules/.bun/d3-selection@3.0.0/node_modules/d3-selection/src/select.js
 function select_default2(selector) {
   return typeof selector === "string" ? new Selection([[document.querySelector(selector)]], [document.documentElement]) : new Selection([[selector]], root);
 }
-// node_modules/.bun/d3-drag@3.0.0/node_modules/d3-drag/src/noevent.js
+// ../node_modules/.bun/d3-drag@3.0.0/node_modules/d3-drag/src/noevent.js
 var nonpassive = { passive: false };
 var nonpassivecapture = { capture: true, passive: false };
 function nopropagation(event) {
@@ -17912,7 +17921,7 @@ function noevent_default(event) {
   event.stopImmediatePropagation();
 }
 
-// node_modules/.bun/d3-drag@3.0.0/node_modules/d3-drag/src/nodrag.js
+// ../node_modules/.bun/d3-drag@3.0.0/node_modules/d3-drag/src/nodrag.js
 function nodrag_default(view) {
   var root2 = view.document.documentElement, selection2 = select_default2(view).on("dragstart.drag", noevent_default, nonpassivecapture);
   if ("onselectstart" in root2) {
@@ -17938,10 +17947,10 @@ function yesdrag(view, noclick) {
   }
 }
 
-// node_modules/.bun/d3-drag@3.0.0/node_modules/d3-drag/src/constant.js
+// ../node_modules/.bun/d3-drag@3.0.0/node_modules/d3-drag/src/constant.js
 var constant_default2 = (x) => () => x;
 
-// node_modules/.bun/d3-drag@3.0.0/node_modules/d3-drag/src/event.js
+// ../node_modules/.bun/d3-drag@3.0.0/node_modules/d3-drag/src/event.js
 function DragEvent(type, {
   sourceEvent,
   subject,
@@ -17973,7 +17982,7 @@ DragEvent.prototype.on = function() {
   return value === this._ ? this : value;
 };
 
-// node_modules/.bun/d3-drag@3.0.0/node_modules/d3-drag/src/drag.js
+// ../node_modules/.bun/d3-drag@3.0.0/node_modules/d3-drag/src/drag.js
 function defaultFilter(event) {
   return !event.ctrlKey && !event.button;
 }
@@ -18116,7 +18125,7 @@ function drag_default() {
   };
   return drag;
 }
-// node_modules/.bun/d3-color@3.1.0/node_modules/d3-color/src/define.js
+// ../node_modules/.bun/d3-color@3.1.0/node_modules/d3-color/src/define.js
 function define_default(constructor, factory, prototype) {
   constructor.prototype = factory.prototype = prototype;
   prototype.constructor = constructor;
@@ -18128,7 +18137,7 @@ function extend(parent, definition) {
   return prototype;
 }
 
-// node_modules/.bun/d3-color@3.1.0/node_modules/d3-color/src/color.js
+// ../node_modules/.bun/d3-color@3.1.0/node_modules/d3-color/src/color.js
 function Color() {}
 var darker = 0.7;
 var brighter = 1 / darker;
@@ -18469,7 +18478,7 @@ function clampt(value) {
 function hsl2rgb(h, m1, m2) {
   return (h < 60 ? m1 + (m2 - m1) * h / 60 : h < 180 ? m2 : h < 240 ? m1 + (m2 - m1) * (240 - h) / 60 : m1) * 255;
 }
-// node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/basis.js
+// ../node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/basis.js
 function basis(t1, v0, v1, v2, v3) {
   var t2 = t1 * t1, t3 = t2 * t1;
   return ((1 - 3 * t1 + 3 * t2 - t3) * v0 + (4 - 6 * t2 + 3 * t3) * v1 + (1 + 3 * t1 + 3 * t2 - 3 * t3) * v2 + t3 * v3) / 6;
@@ -18482,7 +18491,7 @@ function basis_default(values) {
   };
 }
 
-// node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/basisClosed.js
+// ../node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/basisClosed.js
 function basisClosed_default(values) {
   var n = values.length;
   return function(t) {
@@ -18491,10 +18500,10 @@ function basisClosed_default(values) {
   };
 }
 
-// node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/constant.js
+// ../node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/constant.js
 var constant_default3 = (x) => () => x;
 
-// node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/color.js
+// ../node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/color.js
 function linear(a, d) {
   return function(t) {
     return a + t * d;
@@ -18515,7 +18524,7 @@ function nogamma(a, b) {
   return d ? linear(a, d) : constant_default3(isNaN(a) ? b : a);
 }
 
-// node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/rgb.js
+// ../node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/rgb.js
 var rgb_default = function rgbGamma(y) {
   var color2 = gamma(y);
   function rgb2(start, end) {
@@ -18555,7 +18564,7 @@ function rgbSpline(spline) {
 var rgbBasis = rgbSpline(basis_default);
 var rgbBasisClosed = rgbSpline(basisClosed_default);
 
-// node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/numberArray.js
+// ../node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/numberArray.js
 function numberArray_default(a, b) {
   if (!b)
     b = [];
@@ -18570,7 +18579,7 @@ function isNumberArray(x) {
   return ArrayBuffer.isView(x) && !(x instanceof DataView);
 }
 
-// node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/array.js
+// ../node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/array.js
 function genericArray(a, b) {
   var nb = b ? b.length : 0, na = a ? Math.min(nb, a.length) : 0, x = new Array(na), c = new Array(nb), i;
   for (i = 0;i < na; ++i)
@@ -18584,7 +18593,7 @@ function genericArray(a, b) {
   };
 }
 
-// node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/date.js
+// ../node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/date.js
 function date_default(a, b) {
   var d = new Date;
   return a = +a, b = +b, function(t) {
@@ -18592,14 +18601,14 @@ function date_default(a, b) {
   };
 }
 
-// node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/number.js
+// ../node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/number.js
 function number_default(a, b) {
   return a = +a, b = +b, function(t) {
     return a * (1 - t) + b * t;
   };
 }
 
-// node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/object.js
+// ../node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/object.js
 function object_default(a, b) {
   var i = {}, c = {}, k;
   if (a === null || typeof a !== "object")
@@ -18620,7 +18629,7 @@ function object_default(a, b) {
   };
 }
 
-// node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/string.js
+// ../node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/string.js
 var reA = /[-+]?(?:\d+\.?\d*|\.?\d+)(?:[eE][-+]?\d+)?/g;
 var reB = new RegExp(reA.source, "g");
 function zero(b) {
@@ -18669,12 +18678,12 @@ function string_default(a, b) {
   });
 }
 
-// node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/value.js
+// ../node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/value.js
 function value_default(a, b) {
   var t = typeof b, c;
   return b == null || t === "boolean" ? constant_default3(b) : (t === "number" ? number_default : t === "string" ? (c = color(b)) ? (b = c, rgb_default) : string_default : b instanceof color ? rgb_default : b instanceof Date ? date_default : isNumberArray(b) ? numberArray_default : Array.isArray(b) ? genericArray : typeof b.valueOf !== "function" && typeof b.toString !== "function" || isNaN(b) ? object_default : number_default)(a, b);
 }
-// node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/transform/decompose.js
+// ../node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/transform/decompose.js
 var degrees = 180 / Math.PI;
 var identity = {
   translateX: 0,
@@ -18704,7 +18713,7 @@ function decompose_default(a, b, c, d, e, f) {
   };
 }
 
-// node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/transform/parse.js
+// ../node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/transform/parse.js
 var svgNode;
 function parseCss(value) {
   const m = new (typeof DOMMatrix === "function" ? DOMMatrix : WebKitCSSMatrix)(value + "");
@@ -18722,7 +18731,7 @@ function parseSvg(value) {
   return decompose_default(value.a, value.b, value.c, value.d, value.e, value.f);
 }
 
-// node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/transform/index.js
+// ../node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/transform/index.js
 function interpolateTransform(parse, pxComma, pxParen, degParen) {
   function pop(s) {
     return s.length ? s.pop() + " " : "";
@@ -18779,7 +18788,7 @@ function interpolateTransform(parse, pxComma, pxParen, degParen) {
 }
 var interpolateTransformCss = interpolateTransform(parseCss, "px, ", "px)", "deg)");
 var interpolateTransformSvg = interpolateTransform(parseSvg, ", ", ")", ")");
-// node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/zoom.js
+// ../node_modules/.bun/d3-interpolate@3.0.1/node_modules/d3-interpolate/src/zoom.js
 var epsilon2 = 0.000000000001;
 function cosh(x) {
   return ((x = Math.exp(x)) + 1 / x) / 2;
@@ -18823,7 +18832,7 @@ var zoom_default = function zoomRho(rho, rho2, rho4) {
   };
   return zoom;
 }(Math.SQRT2, 2, 4);
-// node_modules/.bun/d3-timer@3.0.1/node_modules/d3-timer/src/timer.js
+// ../node_modules/.bun/d3-timer@3.0.1/node_modules/d3-timer/src/timer.js
 var frame = 0;
 var timeout = 0;
 var interval = 0;
@@ -18935,7 +18944,7 @@ function sleep(time) {
     frame = 1, setFrame(wake);
   }
 }
-// node_modules/.bun/d3-timer@3.0.1/node_modules/d3-timer/src/timeout.js
+// ../node_modules/.bun/d3-timer@3.0.1/node_modules/d3-timer/src/timeout.js
 function timeout_default(callback, delay, time) {
   var t = new Timer;
   delay = delay == null ? 0 : +delay;
@@ -18945,7 +18954,7 @@ function timeout_default(callback, delay, time) {
   }, delay, time);
   return t;
 }
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/schedule.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/schedule.js
 var emptyOn = dispatch_default("start", "end", "cancel", "interrupt");
 var emptyTween = [];
 var CREATED = 0;
@@ -19065,7 +19074,7 @@ function create(node, id, self) {
   }
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/interrupt.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/interrupt.js
 function interrupt_default(node, name) {
   var schedules = node.__transition, schedule, active, empty2 = true, i;
   if (!schedules)
@@ -19086,14 +19095,14 @@ function interrupt_default(node, name) {
     delete node.__transition;
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/selection/interrupt.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/selection/interrupt.js
 function interrupt_default2(name) {
   return this.each(function() {
     interrupt_default(this, name);
   });
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/tween.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/tween.js
 function tweenRemove(id, name) {
   var tween0, tween1;
   return function() {
@@ -19156,13 +19165,13 @@ function tweenValue(transition, name, value) {
   };
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/interpolate.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/interpolate.js
 function interpolate_default(a, b) {
   var c;
   return (typeof b === "number" ? number_default : b instanceof color ? rgb_default : (c = color(b)) ? (b = c, rgb_default) : string_default)(a, b);
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/attr.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/attr.js
 function attrRemove2(name) {
   return function() {
     this.removeAttribute(name);
@@ -19214,7 +19223,7 @@ function attr_default2(name, value) {
   return this.attrTween(name, typeof value === "function" ? (fullname.local ? attrFunctionNS2 : attrFunction2)(fullname, i, tweenValue(this, "attr." + name, value)) : value == null ? (fullname.local ? attrRemoveNS2 : attrRemove2)(fullname) : (fullname.local ? attrConstantNS2 : attrConstant2)(fullname, i, value));
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/attrTween.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/attrTween.js
 function attrInterpolate(name, i) {
   return function(t) {
     this.setAttribute(name, i.call(this, t));
@@ -19259,7 +19268,7 @@ function attrTween_default(name, value) {
   return this.tween(key, (fullname.local ? attrTweenNS : attrTween)(fullname, value));
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/delay.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/delay.js
 function delayFunction(id, value) {
   return function() {
     init(this, id).delay = +value.apply(this, arguments);
@@ -19275,7 +19284,7 @@ function delay_default(value) {
   return arguments.length ? this.each((typeof value === "function" ? delayFunction : delayConstant)(id, value)) : get2(this.node(), id).delay;
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/duration.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/duration.js
 function durationFunction(id, value) {
   return function() {
     set2(this, id).duration = +value.apply(this, arguments);
@@ -19291,7 +19300,7 @@ function duration_default(value) {
   return arguments.length ? this.each((typeof value === "function" ? durationFunction : durationConstant)(id, value)) : get2(this.node(), id).duration;
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/ease.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/ease.js
 function easeConstant(id, value) {
   if (typeof value !== "function")
     throw new Error;
@@ -19304,7 +19313,7 @@ function ease_default(value) {
   return arguments.length ? this.each(easeConstant(id, value)) : get2(this.node(), id).ease;
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/easeVarying.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/easeVarying.js
 function easeVarying(id, value) {
   return function() {
     var v = value.apply(this, arguments);
@@ -19319,7 +19328,7 @@ function easeVarying_default(value) {
   return this.each(easeVarying(this._id, value));
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/filter.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/filter.js
 function filter_default2(match) {
   if (typeof match !== "function")
     match = matcher_default(match);
@@ -19333,7 +19342,7 @@ function filter_default2(match) {
   return new Transition(subgroups, this._parents, this._name, this._id);
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/merge.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/merge.js
 function merge_default2(transition) {
   if (transition._id !== this._id)
     throw new Error;
@@ -19350,7 +19359,7 @@ function merge_default2(transition) {
   return new Transition(merges, this._parents, this._name, this._id);
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/on.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/on.js
 function start(name) {
   return (name + "").trim().split(/^|\s+/).every(function(t) {
     var i = t.indexOf(".");
@@ -19373,7 +19382,7 @@ function on_default2(name, listener) {
   return arguments.length < 2 ? get2(this.node(), id).on.on(name) : this.each(onFunction(id, name, listener));
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/remove.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/remove.js
 function removeFunction(id) {
   return function() {
     var parent = this.parentNode;
@@ -19388,7 +19397,7 @@ function remove_default2() {
   return this.on("end.remove", removeFunction(this._id));
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/select.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/select.js
 function select_default3(select) {
   var name = this._name, id = this._id;
   if (typeof select !== "function")
@@ -19406,7 +19415,7 @@ function select_default3(select) {
   return new Transition(subgroups, this._parents, name, id);
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/selectAll.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/selectAll.js
 function selectAll_default2(select) {
   var name = this._name, id = this._id;
   if (typeof select !== "function")
@@ -19427,13 +19436,13 @@ function selectAll_default2(select) {
   return new Transition(subgroups, parents, name, id);
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/selection.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/selection.js
 var Selection2 = selection_default.prototype.constructor;
 function selection_default2() {
   return new Selection2(this._groups, this._parents);
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/style.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/style.js
 function styleNull(name, interpolate) {
   var string00, string10, interpolate0;
   return function() {
@@ -19476,7 +19485,7 @@ function style_default2(name, value, priority) {
   return value == null ? this.styleTween(name, styleNull(name, i)).on("end.style." + name, styleRemove2(name)) : typeof value === "function" ? this.styleTween(name, styleFunction2(name, i, tweenValue(this, "style." + name, value))).each(styleMaybeRemove(this._id, name)) : this.styleTween(name, styleConstant2(name, i, value), priority).on("end.style." + name, null);
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/styleTween.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/styleTween.js
 function styleInterpolate(name, i, priority) {
   return function(t) {
     this.style.setProperty(name, i.call(this, t), priority);
@@ -19504,7 +19513,7 @@ function styleTween_default(name, value, priority) {
   return this.tween(key, styleTween(name, value, priority == null ? "" : priority));
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/text.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/text.js
 function textConstant2(value) {
   return function() {
     this.textContent = value;
@@ -19520,7 +19529,7 @@ function text_default2(value) {
   return this.tween("text", typeof value === "function" ? textFunction2(tweenValue(this, "text", value)) : textConstant2(value == null ? "" : value + ""));
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/textTween.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/textTween.js
 function textInterpolate(i) {
   return function(t) {
     this.textContent = i.call(this, t);
@@ -19548,7 +19557,7 @@ function textTween_default(value) {
   return this.tween(key, textTween(value));
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/transition.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/transition.js
 function transition_default() {
   var name = this._name, id0 = this._id, id1 = newId();
   for (var groups = this._groups, m = groups.length, j = 0;j < m; ++j) {
@@ -19567,7 +19576,7 @@ function transition_default() {
   return new Transition(groups, this._parents, name, id1);
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/end.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/end.js
 function end_default() {
   var on0, on1, that = this, id = that._id, size = that.size();
   return new Promise(function(resolve, reject) {
@@ -19590,7 +19599,7 @@ function end_default() {
   });
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/index.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/transition/index.js
 var id = 0;
 function Transition(groups, parents, name, id2) {
   this._groups = groups;
@@ -19637,11 +19646,11 @@ Transition.prototype = transition.prototype = {
   end: end_default,
   [Symbol.iterator]: selection_prototype[Symbol.iterator]
 };
-// node_modules/.bun/d3-ease@3.0.1/node_modules/d3-ease/src/cubic.js
+// ../node_modules/.bun/d3-ease@3.0.1/node_modules/d3-ease/src/cubic.js
 function cubicInOut(t) {
   return ((t *= 2) <= 1 ? t * t * t : (t -= 2) * t * t + 2) / 2;
 }
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/selection/transition.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/selection/transition.js
 var defaultTiming = {
   time: null,
   delay: 0,
@@ -19674,13 +19683,13 @@ function transition_default2(name) {
   return new Transition(groups, this._parents, name, id2);
 }
 
-// node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/selection/index.js
+// ../node_modules/.bun/d3-transition@3.0.1+ddb27bb92657a88b/node_modules/d3-transition/src/selection/index.js
 selection_default.prototype.interrupt = interrupt_default2;
 selection_default.prototype.transition = transition_default2;
-// node_modules/.bun/d3-zoom@3.0.0/node_modules/d3-zoom/src/constant.js
+// ../node_modules/.bun/d3-zoom@3.0.0/node_modules/d3-zoom/src/constant.js
 var constant_default4 = (x) => () => x;
 
-// node_modules/.bun/d3-zoom@3.0.0/node_modules/d3-zoom/src/event.js
+// ../node_modules/.bun/d3-zoom@3.0.0/node_modules/d3-zoom/src/event.js
 function ZoomEvent(type, {
   sourceEvent,
   target,
@@ -19696,7 +19705,7 @@ function ZoomEvent(type, {
   });
 }
 
-// node_modules/.bun/d3-zoom@3.0.0/node_modules/d3-zoom/src/transform.js
+// ../node_modules/.bun/d3-zoom@3.0.0/node_modules/d3-zoom/src/transform.js
 function Transform(k, x, y) {
   this.k = k;
   this.x = x;
@@ -19747,7 +19756,7 @@ function transform(node) {
   return node.__zoom;
 }
 
-// node_modules/.bun/d3-zoom@3.0.0/node_modules/d3-zoom/src/noevent.js
+// ../node_modules/.bun/d3-zoom@3.0.0/node_modules/d3-zoom/src/noevent.js
 function nopropagation2(event) {
   event.stopImmediatePropagation();
 }
@@ -19756,7 +19765,7 @@ function noevent_default2(event) {
   event.stopImmediatePropagation();
 }
 
-// node_modules/.bun/d3-zoom@3.0.0/node_modules/d3-zoom/src/zoom.js
+// ../node_modules/.bun/d3-zoom@3.0.0/node_modules/d3-zoom/src/zoom.js
 function defaultFilter2(event) {
   return (!event.ctrlKey || event.type === "wheel") && !event.button;
 }
@@ -20084,7 +20093,7 @@ function zoom_default2() {
   };
   return zoom;
 }
-// node_modules/.bun/@xyflow+system@0.0.80/node_modules/@xyflow/system/dist/esm/index.js
+// ../node_modules/.bun/@xyflow+system@0.0.80/node_modules/@xyflow/system/dist/esm/index.js
 var errorMessages = {
   error001: (lib = "react") => `Seems like you have not used ${lib === "svelte" ? "SvelteFlowProvider" : "ReactFlowProvider"} as an ancestor. Help: https://${lib}flow.dev/error#001`,
   error002: () => "It looks like you've created a new nodeTypes or edgeTypes object. If this wasn't on purpose please define the nodeTypes/edgeTypes outside of the component or memoize them.",
@@ -22692,11 +22701,11 @@ function XYResizer({ domNode, nodeId, getStoreItems, onChange, onEnd }) {
     destroy
   };
 }
-// node_modules/.bun/zustand@4.5.7+938b92ffa7d9e6d6/node_modules/zustand/esm/traditional.mjs
+// ../node_modules/.bun/zustand@4.5.7+938b92ffa7d9e6d6/node_modules/zustand/esm/traditional.mjs
 var import_react4 = __toESM(require_react(), 1);
 var import_with_selector = __toESM(require_with_selector(), 1);
 
-// node_modules/.bun/zustand@4.5.7+938b92ffa7d9e6d6/node_modules/zustand/esm/vanilla.mjs
+// ../node_modules/.bun/zustand@4.5.7+938b92ffa7d9e6d6/node_modules/zustand/esm/vanilla.mjs
 var createStoreImpl = (createState) => {
   let state;
   const listeners2 = /* @__PURE__ */ new Set;
@@ -22726,7 +22735,7 @@ var createStoreImpl = (createState) => {
 };
 var createStore = (createState) => createState ? createStoreImpl(createState) : createStoreImpl;
 
-// node_modules/.bun/zustand@4.5.7+938b92ffa7d9e6d6/node_modules/zustand/esm/traditional.mjs
+// ../node_modules/.bun/zustand@4.5.7+938b92ffa7d9e6d6/node_modules/zustand/esm/traditional.mjs
 var { useDebugValue } = import_react4.default;
 var { useSyncExternalStoreWithSelector } = import_with_selector.default;
 var identity3 = (arg) => arg;
@@ -22743,7 +22752,7 @@ var createWithEqualityFnImpl = (createState, defaultEqualityFn) => {
 };
 var createWithEqualityFn = (createState, defaultEqualityFn) => createState ? createWithEqualityFnImpl(createState, defaultEqualityFn) : createWithEqualityFnImpl;
 
-// node_modules/.bun/zustand@4.5.7+938b92ffa7d9e6d6/node_modules/zustand/esm/shallow.mjs
+// ../node_modules/.bun/zustand@4.5.7+938b92ffa7d9e6d6/node_modules/zustand/esm/shallow.mjs
 function shallow$1(objA, objB) {
   if (Object.is(objA, objB)) {
     return true;
@@ -22783,7 +22792,7 @@ function shallow$1(objA, objB) {
   return true;
 }
 
-// node_modules/.bun/@xyflow+react@12.11.3+8468e999e7891f1b/node_modules/@xyflow/react/dist/esm/index.js
+// ../node_modules/.bun/@xyflow+react@12.11.3+8468e999e7891f1b/node_modules/@xyflow/react/dist/esm/index.js
 var import_react_dom = __toESM(require_react_dom(), 1);
 "use client";
 var StoreContext = import_react5.createContext(null);
@@ -25966,17 +25975,177 @@ function ResizeControl({ nodeId, position, variant = ResizeControlVariant.Handle
 }
 var NodeResizeControl = import_react5.memo(ResizeControl);
 
-// ui/src/components/GraphCanvas.tsx
-var import_react10 = __toESM(require_react(), 1);
+// src/components/GraphCanvas.tsx
+var import_react13 = __toESM(require_react(), 1);
 
-// ui/src/components/NodeComponent.tsx
+// src/components/NodeComponent.tsx
+var import_react10 = __toESM(require_react(), 1);
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/createLucideIcon.mjs
+var import_react8 = __toESM(require_react(), 1);
+
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/shared/src/utils/mergeClasses.mjs
+var mergeClasses = (...classes) => classes.filter((className, index2, array2) => {
+  return Boolean(className) && className.trim() !== "" && array2.indexOf(className) === index2;
+}).join(" ").trim();
+
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/shared/src/utils/toKebabCase.mjs
+var toKebabCase = (string) => string.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/shared/src/utils/toCamelCase.mjs
+var toCamelCase = (string) => string.replace(/^([A-Z])|[\s-_]+(\w)/g, (match, p1, p2) => p2 ? p2.toUpperCase() : p1.toLowerCase());
+
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/shared/src/utils/toPascalCase.mjs
+var toPascalCase = (string) => {
+  const camelCase = toCamelCase(string);
+  return camelCase.charAt(0).toUpperCase() + camelCase.slice(1);
+};
+
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/Icon.mjs
 var import_react7 = __toESM(require_react(), 1);
+
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/defaultAttributes.mjs
+var defaultAttributes = {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: 24,
+  height: 24,
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 2,
+  strokeLinecap: "round",
+  strokeLinejoin: "round"
+};
+
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/shared/src/utils/hasA11yProp.mjs
+var hasA11yProp = (props) => {
+  for (const prop in props) {
+    if (prop.startsWith("aria-") || prop === "role" || prop === "title") {
+      return true;
+    }
+  }
+  return false;
+};
+
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/context.mjs
+var import_react6 = __toESM(require_react(), 1);
+"use client";
+var LucideContext = import_react6.createContext({});
+var useLucideContext = () => import_react6.useContext(LucideContext);
+
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/Icon.mjs
+"use client";
+var Icon = import_react7.forwardRef(({ color: color2, size, strokeWidth, absoluteStrokeWidth, className = "", children: children2, iconNode, ...rest }, ref) => {
+  const {
+    size: contextSize = 24,
+    strokeWidth: contextStrokeWidth = 2,
+    absoluteStrokeWidth: contextAbsoluteStrokeWidth = false,
+    color: contextColor = "currentColor",
+    className: contextClass = ""
+  } = useLucideContext() ?? {};
+  const calculatedStrokeWidth = absoluteStrokeWidth ?? contextAbsoluteStrokeWidth ? Number(strokeWidth ?? contextStrokeWidth) * 24 / Number(size ?? contextSize) : strokeWidth ?? contextStrokeWidth;
+  return import_react7.createElement("svg", {
+    ref,
+    ...defaultAttributes,
+    width: size ?? contextSize ?? defaultAttributes.width,
+    height: size ?? contextSize ?? defaultAttributes.height,
+    stroke: color2 ?? contextColor,
+    strokeWidth: calculatedStrokeWidth,
+    className: mergeClasses("lucide", contextClass, className),
+    ...!children2 && !hasA11yProp(rest) && { "aria-hidden": "true" },
+    ...rest
+  }, [
+    ...iconNode.map(([tag, attrs]) => import_react7.createElement(tag, attrs)),
+    ...Array.isArray(children2) ? children2 : [children2]
+  ]);
+});
+
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/createLucideIcon.mjs
+var createLucideIcon = (iconName, iconNode) => {
+  const Component = import_react8.forwardRef(({ className, ...props }, ref) => import_react8.createElement(Icon, {
+    ref,
+    iconNode,
+    className: mergeClasses(`lucide-${toKebabCase(toPascalCase(iconName))}`, `lucide-${iconName}`, className),
+    ...props
+  }));
+  Component.displayName = toPascalCase(iconName);
+  return Component;
+};
+
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/circle-question-mark.mjs
+var __iconNode = [
+  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
+  ["path", { d: "M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3", key: "1u773s" }],
+  ["path", { d: "M12 17h.01", key: "p32p05" }]
+];
+var CircleQuestionMark = createLucideIcon("circle-question-mark", __iconNode);
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/triangle-alert.mjs
+var __iconNode2 = [
+  [
+    "path",
+    {
+      d: "m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3",
+      key: "wmoenq"
+    }
+  ],
+  ["path", { d: "M12 9v4", key: "juzpu7" }],
+  ["path", { d: "M12 17h.01", key: "p32p05" }]
+];
+var TriangleAlert = createLucideIcon("triangle-alert", __iconNode2);
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/link.mjs
+var __iconNode3 = [
+  ["path", { d: "M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71", key: "1cjeqo" }],
+  ["path", { d: "M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71", key: "19qd67" }]
+];
+var Link = createLucideIcon("link", __iconNode3);
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/moon.mjs
+var __iconNode4 = [
+  [
+    "path",
+    {
+      d: "M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401",
+      key: "kfwtm"
+    }
+  ]
+];
+var Moon = createLucideIcon("moon", __iconNode4);
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/sun.mjs
+var __iconNode5 = [
+  ["circle", { cx: "12", cy: "12", r: "4", key: "4exip2" }],
+  ["path", { d: "M12 2v2", key: "tus03m" }],
+  ["path", { d: "M12 20v2", key: "1lh1kg" }],
+  ["path", { d: "m4.93 4.93 1.41 1.41", key: "149t6j" }],
+  ["path", { d: "m17.66 17.66 1.41 1.41", key: "ptbguv" }],
+  ["path", { d: "M2 12h2", key: "1t8f8n" }],
+  ["path", { d: "M20 12h2", key: "1q8mjw" }],
+  ["path", { d: "m6.34 17.66-1.41 1.41", key: "1m8zz5" }],
+  ["path", { d: "m19.07 4.93-1.41 1.41", key: "1shlcs" }]
+];
+var Sun = createLucideIcon("sun", __iconNode5);
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/target.mjs
+var __iconNode6 = [
+  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
+  ["circle", { cx: "12", cy: "12", r: "6", key: "1vlfrh" }],
+  ["circle", { cx: "12", cy: "12", r: "2", key: "1c9p78" }]
+];
+var Target = createLucideIcon("target", __iconNode6);
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/zap.mjs
+var __iconNode7 = [
+  [
+    "path",
+    {
+      d: "M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z",
+      key: "1v7up4"
+    }
+  ]
+];
+var Zap = createLucideIcon("zap", __iconNode7);
+// src/components/NodeComponent.tsx
 var jsx_dev_runtime3 = __toESM(require_jsx_dev_runtime(), 1);
 var TYPE_GLYPHS = {
-  feature: "◆",
-  bugfix: "⚠",
-  quick: "⚡",
-  unknown: "?"
+  feature: Target,
+  bugfix: TriangleAlert,
+  quick: Zap,
+  unknown: CircleQuestionMark
 };
 var TYPE_LABELS = {
   feature: "Feature",
@@ -25994,19 +26163,21 @@ function SpecNode({ data }) {
     owner,
     selected: selected2,
     superseded,
+    reviewed,
     onSelect
   } = data;
-  const handleKeyDown = import_react7.useCallback((e) => {
+  const handleKeyDown = import_react10.useCallback((e) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       onSelect?.(id2);
     }
   }, [onSelect, id2]);
-  const handleClick = import_react7.useCallback(() => {
+  const handleClick = import_react10.useCallback(() => {
     onSelect?.(id2);
   }, [onSelect, id2]);
   const ariaLabel = `${title}, ${TYPE_LABELS[type]}, ${stage}, ${progress}%`;
   const isSelected = selected2 ?? false;
+  const TypeGlyph = TYPE_GLYPHS[type];
   return /* @__PURE__ */ jsx_dev_runtime3.jsxDEV("button", {
     type: "button",
     className: `spec-node spec-node--${type}${isSelected ? " spec-node--selected" : ""}${superseded ? " spec-node--superseded" : ""}`,
@@ -26028,11 +26199,19 @@ function SpecNode({ data }) {
           /* @__PURE__ */ jsx_dev_runtime3.jsxDEV("span", {
             className: "spec-node__glyph",
             "aria-hidden": "true",
-            children: TYPE_GLYPHS[type]
+            children: /* @__PURE__ */ jsx_dev_runtime3.jsxDEV(TypeGlyph, {
+              size: 14
+            }, undefined, false, undefined, this)
           }, undefined, false, undefined, this),
           /* @__PURE__ */ jsx_dev_runtime3.jsxDEV("span", {
             className: "spec-node__type-label",
             children: TYPE_LABELS[type]
+          }, undefined, false, undefined, this),
+          reviewed && /* @__PURE__ */ jsx_dev_runtime3.jsxDEV("span", {
+            className: "spec-node__reviewed",
+            title: "Reviewed",
+            "aria-label": "Reviewed",
+            children: "✓"
           }, undefined, false, undefined, this)
         ]
       }, undefined, true, undefined, this),
@@ -26074,7 +26253,7 @@ function SpecNode({ data }) {
   }, undefined, true, undefined, this);
 }
 
-// ui/src/components/EdgeComponent.tsx
+// src/components/EdgeComponent.tsx
 var jsx_dev_runtime4 = __toESM(require_jsx_dev_runtime(), 1);
 var PARALLEL_OFFSET_PX = 14;
 function SpecEdge({
@@ -26133,22 +26312,47 @@ function SpecEdge({
   }, undefined, true, undefined, this);
 }
 
-// ui/src/components/GraphCanvas.tsx
+// src/components/GraphCanvas.tsx
 var jsx_dev_runtime5 = __toESM(require_jsx_dev_runtime(), 1);
-var STAGES2 = ["requirements", "bug_analysis", "design", "tasks", "completed"];
+var Y_AXIS_OPTIONS = [
+  { value: "owner", label: "Owner" },
+  { value: "repository", label: "Repository" },
+  { value: "type", label: "Type" },
+  { value: "theme", label: "Theme" }
+];
+var STAGES2 = ["new", "scoped", "refined", "in-flight", "done"];
+var STAGE_LABELS = {
+  new: "New",
+  scoped: "Scoped",
+  refined: "Refined",
+  "in-flight": "In-Flight",
+  done: "Done"
+};
 var LEFT_GUTTER = 160;
 var STAGE_WIDTH = 270;
 var LANE_GAP = 220;
 var NODE_GAP = 138;
 var nodeTypes = { spec: SpecNode };
 var edgeTypes = { spec: SpecEdge };
-function placeGraphNodes(specs) {
-  const themes = [...new Set(specs.map((spec) => spec.theme || "Unassigned"))].sort();
+function getLaneValue(spec, field) {
+  switch (field) {
+    case "owner":
+      return spec.owner || "Unassigned";
+    case "repository":
+      return spec.repository || "Unassigned";
+    case "type":
+      return spec.type || "unknown";
+    case "theme":
+      return spec.theme || "Unassigned";
+  }
+}
+function placeGraphNodes(specs, yAxisField = "theme") {
+  const lanes = [...new Set(specs.map((spec) => getLaneValue(spec, yAxisField)))].sort();
   const nodes = [];
-  for (const theme of themes) {
-    const laneIndex = themes.indexOf(theme);
+  for (const lane of lanes) {
+    const laneIndex = lanes.indexOf(lane);
     for (const stage of STAGES2) {
-      const inCell = specs.filter((spec) => (spec.theme || "Unassigned") === theme && spec.stage === stage).sort((a, b) => a.title.localeCompare(b.title) || a.key.localeCompare(b.key));
+      const inCell = specs.filter((spec) => getLaneValue(spec, yAxisField) === lane && spec.stage === stage).sort((a, b) => a.title.localeCompare(b.title) || a.key.localeCompare(b.key));
       inCell.forEach((spec, rowIndex) => {
         nodes.push({
           id: spec.key,
@@ -26163,7 +26367,8 @@ function placeGraphNodes(specs) {
             stage: spec.stage,
             progress: spec.progress,
             owner: spec.owner,
-            theme
+            theme: spec.theme || "Unassigned",
+            reviewed: spec.reviewed ?? false
           }
         });
       });
@@ -26247,29 +26452,29 @@ function GraphLegend() {
     ]
   }, undefined, true, undefined, this);
 }
-function GraphOverlays({ specs }) {
-  const themes = [...new Set(specs.map((spec) => spec.theme || "Unassigned"))].sort();
-  return /* @__PURE__ */ jsx_dev_runtime5.jsxDEV("div", {
-    className: "graph-overlay-labels",
-    "aria-hidden": "true",
+function GraphOverlays({ specs, yAxisField }) {
+  const lanes = [...new Set(specs.map((spec) => getLaneValue(spec, yAxisField)))].sort();
+  return /* @__PURE__ */ jsx_dev_runtime5.jsxDEV(jsx_dev_runtime5.Fragment, {
     children: [
       /* @__PURE__ */ jsx_dev_runtime5.jsxDEV("div", {
-        className: "graph-stage-labels",
+        className: "graph-stage-header",
+        "aria-hidden": "true",
         children: STAGES2.map((stage) => /* @__PURE__ */ jsx_dev_runtime5.jsxDEV("span", {
-          children: stage.replace("_", " ")
+          children: STAGE_LABELS[stage] ?? stage
         }, stage, false, undefined, this))
       }, undefined, false, undefined, this),
       /* @__PURE__ */ jsx_dev_runtime5.jsxDEV("div", {
-        className: "graph-lane-labels",
-        children: themes.map((theme) => /* @__PURE__ */ jsx_dev_runtime5.jsxDEV("span", {
-          children: theme
-        }, theme, false, undefined, this))
+        className: "graph-lane-gutter",
+        "aria-hidden": "true",
+        children: lanes.map((lane) => /* @__PURE__ */ jsx_dev_runtime5.jsxDEV("span", {
+          children: lane
+        }, lane, false, undefined, this))
       }, undefined, false, undefined, this)
     ]
   }, undefined, true, undefined, this);
 }
-function GraphCanvasInner({ specs, selectedKey, onSelect, colorMode = "dark" }) {
-  const supersededKeys = import_react10.useMemo(() => {
+function GraphCanvasInner({ specs, selectedKey, onSelect, colorMode = "dark", yAxisField = "theme" }) {
+  const supersededKeys = import_react13.useMemo(() => {
     const keys = new Set;
     for (const spec of specs) {
       for (const rel of spec.relationships ?? []) {
@@ -26279,42 +26484,46 @@ function GraphCanvasInner({ specs, selectedKey, onSelect, colorMode = "dark" }) 
     }
     return keys;
   }, [specs]);
-  const nodes = import_react10.useMemo(() => placeGraphNodes(specs).map((node) => ({ ...node, data: { ...node.data, selected: node.id === selectedKey, superseded: supersededKeys.has(node.id), onSelect } })), [specs, selectedKey, onSelect, supersededKeys]);
-  const edges = import_react10.useMemo(() => buildGraphEdges(specs, selectedKey), [specs, selectedKey]);
-  const handleNodeClick2 = import_react10.useCallback((_event, node) => onSelect?.(node.id), [onSelect]);
-  const handleInit = import_react10.useCallback((instance) => {
+  const nodes = import_react13.useMemo(() => placeGraphNodes(specs, yAxisField).map((node) => ({ ...node, data: { ...node.data, selected: node.id === selectedKey, superseded: supersededKeys.has(node.id), onSelect } })), [specs, selectedKey, onSelect, supersededKeys, yAxisField]);
+  const edges = import_react13.useMemo(() => buildGraphEdges(specs, selectedKey), [specs, selectedKey]);
+  const handleNodeClick2 = import_react13.useCallback((_event, node) => onSelect?.(node.id), [onSelect]);
+  const handleInit = import_react13.useCallback((instance) => {
     instance.fitView({ padding: 0.15 });
   }, []);
   return /* @__PURE__ */ jsx_dev_runtime5.jsxDEV("div", {
     className: "graph-canvas-container",
     children: [
-      /* @__PURE__ */ jsx_dev_runtime5.jsxDEV(index, {
-        nodes,
-        edges,
-        nodeTypes,
-        edgeTypes,
-        colorMode,
-        onNodeClick: handleNodeClick2,
-        onInit: handleInit,
-        minZoom: 0.25,
-        maxZoom: 4,
-        nodesDraggable: false,
-        nodesConnectable: false,
-        fitView: true,
-        fitViewOptions: { padding: 0.15 },
-        children: [
-          /* @__PURE__ */ jsx_dev_runtime5.jsxDEV(Background, {
-            color: colorMode === "dark" ? "#34323d" : "#d0d0d8",
-            gap: 26,
-            size: 1
-          }, undefined, false, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime5.jsxDEV(Controls, {
-            showInteractive: false
-          }, undefined, false, undefined, this)
-        ]
-      }, undefined, true, undefined, this),
       /* @__PURE__ */ jsx_dev_runtime5.jsxDEV(GraphOverlays, {
-        specs
+        specs,
+        yAxisField
+      }, undefined, false, undefined, this),
+      /* @__PURE__ */ jsx_dev_runtime5.jsxDEV("div", {
+        className: "graph-viewport",
+        children: /* @__PURE__ */ jsx_dev_runtime5.jsxDEV(index, {
+          nodes,
+          edges,
+          nodeTypes,
+          edgeTypes,
+          colorMode,
+          onNodeClick: handleNodeClick2,
+          onInit: handleInit,
+          minZoom: 0.25,
+          maxZoom: 4,
+          nodesDraggable: false,
+          nodesConnectable: false,
+          fitView: true,
+          fitViewOptions: { padding: 0.15 },
+          children: [
+            /* @__PURE__ */ jsx_dev_runtime5.jsxDEV(Background, {
+              color: colorMode === "dark" ? "#34323d" : "#d0d0d8",
+              gap: 26,
+              size: 1
+            }, undefined, false, undefined, this),
+            /* @__PURE__ */ jsx_dev_runtime5.jsxDEV(Controls, {
+              showInteractive: false
+            }, undefined, false, undefined, this)
+          ]
+        }, undefined, true, undefined, this)
       }, undefined, false, undefined, this),
       /* @__PURE__ */ jsx_dev_runtime5.jsxDEV(GraphLegend, {}, undefined, false, undefined, this)
     ]
@@ -26328,11 +26537,11 @@ function GraphCanvas(props) {
   }, undefined, false, undefined, this);
 }
 
-// ui/src/components/DetailPanel.tsx
-var import_react13 = __toESM(require_react(), 1);
+// src/components/DetailPanel.tsx
+var import_react16 = __toESM(require_react(), 1);
 
-// ui/src/hooks/useSpecDetail.ts
-var import_react11 = __toESM(require_react(), 1);
+// src/hooks/useSpecDetail.ts
+var import_react14 = __toESM(require_react(), 1);
 function str(v, fallback = "") {
   return typeof v === "string" ? v : fallback;
 }
@@ -26371,7 +26580,8 @@ function normalizeDetail(raw) {
       } : undefined,
       legalHold: legal ? { active: legal.active === true, reason: str(legal.reason) || undefined } : undefined,
       approvers,
-      implementationRef: str(meta["implementationRef"]) || undefined
+      implementationRef: str(meta["implementationRef"]) || undefined,
+      reviewedAt: str(meta["reviewedAt"]) || undefined
     },
     provenance: {
       repository: str(spec["repository"], "—"),
@@ -26399,18 +26609,35 @@ function normalizeSuggestions(raw) {
     evidence: str(s["evidence"])
   })).filter((s) => s.id !== "");
 }
+function normalizeProposals(raw) {
+  const r = raw;
+  const arr = r?.["proposals"];
+  if (!Array.isArray(arr))
+    return [];
+  return arr.filter((p) => !!p && typeof p === "object").map((p) => ({
+    id: str(p["id"]),
+    specKey: str(p["spec_key"] ?? p["specKey"]),
+    patch: typeof p["patch"] === "string" ? JSON.parse(p["patch"]) : p["patch"] ?? {},
+    status: str(p["status"], "pending"),
+    submittedAt: str(p["submitted_at"] ?? p["submittedAt"]),
+    rationale: str(p["rationale"]) || undefined,
+    source: str(p["source"]) || undefined
+  })).filter((p) => p.id !== "" && p.status === "pending");
+}
 function useSpecDetail(specKey) {
   const { api, notify } = useCrew();
-  const [detail, setDetail] = import_react11.useState(null);
-  const [suggestions, setSuggestions] = import_react11.useState([]);
-  const [loading, setLoading] = import_react11.useState(false);
-  const [saving, setSaving] = import_react11.useState(false);
-  const [error, setError] = import_react11.useState(null);
-  const fetchIdRef = import_react11.useRef(0);
-  const load = import_react11.useCallback(async () => {
+  const [detail, setDetail] = import_react14.useState(null);
+  const [suggestions, setSuggestions] = import_react14.useState([]);
+  const [proposals, setProposals] = import_react14.useState([]);
+  const [loading, setLoading] = import_react14.useState(false);
+  const [saving, setSaving] = import_react14.useState(false);
+  const [error, setError] = import_react14.useState(null);
+  const fetchIdRef = import_react14.useRef(0);
+  const load = import_react14.useCallback(async () => {
     if (!specKey) {
       setDetail(null);
       setSuggestions([]);
+      setProposals([]);
       setError(null);
       return;
     }
@@ -26418,33 +26645,37 @@ function useSpecDetail(specKey) {
     setLoading(true);
     setError(null);
     try {
-      const [detailRes, sugRes] = await Promise.all([
+      const [detailRes, sugRes, propRes] = await Promise.all([
         api.fetch(`/specs/${encodeURIComponent(specKey)}`),
-        api.fetch(`/specs/${encodeURIComponent(specKey)}/suggestions`)
+        api.fetch(`/specs/${encodeURIComponent(specKey)}/suggestions`),
+        api.fetch(`/specs/${encodeURIComponent(specKey)}/proposals`)
       ]);
       if (!detailRes.ok)
         throw new Error(`Failed to load spec: ${detailRes.status}`);
       const detailData = await detailRes.json();
       const sugData = sugRes.ok ? await sugRes.json() : { suggestions: [] };
+      const propData = propRes.ok ? await propRes.json() : { proposals: [] };
       if (id2 === fetchIdRef.current) {
         setDetail(normalizeDetail(detailData));
         setSuggestions(normalizeSuggestions(sugData));
+        setProposals(normalizeProposals(propData));
       }
     } catch (err) {
       if (id2 === fetchIdRef.current) {
         setError(err instanceof Error ? err.message : String(err));
         setDetail(null);
         setSuggestions([]);
+        setProposals([]);
       }
     } finally {
       if (id2 === fetchIdRef.current)
         setLoading(false);
     }
   }, [api, specKey]);
-  import_react11.useEffect(() => {
+  import_react14.useEffect(() => {
     load();
   }, [load]);
-  const save = import_react11.useCallback(async (patch) => {
+  const save = import_react14.useCallback(async (patch) => {
     if (!specKey || !detail)
       return false;
     setSaving(true);
@@ -26487,7 +26718,7 @@ function useSpecDetail(specKey) {
       setSaving(false);
     }
   }, [api, specKey, detail, notify]);
-  const acceptSuggestion = import_react11.useCallback(async (id2) => {
+  const acceptSuggestion = import_react14.useCallback(async (id2) => {
     try {
       const res = await api.fetch(`/suggestions/${encodeURIComponent(id2)}/accept`, {
         method: "POST"
@@ -26500,7 +26731,7 @@ function useSpecDetail(specKey) {
       notify.error(err instanceof Error ? err.message : String(err));
     }
   }, [api, notify]);
-  const rejectSuggestion = import_react11.useCallback(async (id2) => {
+  const rejectSuggestion = import_react14.useCallback(async (id2) => {
     try {
       const res = await api.fetch(`/suggestions/${encodeURIComponent(id2)}/reject`, {
         method: "POST"
@@ -26513,20 +26744,50 @@ function useSpecDetail(specKey) {
       notify.error(err instanceof Error ? err.message : String(err));
     }
   }, [api, notify]);
-  return import_react11.useMemo(() => ({
+  const acceptProposal = import_react14.useCallback(async (id2) => {
+    try {
+      const res = await api.fetch(`/proposals/${encodeURIComponent(id2)}/accept`, {
+        method: "POST"
+      });
+      if (!res.ok)
+        throw new Error(`Accept proposal failed: ${res.status}`);
+      setProposals((prev) => prev.filter((p) => p.id !== id2));
+      load();
+      notify.success("Proposal accepted — metadata updated.");
+    } catch (err) {
+      notify.error(err instanceof Error ? err.message : String(err));
+    }
+  }, [api, notify, load]);
+  const rejectProposal = import_react14.useCallback(async (id2) => {
+    try {
+      const res = await api.fetch(`/proposals/${encodeURIComponent(id2)}/reject`, {
+        method: "POST"
+      });
+      if (!res.ok)
+        throw new Error(`Reject proposal failed: ${res.status}`);
+      setProposals((prev) => prev.filter((p) => p.id !== id2));
+      notify.info("Proposal rejected.");
+    } catch (err) {
+      notify.error(err instanceof Error ? err.message : String(err));
+    }
+  }, [api, notify]);
+  return import_react14.useMemo(() => ({
     detail,
     suggestions,
+    proposals,
     loading,
     saving,
     error,
     save,
     acceptSuggestion,
     rejectSuggestion,
+    acceptProposal,
+    rejectProposal,
     refetch: load
-  }), [detail, suggestions, loading, saving, error, save, acceptSuggestion, rejectSuggestion, load]);
+  }), [detail, suggestions, proposals, loading, saving, error, save, acceptSuggestion, rejectSuggestion, acceptProposal, rejectProposal, load]);
 }
 
-// ui/src/components/SpecActions.tsx
+// src/components/SpecActions.tsx
 var jsx_dev_runtime6 = __toESM(require_jsx_dev_runtime(), 1);
 function buildPermalink(detail) {
   const { remoteUrl, relativePath, commitHash, branch } = detail.provenance;
@@ -26553,9 +26814,13 @@ function SpecActions({ detail }) {
   const permalink = buildPermalink(detail);
   const { isDirty, commitHash } = detail.provenance;
   const openInChat = () => {
+    const specLabel = detail.metadata.title || detail.specId || detail.key;
+    const prompt = `Tell me about the spec "${specLabel}" (key: ${detail.key})`;
     chatLauncher.open({
       specId: detail.specId || detail.key,
-      revisionId: commitHash || undefined
+      revisionId: commitHash || undefined,
+      prompt,
+      agent: "spectral-librarian"
     });
   };
   return /* @__PURE__ */ jsx_dev_runtime6.jsxDEV("div", {
@@ -26595,8 +26860,8 @@ function SpecActions({ detail }) {
   }, undefined, true, undefined, this);
 }
 
-// ui/src/components/MetadataPanel.tsx
-var import_react12 = __toESM(require_react(), 1);
+// src/components/MetadataPanel.tsx
+var import_react15 = __toESM(require_react(), 1);
 var jsx_dev_runtime7 = __toESM(require_jsx_dev_runtime(), 1);
 function EditableField({
   label,
@@ -26607,11 +26872,11 @@ function EditableField({
   commitTrigger,
   onCommit
 }) {
-  const [editing, setEditing] = import_react12.useState(false);
-  const [draft, setDraft] = import_react12.useState(value);
-  const draftRef = import_react12.useRef(draft);
+  const [editing, setEditing] = import_react15.useState(false);
+  const [draft, setDraft] = import_react15.useState(value);
+  const draftRef = import_react15.useRef(draft);
   draftRef.current = draft;
-  const valueRef = import_react12.useRef(value);
+  const valueRef = import_react15.useRef(value);
   valueRef.current = value;
   const start2 = () => {
     setDraft(value);
@@ -26623,8 +26888,8 @@ function EditableField({
     if (draft !== value)
       onCommit(draft.trim());
   };
-  const isFirstTrigger = import_react12.useRef(true);
-  import_react12.useEffect(() => {
+  const isFirstTrigger = import_react15.useRef(true);
+  import_react15.useEffect(() => {
     if (isFirstTrigger.current) {
       isFirstTrigger.current = false;
       return;
@@ -26706,9 +26971,9 @@ function MetadataPanel({
 }) {
   const { notify, chatLauncher } = useCrew();
   const { metadata } = detail;
-  const [tagsEditing, setTagsEditing] = import_react12.useState(false);
-  const [tagsDraft, setTagsDraft] = import_react12.useState(metadata.tags.join(", "));
-  const tagsDraftRef = import_react12.useRef(tagsDraft);
+  const [tagsEditing, setTagsEditing] = import_react15.useState(false);
+  const [tagsDraft, setTagsDraft] = import_react15.useState(metadata.tags.join(", "));
+  const tagsDraftRef = import_react15.useRef(tagsDraft);
   tagsDraftRef.current = tagsDraft;
   const commitTags = () => {
     setTagsEditing(false);
@@ -26717,8 +26982,8 @@ function MetadataPanel({
       onSave({ tags: next });
     }
   };
-  const isFirstKeyChange = import_react12.useRef(true);
-  import_react12.useEffect(() => {
+  const isFirstKeyChange = import_react15.useRef(true);
+  import_react15.useEffect(() => {
     if (isFirstKeyChange.current) {
       isFirstKeyChange.current = false;
       return;
@@ -26970,6 +27235,31 @@ function MetadataPanel({
         ]
       }, undefined, true, undefined, this),
       /* @__PURE__ */ jsx_dev_runtime7.jsxDEV("div", {
+        className: "meta-field",
+        children: [
+          /* @__PURE__ */ jsx_dev_runtime7.jsxDEV("div", {
+            className: "meta-field__head",
+            children: /* @__PURE__ */ jsx_dev_runtime7.jsxDEV("span", {
+              className: "meta-field__label",
+              children: "Reviewed"
+            }, undefined, false, undefined, this)
+          }, undefined, false, undefined, this),
+          metadata.reviewedAt ? /* @__PURE__ */ jsx_dev_runtime7.jsxDEV("p", {
+            className: "meta-field__value",
+            children: [
+              "✓ ",
+              new Date(metadata.reviewedAt).toLocaleDateString()
+            ]
+          }, undefined, true, undefined, this) : /* @__PURE__ */ jsx_dev_runtime7.jsxDEV("button", {
+            type: "button",
+            className: "meta-field__mark-reviewed",
+            disabled: saving,
+            onClick: () => void onSave({ reviewedAt: new Date().toISOString() }),
+            children: "Mark as reviewed"
+          }, undefined, false, undefined, this)
+        ]
+      }, undefined, true, undefined, this),
+      /* @__PURE__ */ jsx_dev_runtime7.jsxDEV("div", {
         className: "metadata-panel__relationships",
         children: [
           /* @__PURE__ */ jsx_dev_runtime7.jsxDEV("h4", {
@@ -27052,8 +27342,154 @@ Show me the relevant content from both specs that supports or contradicts this s
   }, undefined, true, undefined, this);
 }
 
-// ui/src/components/DetailPanel.tsx
+// src/components/ProposalQueue.tsx
 var jsx_dev_runtime8 = __toESM(require_jsx_dev_runtime(), 1);
+function ProposalQueue({ proposals, specKey, specTitle, onAccept, onReject }) {
+  const { chatLauncher } = useCrew();
+  if (proposals.length === 0)
+    return null;
+  return /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("section", {
+    className: "proposal-queue",
+    "aria-label": "Pending metadata proposals",
+    children: [
+      /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("header", {
+        className: "proposal-queue__header",
+        children: [
+          /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("h4", {
+            children: [
+              "Pending proposals",
+              /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("span", {
+                className: "proposal-queue__count",
+                children: proposals.length
+              }, undefined, false, undefined, this)
+            ]
+          }, undefined, true, undefined, this),
+          /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("p", {
+            className: "proposal-queue__subtitle",
+            children: "Agent-submitted changes awaiting your approval."
+          }, undefined, false, undefined, this)
+        ]
+      }, undefined, true, undefined, this),
+      /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("ul", {
+        className: "proposal-queue__list",
+        children: proposals.map((p) => /* @__PURE__ */ jsx_dev_runtime8.jsxDEV(ProposalCard, {
+          proposal: p,
+          specKey,
+          specTitle,
+          onAccept,
+          onReject,
+          onChat: (prompt) => chatLauncher.open({ specId: specKey, prompt })
+        }, p.id, false, undefined, this))
+      }, undefined, false, undefined, this)
+    ]
+  }, undefined, true, undefined, this);
+}
+function ProposalCard({
+  proposal,
+  specKey,
+  specTitle,
+  onAccept,
+  onReject,
+  onChat
+}) {
+  const fields = Object.entries(proposal.patch);
+  const submittedDate = proposal.submittedAt ? new Date(proposal.submittedAt).toLocaleString() : "Unknown";
+  const buildChatPrompt = () => {
+    const fieldSummary = fields.map(([k, v]) => `  • ${formatFieldName(k)}: ${formatValue(v)}`).join(`
+`);
+    return [
+      `Help me decide on this metadata proposal for "${specTitle}" (${specKey}):`,
+      "",
+      `Proposed changes:`,
+      fieldSummary,
+      "",
+      proposal.rationale ? `Agent rationale: ${proposal.rationale}` : "",
+      "",
+      `Use get_spec_context to read the current spec and tell me whether these proposed metadata values are accurate and should be accepted, or if they're wrong/incomplete and should be rejected.`
+    ].filter(Boolean).join(`
+`);
+  };
+  return /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("li", {
+    className: "proposal-card",
+    children: [
+      /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("div", {
+        className: "proposal-card__meta",
+        children: [
+          /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("span", {
+            className: "proposal-card__source",
+            children: proposal.source === "agent" ? "\uD83E\uDD16 Agent" : "\uD83D\uDCDD Manual"
+          }, undefined, false, undefined, this),
+          /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("time", {
+            className: "proposal-card__time",
+            dateTime: proposal.submittedAt,
+            children: submittedDate
+          }, undefined, false, undefined, this)
+        ]
+      }, undefined, true, undefined, this),
+      proposal.rationale && /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("p", {
+        className: "proposal-card__rationale",
+        children: proposal.rationale
+      }, undefined, false, undefined, this),
+      /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("div", {
+        className: "proposal-card__diff",
+        children: fields.map(([key, value]) => /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("div", {
+          className: "proposal-card__field",
+          children: [
+            /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("span", {
+              className: "proposal-card__key",
+              children: formatFieldName(key)
+            }, undefined, false, undefined, this),
+            /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("span", {
+              className: "proposal-card__value",
+              children: formatValue(value)
+            }, undefined, false, undefined, this)
+          ]
+        }, key, true, undefined, this))
+      }, undefined, false, undefined, this),
+      /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("div", {
+        className: "proposal-card__actions",
+        children: [
+          /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("button", {
+            type: "button",
+            className: "proposal-card__chat",
+            onClick: () => onChat(buildChatPrompt()),
+            title: "Open Crew chat to discuss this proposal",
+            children: "Why?"
+          }, undefined, false, undefined, this),
+          /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("button", {
+            type: "button",
+            className: "proposal-card__accept",
+            onClick: () => onAccept(proposal.id),
+            "aria-label": `Accept proposal ${proposal.id.slice(0, 8)}`,
+            children: "✓ Accept"
+          }, undefined, false, undefined, this),
+          /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("button", {
+            type: "button",
+            className: "proposal-card__reject",
+            onClick: () => onReject(proposal.id),
+            "aria-label": `Reject proposal ${proposal.id.slice(0, 8)}`,
+            children: "✗ Reject"
+          }, undefined, false, undefined, this)
+        ]
+      }, undefined, true, undefined, this)
+    ]
+  }, undefined, true, undefined, this);
+}
+function formatFieldName(key) {
+  return key.replace(/([A-Z])/g, " $1").replace(/^./, (c) => c.toUpperCase()).trim();
+}
+function formatValue(value) {
+  if (value === null || value === undefined)
+    return "(clear)";
+  if (Array.isArray(value))
+    return value.join(", ");
+  if (typeof value === "object")
+    return JSON.stringify(value);
+  return String(value);
+}
+
+// src/components/DetailPanel.tsx
+var jsx_dev_runtime9 = __toESM(require_jsx_dev_runtime(), 1);
 function DetailPanel({
   specKey,
   variant = "rail",
@@ -27062,14 +27498,17 @@ function DetailPanel({
   const {
     detail,
     suggestions,
+    proposals,
     loading,
     saving,
     error,
     save,
     acceptSuggestion,
-    rejectSuggestion
+    rejectSuggestion,
+    acceptProposal,
+    rejectProposal
   } = useSpecDetail(specKey);
-  import_react13.useEffect(() => {
+  import_react16.useEffect(() => {
     if (!onClose)
       return;
     const handleKey = (e) => {
@@ -27081,34 +27520,34 @@ function DetailPanel({
   }, [onClose]);
   if (!specKey)
     return null;
-  return /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("aside", {
+  return /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("aside", {
     className: `detail-panel detail-panel--${variant}`,
     "aria-label": "Spec detail",
     "aria-busy": loading,
     children: [
-      onClose && /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("button", {
+      onClose && /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("button", {
         type: "button",
         className: "detail-panel__close",
         onClick: onClose,
         "aria-label": "Close detail",
         children: "✕"
       }, undefined, false, undefined, this),
-      loading && !detail && /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("p", {
+      loading && !detail && /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("p", {
         className: "detail-panel__status",
         role: "status",
         children: "Loading spec…"
       }, undefined, false, undefined, this),
-      error && !detail && /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("p", {
+      error && !detail && /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("p", {
         className: "detail-panel__status",
         role: "alert",
         children: error
       }, undefined, false, undefined, this),
-      detail && /* @__PURE__ */ jsx_dev_runtime8.jsxDEV(jsx_dev_runtime8.Fragment, {
+      detail && /* @__PURE__ */ jsx_dev_runtime9.jsxDEV(jsx_dev_runtime9.Fragment, {
         children: [
-          /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("header", {
+          /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("header", {
             className: "detail-panel__header",
             children: [
-              /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("p", {
+              /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("p", {
                 className: "detail-panel__eyebrow",
                 children: [
                   detail.type,
@@ -27119,11 +27558,11 @@ function DetailPanel({
                   "%"
                 ]
               }, undefined, true, undefined, this),
-              /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("h2", {
+              /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("h2", {
                 className: "detail-panel__title",
                 children: [
                   detail.metadata.title,
-                  saving && /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("span", {
+                  saving && /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("span", {
                     className: "detail-panel__saving",
                     role: "status",
                     "aria-live": "polite",
@@ -27131,16 +27570,23 @@ function DetailPanel({
                   }, undefined, false, undefined, this)
                 ]
               }, undefined, true, undefined, this),
-              /* @__PURE__ */ jsx_dev_runtime8.jsxDEV("p", {
+              /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("p", {
                 className: "detail-panel__key",
                 children: detail.key
               }, undefined, false, undefined, this)
             ]
           }, undefined, true, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime8.jsxDEV(SpecActions, {
+          /* @__PURE__ */ jsx_dev_runtime9.jsxDEV(SpecActions, {
             detail
           }, undefined, false, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime8.jsxDEV(MetadataPanel, {
+          /* @__PURE__ */ jsx_dev_runtime9.jsxDEV(ProposalQueue, {
+            proposals,
+            specKey: detail.key,
+            specTitle: detail.metadata.title,
+            onAccept: acceptProposal,
+            onReject: rejectProposal
+          }, undefined, false, undefined, this),
+          /* @__PURE__ */ jsx_dev_runtime9.jsxDEV(MetadataPanel, {
             detail,
             suggestions,
             saving,
@@ -27154,8 +27600,8 @@ function DetailPanel({
   }, undefined, true, undefined, this);
 }
 
-// ui/src/views/RelationshipView.tsx
-var jsx_dev_runtime9 = __toESM(require_jsx_dev_runtime(), 1);
+// src/views/RelationshipView.tsx
+var jsx_dev_runtime10 = __toESM(require_jsx_dev_runtime(), 1);
 var MAX_VISIBLE_NODES = 250;
 var LOCAL_ALIASES_KEY = "kiro-spec-library:aliases";
 function getLocalAliases() {
@@ -27216,6 +27662,7 @@ function normalizeSpec(record) {
     owner: str2("owner"),
     theme: str2("theme"),
     progress: num2("progress", 0),
+    reviewed: !!(r["reviewed_at"] || r["reviewedAt"]),
     relationships: parseRelArray("relationships"),
     suggestions: parseRelArray("suggestions")
   };
@@ -27247,9 +27694,9 @@ function deriveFilterOptions(specs) {
 }
 function RelationshipView() {
   const [urlState, setUrlState] = useUrlState();
-  const [hintVisible, setHintVisible] = import_react14.useState(false);
-  const hintShownRef = import_react14.useRef(false);
-  const [filters, setFilters] = import_react14.useState(() => ({
+  const [hintVisible, setHintVisible] = import_react17.useState(false);
+  const hintShownRef = import_react17.useRef(false);
+  const [filters, setFilters] = import_react17.useState(() => ({
     scope: "team",
     theme: urlState.filters.theme,
     type: urlState.filters.type,
@@ -27268,8 +27715,8 @@ function RelationshipView() {
     },
     limit: 500
   });
-  const allSpecs = import_react14.useMemo(() => rawSpecs.map(normalizeSpecExtended), [rawSpecs]);
-  const filteredSpecs = import_react14.useMemo(() => {
+  const allSpecs = import_react17.useMemo(() => (rawSpecs ?? []).map(normalizeSpecExtended), [rawSpecs]);
+  const filteredSpecs = import_react17.useMemo(() => {
     let result = allSpecs;
     if (filters.scope === "mine") {
       const aliases = getLocalAliases();
@@ -27286,23 +27733,23 @@ function RelationshipView() {
     }
     return result;
   }, [allSpecs, filters.scope, filters.theme, filters.metadataComplete]);
-  const sortedSpecs = import_react14.useMemo(() => [...filteredSpecs].sort((a, b) => a.title.localeCompare(b.title)), [filteredSpecs]);
+  const sortedSpecs = import_react17.useMemo(() => [...filteredSpecs].sort((a, b) => a.title.localeCompare(b.title)), [filteredSpecs]);
   const isTruncated = sortedSpecs.length > MAX_VISIBLE_NODES;
-  const visibleSpecs = import_react14.useMemo(() => isTruncated ? sortedSpecs.slice(0, MAX_VISIBLE_NODES) : sortedSpecs, [sortedSpecs, isTruncated]);
-  const graphSpecs = import_react14.useMemo(() => visibleSpecs.map(({ repository: _r, metadataComplete: _m, ...spec }) => spec), [visibleSpecs]);
-  const filterOptions = import_react14.useMemo(() => deriveFilterOptions(allSpecs), [allSpecs]);
-  const [selectedKey, setSelectedKey] = import_react14.useState(urlState.selected);
-  const selectSpec = import_react14.useCallback((key) => {
+  const visibleSpecs = import_react17.useMemo(() => isTruncated ? sortedSpecs.slice(0, MAX_VISIBLE_NODES) : sortedSpecs, [sortedSpecs, isTruncated]);
+  const graphSpecs = import_react17.useMemo(() => visibleSpecs.map(({ metadataComplete: _m, ...spec }) => spec), [visibleSpecs]);
+  const filterOptions = import_react17.useMemo(() => deriveFilterOptions(allSpecs), [allSpecs]);
+  const [selectedKey, setSelectedKey] = import_react17.useState(urlState.selected);
+  const selectSpec = import_react17.useCallback((key) => {
     setSelectedKey(key);
     setUrlState({ selected: key });
   }, [setUrlState]);
-  const handleCanvasSelect = import_react14.useCallback((key) => {
+  const handleCanvasSelect = import_react17.useCallback((key) => {
     selectSpec(key);
   }, [selectSpec]);
-  const selectedSpec = import_react14.useMemo(() => selectedKey ? visibleSpecs.find((s) => s.key === selectedKey) : undefined, [selectedKey, visibleSpecs]);
-  const containerRef = import_react14.useRef(null);
-  const [focusIndex, setFocusIndex] = import_react14.useState(-1);
-  import_react14.useEffect(() => {
+  const selectedSpec = import_react17.useMemo(() => selectedKey ? visibleSpecs.find((s) => s.key === selectedKey) : undefined, [selectedKey, visibleSpecs]);
+  const containerRef = import_react17.useRef(null);
+  const [focusIndex, setFocusIndex] = import_react17.useState(-1);
+  import_react17.useEffect(() => {
     const el = containerRef.current;
     if (!el)
       return;
@@ -27341,12 +27788,12 @@ function RelationshipView() {
     el.addEventListener("keydown", handleKeyDown);
     return () => el.removeEventListener("keydown", handleKeyDown);
   }, [focusIndex, visibleSpecs, selectSpec]);
-  import_react14.useEffect(() => {
+  import_react17.useEffect(() => {
     if (urlState.selected !== selectedKey) {
       setSelectedKey(urlState.selected);
     }
   }, [urlState.selected]);
-  const handleFilterChange = import_react14.useCallback((next) => {
+  const handleFilterChange = import_react17.useCallback((next) => {
     setFilters(next);
     setUrlState({
       query: next.query,
@@ -27358,7 +27805,7 @@ function RelationshipView() {
       }
     });
   }, [setUrlState]);
-  const statusText = import_react14.useMemo(() => {
+  const statusText = import_react17.useMemo(() => {
     if (loading)
       return "Loading specifications…";
     if (error)
@@ -27368,7 +27815,7 @@ function RelationshipView() {
     const sel = selectedSpec ? ` Selected: ${selectedSpec.title}.` : "";
     return `Showing ${visibleSpecs.length} of ${filteredSpecs.length} specifications.${sel}`;
   }, [loading, error, visibleSpecs.length, filteredSpecs.length, selectedSpec]);
-  const handleContainerFocus = import_react14.useCallback(() => {
+  const handleContainerFocus = import_react17.useCallback(() => {
     if (!hintShownRef.current) {
       hintShownRef.current = true;
       setHintVisible(true);
@@ -27376,33 +27823,33 @@ function RelationshipView() {
     }
   }, []);
   if (error) {
-    return /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("div", {
+    return /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("div", {
       className: "relationship-view",
       role: "alert",
       "aria-live": "assertive",
       children: [
-        /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("header", {
+        /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("header", {
           className: "relationship-header",
           children: [
-            /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("p", {
+            /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("p", {
               className: "eyebrow",
               children: "Relationship observatory"
             }, undefined, false, undefined, this),
-            /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("h1", {
+            /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("h1", {
               children: "Spec Library"
             }, undefined, false, undefined, this)
           ]
         }, undefined, true, undefined, this),
-        /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("div", {
+        /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("div", {
           className: "graph-shell",
           children: [
-            /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("p", {
+            /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("p", {
               children: [
                 "Failed to load specifications: ",
                 error
               ]
             }, undefined, true, undefined, this),
-            /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("p", {
+            /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("p", {
               children: "Check your connection and try again."
             }, undefined, false, undefined, this)
           ]
@@ -27410,7 +27857,7 @@ function RelationshipView() {
       ]
     }, undefined, true, undefined, this);
   }
-  return /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("div", {
+  return /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("div", {
     ref: containerRef,
     className: "relationship-view",
     tabIndex: 0,
@@ -27418,29 +27865,29 @@ function RelationshipView() {
     role: "application",
     onFocus: handleContainerFocus,
     children: [
-      /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("header", {
+      /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("header", {
         className: "relationship-header",
         children: [
-          /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("p", {
+          /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("p", {
             className: "eyebrow",
             children: "Relationship observatory"
           }, undefined, false, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("h1", {
+          /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("h1", {
             children: "Spec Library"
           }, undefined, false, undefined, this)
         ]
       }, undefined, true, undefined, this),
-      /* @__PURE__ */ jsx_dev_runtime9.jsxDEV(FilterBar, {
+      /* @__PURE__ */ jsx_dev_runtime10.jsxDEV(FilterBar, {
         filters,
         options: filterOptions,
         onChange: handleFilterChange,
         resultCount: visibleSpecs.length
       }, undefined, false, undefined, this),
-      isTruncated && /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("div", {
+      isTruncated && /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("div", {
         role: "status",
         "aria-live": "polite",
         className: "truncation-prompt",
-        children: /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("p", {
+        children: /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("p", {
           children: [
             "Showing ",
             MAX_VISIBLE_NODES,
@@ -27450,64 +27897,85 @@ function RelationshipView() {
           ]
         }, undefined, true, undefined, this)
       }, undefined, false, undefined, this),
-      /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("div", {
+      /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("div", {
         className: "visually-hidden",
         "aria-live": "polite",
         "aria-atomic": "true",
         children: statusText
       }, undefined, false, undefined, this),
-      loading ? /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("div", {
+      loading ? /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("div", {
         className: "graph-shell",
         "aria-busy": "true",
         "aria-label": "Loading specifications",
-        children: /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("div", {
+        children: /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("div", {
           className: "skeleton-container",
           children: [
-            /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("div", {
+            /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("div", {
               className: "skeleton-node"
             }, undefined, false, undefined, this),
-            /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("div", {
+            /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("div", {
               className: "skeleton-node"
             }, undefined, false, undefined, this),
-            /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("div", {
+            /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("div", {
               className: "skeleton-node"
             }, undefined, false, undefined, this),
-            /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("div", {
+            /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("div", {
               className: "skeleton-node"
             }, undefined, false, undefined, this),
-            /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("div", {
+            /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("div", {
               className: "skeleton-node"
             }, undefined, false, undefined, this)
           ]
         }, undefined, true, undefined, this)
-      }, undefined, false, undefined, this) : visibleSpecs.length === 0 ? /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("div", {
+      }, undefined, false, undefined, this) : visibleSpecs.length === 0 ? /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("div", {
         className: "graph-shell",
-        children: /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("p", {
+        children: /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("p", {
           children: "No specifications match the current view."
         }, undefined, false, undefined, this)
-      }, undefined, false, undefined, this) : /* @__PURE__ */ jsx_dev_runtime9.jsxDEV(jsx_dev_runtime9.Fragment, {
-        children: /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("div", {
+      }, undefined, false, undefined, this) : /* @__PURE__ */ jsx_dev_runtime10.jsxDEV(jsx_dev_runtime10.Fragment, {
+        children: /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("div", {
           className: "graph-with-rail",
           children: [
-            /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("div", {
+            /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("div", {
               className: "graph-column",
               children: [
-                /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("div", {
+                /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("div", {
+                  className: "graph-toolbar",
+                  children: /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("label", {
+                    className: "y-axis-selector",
+                    children: [
+                      /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("span", {
+                        children: "Y-axis:"
+                      }, undefined, false, undefined, this),
+                      /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("select", {
+                        value: urlState.yAxis,
+                        onChange: (e) => setUrlState({ yAxis: e.target.value }),
+                        "aria-label": "Y-axis grouping",
+                        children: Y_AXIS_OPTIONS.map((opt) => /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("option", {
+                          value: opt.value,
+                          children: opt.label
+                        }, opt.value, false, undefined, this))
+                      }, undefined, false, undefined, this)
+                    ]
+                  }, undefined, true, undefined, this)
+                }, undefined, false, undefined, this),
+                /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("div", {
                   className: "graph-shell",
-                  children: /* @__PURE__ */ jsx_dev_runtime9.jsxDEV(GraphCanvas, {
+                  children: /* @__PURE__ */ jsx_dev_runtime10.jsxDEV(GraphCanvas, {
                     specs: graphSpecs,
                     selectedKey,
                     onSelect: handleCanvasSelect,
-                    colorMode: urlState.themeMode
+                    colorMode: urlState.themeMode,
+                    yAxisField: urlState.yAxis
                   }, undefined, false, undefined, this)
                 }, undefined, false, undefined, this),
-                hintVisible && /* @__PURE__ */ jsx_dev_runtime9.jsxDEV("p", {
+                hintVisible && /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("p", {
                   className: "keyboard-hint",
                   children: "↑↓ navigate · Enter select · Home/End jump"
                 }, undefined, false, undefined, this)
               ]
             }, undefined, true, undefined, this),
-            selectedKey && /* @__PURE__ */ jsx_dev_runtime9.jsxDEV(DetailPanel, {
+            selectedKey && /* @__PURE__ */ jsx_dev_runtime10.jsxDEV(DetailPanel, {
               specKey: selectedKey,
               variant: "rail",
               onClose: () => selectSpec(undefined)
@@ -27519,11 +27987,11 @@ function RelationshipView() {
   }, undefined, true, undefined, this);
 }
 
-// ui/src/views/ArchiveView.tsx
-var import_react15 = __toESM(require_react(), 1);
+// src/views/ArchiveView.tsx
+var import_react18 = __toESM(require_react(), 1);
 
-// ui/src/components/ArchiveFilterBar.tsx
-var jsx_dev_runtime10 = __toESM(require_jsx_dev_runtime(), 1);
+// src/components/ArchiveFilterBar.tsx
+var jsx_dev_runtime11 = __toESM(require_jsx_dev_runtime(), 1);
 function isNonDefault2(f) {
   return Boolean(f.query || f.type || f.theme || f.repository || f.owner || f.fromDate || f.toDate || f.metadataComplete !== undefined);
 }
@@ -27541,19 +28009,19 @@ function ArchiveFilterBar({
   const selectHandler = (key) => (e) => {
     set3(key, e.target.value || undefined);
   };
-  return /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("div", {
+  return /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
     className: "archive-tools",
     role: "search",
     "aria-label": "Filter archived specs",
     children: [
-      /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("label", {
+      /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("label", {
         className: "archive-search",
         children: [
-          /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("span", {
+          /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
             className: "visually-hidden",
             children: "Search archived specs"
           }, undefined, false, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("input", {
+          /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("input", {
             type: "search",
             maxLength: 200,
             value: filters.query ?? "",
@@ -27563,25 +28031,25 @@ function ArchiveFilterBar({
           }, undefined, false, undefined, this)
         ]
       }, undefined, true, undefined, this),
-      /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("div", {
+      /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
         className: "archive-filter-group",
         children: [
-          /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("label", {
+          /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("label", {
             children: [
-              /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("span", {
+              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
                 className: "visually-hidden",
                 children: "Type"
               }, undefined, false, undefined, this),
-              /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("select", {
+              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("select", {
                 value: filters.type ?? "",
                 onChange: selectHandler("type"),
                 "aria-label": "Filter by type",
                 children: [
-                  /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("option", {
+                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("option", {
                     value: "",
                     children: "All types"
                   }, undefined, false, undefined, this),
-                  options.types.map((t) => /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("option", {
+                  options.types.map((t) => /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("option", {
                     value: t,
                     children: t
                   }, t, false, undefined, this))
@@ -27589,22 +28057,22 @@ function ArchiveFilterBar({
               }, undefined, true, undefined, this)
             ]
           }, undefined, true, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("label", {
+          /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("label", {
             children: [
-              /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("span", {
+              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
                 className: "visually-hidden",
                 children: "Theme"
               }, undefined, false, undefined, this),
-              /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("select", {
+              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("select", {
                 value: filters.theme ?? "",
                 onChange: selectHandler("theme"),
                 "aria-label": "Filter by theme",
                 children: [
-                  /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("option", {
+                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("option", {
                     value: "",
                     children: "All themes"
                   }, undefined, false, undefined, this),
-                  options.themes.map((t) => /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("option", {
+                  options.themes.map((t) => /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("option", {
                     value: t,
                     children: t
                   }, t, false, undefined, this))
@@ -27612,22 +28080,22 @@ function ArchiveFilterBar({
               }, undefined, true, undefined, this)
             ]
           }, undefined, true, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("label", {
+          /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("label", {
             children: [
-              /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("span", {
+              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
                 className: "visually-hidden",
                 children: "Repository"
               }, undefined, false, undefined, this),
-              /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("select", {
+              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("select", {
                 value: filters.repository ?? "",
                 onChange: selectHandler("repository"),
                 "aria-label": "Filter by repository",
                 children: [
-                  /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("option", {
+                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("option", {
                     value: "",
                     children: "All repositories"
                   }, undefined, false, undefined, this),
-                  options.repositories.map((r) => /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("option", {
+                  options.repositories.map((r) => /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("option", {
                     value: r,
                     children: r
                   }, r, false, undefined, this))
@@ -27635,22 +28103,22 @@ function ArchiveFilterBar({
               }, undefined, true, undefined, this)
             ]
           }, undefined, true, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("label", {
+          /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("label", {
             children: [
-              /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("span", {
+              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
                 className: "visually-hidden",
                 children: "Owner"
               }, undefined, false, undefined, this),
-              /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("select", {
+              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("select", {
                 value: filters.owner ?? "",
                 onChange: selectHandler("owner"),
                 "aria-label": "Filter by owner",
                 children: [
-                  /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("option", {
+                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("option", {
                     value: "",
                     children: "All owners"
                   }, undefined, false, undefined, this),
-                  options.owners.map((o) => /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("option", {
+                  options.owners.map((o) => /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("option", {
                     value: o,
                     children: o
                   }, o, false, undefined, this))
@@ -27658,13 +28126,13 @@ function ArchiveFilterBar({
               }, undefined, true, undefined, this)
             ]
           }, undefined, true, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("label", {
+          /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("label", {
             children: [
-              /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("span", {
+              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
                 className: "visually-hidden",
                 children: "Metadata completeness"
               }, undefined, false, undefined, this),
-              /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("select", {
+              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("select", {
                 value: filters.metadataComplete === true ? "true" : filters.metadataComplete === false ? "false" : "",
                 onChange: (e) => {
                   const v = e.target.value;
@@ -27672,15 +28140,15 @@ function ArchiveFilterBar({
                 },
                 "aria-label": "Filter by metadata completeness",
                 children: [
-                  /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("option", {
+                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("option", {
                     value: "",
                     children: "Any completeness"
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("option", {
+                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("option", {
                     value: "true",
                     children: "Metadata complete"
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("option", {
+                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("option", {
                     value: "false",
                     children: "Needs metadata"
                   }, undefined, false, undefined, this)
@@ -27688,14 +28156,14 @@ function ArchiveFilterBar({
               }, undefined, true, undefined, this)
             ]
           }, undefined, true, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("label", {
+          /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("label", {
             className: "archive-date",
             children: [
-              /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("span", {
+              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
                 className: "visually-hidden",
                 children: "From date"
               }, undefined, false, undefined, this),
-              /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("input", {
+              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("input", {
                 type: "date",
                 value: filters.fromDate ?? "",
                 onChange: (e) => set3("fromDate", e.target.value || undefined),
@@ -27703,14 +28171,14 @@ function ArchiveFilterBar({
               }, undefined, false, undefined, this)
             ]
           }, undefined, true, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("label", {
+          /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("label", {
             className: "archive-date",
             children: [
-              /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("span", {
+              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
                 className: "visually-hidden",
                 children: "To date"
               }, undefined, false, undefined, this),
-              /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("input", {
+              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("input", {
                 type: "date",
                 value: filters.toDate ?? "",
                 onChange: (e) => set3("toDate", e.target.value || undefined),
@@ -27720,24 +28188,24 @@ function ArchiveFilterBar({
           }, undefined, true, undefined, this)
         ]
       }, undefined, true, undefined, this),
-      isNonDefault2(filters) && /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("button", {
+      isNonDefault2(filters) && /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("button", {
         type: "button",
         className: "archive-clear",
         onClick: () => onChange({}),
         children: "Clear filters"
       }, undefined, false, undefined, this),
-      isNonDefault2(filters) && /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("div", {
+      isNonDefault2(filters) && /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
         className: "filter-chips",
         role: "list",
         "aria-label": "Active filters",
         children: [
-          filters.query && /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("span", {
+          filters.query && /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
             className: "filter-chip",
             role: "listitem",
             children: [
               "search: ",
               filters.query,
-              /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("button", {
+              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("button", {
                 type: "button",
                 "aria-label": "Remove search filter",
                 onClick: () => set3("query", undefined),
@@ -27745,13 +28213,13 @@ function ArchiveFilterBar({
               }, undefined, false, undefined, this)
             ]
           }, undefined, true, undefined, this),
-          filters.type && /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("span", {
+          filters.type && /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
             className: "filter-chip",
             role: "listitem",
             children: [
               "type: ",
               filters.type,
-              /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("button", {
+              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("button", {
                 type: "button",
                 "aria-label": `Remove type filter: ${filters.type}`,
                 onClick: () => set3("type", undefined),
@@ -27759,13 +28227,13 @@ function ArchiveFilterBar({
               }, undefined, false, undefined, this)
             ]
           }, undefined, true, undefined, this),
-          filters.theme && /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("span", {
+          filters.theme && /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
             className: "filter-chip",
             role: "listitem",
             children: [
               "theme: ",
               filters.theme,
-              /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("button", {
+              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("button", {
                 type: "button",
                 "aria-label": `Remove theme filter: ${filters.theme}`,
                 onClick: () => set3("theme", undefined),
@@ -27773,13 +28241,13 @@ function ArchiveFilterBar({
               }, undefined, false, undefined, this)
             ]
           }, undefined, true, undefined, this),
-          filters.repository && /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("span", {
+          filters.repository && /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
             className: "filter-chip",
             role: "listitem",
             children: [
               "repository: ",
               filters.repository,
-              /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("button", {
+              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("button", {
                 type: "button",
                 "aria-label": `Remove repository filter: ${filters.repository}`,
                 onClick: () => set3("repository", undefined),
@@ -27787,13 +28255,13 @@ function ArchiveFilterBar({
               }, undefined, false, undefined, this)
             ]
           }, undefined, true, undefined, this),
-          filters.owner && /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("span", {
+          filters.owner && /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
             className: "filter-chip",
             role: "listitem",
             children: [
               "owner: ",
               filters.owner,
-              /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("button", {
+              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("button", {
                 type: "button",
                 "aria-label": `Remove owner filter: ${filters.owner}`,
                 onClick: () => set3("owner", undefined),
@@ -27807,8 +28275,8 @@ function ArchiveFilterBar({
   }, undefined, true, undefined, this);
 }
 
-// ui/src/views/ArchiveView.tsx
-var jsx_dev_runtime11 = __toESM(require_jsx_dev_runtime(), 1);
+// src/views/ArchiveView.tsx
+var jsx_dev_runtime12 = __toESM(require_jsx_dev_runtime(), 1);
 var MONTHS = [
   "January",
   "February",
@@ -27958,26 +28426,26 @@ function groupByMonth(snapshots) {
 function ArchiveView() {
   const [urlState, setUrlState] = useUrlState();
   const { snapshots: rawSnapshots, nextCursor, loadMore, loading, error } = useArchiveData({ limit: 50 });
-  const [filters, setFilters] = import_react15.useState(() => ({
+  const [filters, setFilters] = import_react18.useState(() => ({
     query: urlState.query,
     type: urlState.filters.type,
     theme: urlState.filters.theme,
     repository: urlState.filters.repository,
     owner: urlState.filters.owner
   }));
-  const [selectedId, setSelectedId] = import_react15.useState(urlState.selected);
-  const [isNarrow, setIsNarrow] = import_react15.useState(() => typeof window !== "undefined" && window.innerWidth < NARROW_BREAKPOINT);
-  const [drawerOpen, setDrawerOpen] = import_react15.useState(false);
-  const triggerRef = import_react15.useRef(null);
-  const drawerRef = import_react15.useRef(null);
-  import_react15.useEffect(() => {
+  const [selectedId, setSelectedId] = import_react18.useState(urlState.selected);
+  const [isNarrow, setIsNarrow] = import_react18.useState(() => typeof window !== "undefined" && window.innerWidth < NARROW_BREAKPOINT);
+  const [drawerOpen, setDrawerOpen] = import_react18.useState(false);
+  const triggerRef = import_react18.useRef(null);
+  const drawerRef = import_react18.useRef(null);
+  import_react18.useEffect(() => {
     if (typeof window === "undefined")
       return;
     const onResize = () => setIsNarrow(window.innerWidth < NARROW_BREAKPOINT);
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
-  import_react15.useEffect(() => {
+  import_react18.useEffect(() => {
     if (!drawerOpen)
       return;
     const handleKey = (e) => {
@@ -27987,7 +28455,7 @@ function ArchiveView() {
     document.addEventListener("keydown", handleKey);
     return () => document.removeEventListener("keydown", handleKey);
   }, [drawerOpen]);
-  import_react15.useEffect(() => {
+  import_react18.useEffect(() => {
     if (drawerOpen) {
       const el = drawerRef.current;
       if (el) {
@@ -27998,10 +28466,10 @@ function ArchiveView() {
       triggerRef.current?.focus();
     }
   }, [drawerOpen]);
-  const allSnapshots = import_react15.useMemo(() => rawSnapshots.map(normalizeSnapshot), [rawSnapshots]);
-  const filtered = import_react15.useMemo(() => applyFilters(allSnapshots, filters), [allSnapshots, filters]);
-  const groups = import_react15.useMemo(() => groupByMonth(filtered), [filtered]);
-  const filterOptions = import_react15.useMemo(() => {
+  const allSnapshots = import_react18.useMemo(() => (rawSnapshots ?? []).map(normalizeSnapshot), [rawSnapshots]);
+  const filtered = import_react18.useMemo(() => applyFilters(allSnapshots, filters), [allSnapshots, filters]);
+  const groups = import_react18.useMemo(() => groupByMonth(filtered), [filtered]);
+  const filterOptions = import_react18.useMemo(() => {
     const themes = new Set;
     const owners = new Set;
     const repositories = new Set;
@@ -28023,9 +28491,9 @@ function ArchiveView() {
       types: [...types].sort()
     };
   }, [allSnapshots]);
-  const monthIndex = import_react15.useMemo(() => groups.map((g) => ({ label: g.month, short: g.month.split(" ")[0] })), [groups]);
-  const selected2 = import_react15.useMemo(() => filtered.find((s) => s.id === selectedId) ?? filtered[0], [filtered, selectedId]);
-  const handleSelect = import_react15.useCallback((id2, triggerEl) => {
+  const monthIndex = import_react18.useMemo(() => groups.map((g) => ({ label: g.month, short: g.month.split(" ")[0] })), [groups]);
+  const selected2 = import_react18.useMemo(() => filtered.find((s) => s.id === selectedId) ?? filtered[0], [filtered, selectedId]);
+  const handleSelect = import_react18.useCallback((id2, triggerEl) => {
     setSelectedId(id2);
     setUrlState({ selected: id2 });
     if (isNarrow) {
@@ -28034,7 +28502,7 @@ function ArchiveView() {
       setDrawerOpen(true);
     }
   }, [setUrlState, isNarrow]);
-  const handleFilterChange = import_react15.useCallback((next) => {
+  const handleFilterChange = import_react18.useCallback((next) => {
     setFilters(next);
     setUrlState({
       query: next.query,
@@ -28046,10 +28514,10 @@ function ArchiveView() {
       }
     });
   }, [setUrlState]);
-  const scrollRef = import_react15.useRef(null);
-  const monthRefs = import_react15.useRef(new Map);
-  const [activeMonth, setActiveMonth] = import_react15.useState();
-  import_react15.useEffect(() => {
+  const scrollRef = import_react18.useRef(null);
+  const monthRefs = import_react18.useRef(new Map);
+  const [activeMonth, setActiveMonth] = import_react18.useState();
+  import_react18.useEffect(() => {
     const root2 = scrollRef.current;
     if (!root2 || monthIndex.length === 0)
       return;
@@ -28063,11 +28531,11 @@ function ArchiveView() {
       observer.observe(el);
     return () => observer.disconnect();
   }, [monthIndex]);
-  const scrollToMonth = import_react15.useCallback((month) => {
+  const scrollToMonth = import_react18.useCallback((month) => {
     const el = monthRefs.current.get(month);
     el?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
-  const handleScroll = import_react15.useCallback(() => {
+  const handleScroll = import_react18.useCallback(() => {
     const el = scrollRef.current;
     if (!el || loading || !nextCursor)
       return;
@@ -28076,26 +28544,26 @@ function ArchiveView() {
       loadMore();
   }, [loading, nextCursor, loadMore]);
   if (error) {
-    return /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+    return /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
       className: "archive-view",
       role: "alert",
       children: [
-        /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("header", {
+        /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("header", {
           className: "archive-header",
-          children: /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+          children: /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
             children: [
-              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("h1", {
+              /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("h1", {
                 children: "Spec Library"
               }, undefined, false, undefined, this),
-              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("p", {
+              /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("p", {
                 children: "Browse, retrieve, and curate completed Kiro Specs."
               }, undefined, false, undefined, this)
             ]
           }, undefined, true, undefined, this)
         }, undefined, false, undefined, this),
-        /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+        /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
           className: "archive-empty",
-          children: /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("p", {
+          children: /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("p", {
             children: [
               "Failed to load the archive: ",
               error
@@ -28105,71 +28573,71 @@ function ArchiveView() {
       ]
     }, undefined, true, undefined, this);
   }
-  const detail = selected2 ? /* @__PURE__ */ jsx_dev_runtime11.jsxDEV(SnapshotDetail, {
+  const detail = selected2 ? /* @__PURE__ */ jsx_dev_runtime12.jsxDEV(SnapshotDetail, {
     snapshot: selected2
   }, undefined, false, undefined, this) : null;
-  return /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+  return /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
     className: `archive-view${isNarrow ? " archive-view--narrow" : ""}`,
     children: [
-      /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("header", {
+      /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("header", {
         className: "archive-header",
         children: [
-          /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+          /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
             children: [
-              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("h1", {
+              /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("h1", {
                 children: "Spec Library"
               }, undefined, false, undefined, this),
-              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("p", {
+              /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("p", {
                 children: "Browse, retrieve, and curate completed Kiro Specs."
               }, undefined, false, undefined, this)
             ]
           }, undefined, true, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+          /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
             "aria-live": "polite",
             children: loading ? "Loading…" : `${filtered.length} archived spec${filtered.length === 1 ? "" : "s"}`
           }, undefined, false, undefined, this)
         ]
       }, undefined, true, undefined, this),
-      /* @__PURE__ */ jsx_dev_runtime11.jsxDEV(ArchiveFilterBar, {
+      /* @__PURE__ */ jsx_dev_runtime12.jsxDEV(ArchiveFilterBar, {
         filters,
         options: filterOptions,
         onChange: handleFilterChange,
         resultCount: filtered.length
       }, undefined, false, undefined, this),
-      /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+      /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
         className: "archive-body",
         children: [
-          /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("section", {
+          /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("section", {
             className: "archive-table",
             "aria-label": "Completed specs",
             ref: scrollRef,
             onScroll: handleScroll,
             children: [
-              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+              /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
                 className: "archive-row archive-row--head",
                 role: "row",
                 children: [
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                     children: "Spec name"
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                     children: "Type"
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                     children: "Theme"
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                     children: "Repository"
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                     children: "Owner"
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                     children: "Completed"
                   }, undefined, false, undefined, this)
                 ]
               }, undefined, true, undefined, this),
-              groups.map((group) => /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+              groups.map((group) => /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
                 className: "archive-month",
                 "data-month": group.month,
                 ref: (el) => {
@@ -28179,75 +28647,75 @@ function ArchiveView() {
                     monthRefs.current.delete(group.month);
                 },
                 children: [
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("h2", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("h2", {
                     children: group.month
                   }, undefined, false, undefined, this),
-                  group.rows.map((row) => /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("button", {
+                  group.rows.map((row) => /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("button", {
                     type: "button",
                     className: `archive-row${selected2?.id === row.id ? " is-selected" : ""}`,
                     onClick: (e) => handleSelect(row.id, e.currentTarget),
                     "aria-pressed": selected2?.id === row.id,
                     children: [
-                      /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
-                        children: /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("strong", {
+                      /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
+                        children: /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("strong", {
                           children: row.title
                         }, undefined, false, undefined, this)
                       }, undefined, false, undefined, this),
-                      /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+                      /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                         children: row.type
                       }, undefined, false, undefined, this),
-                      /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+                      /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                         children: row.theme
                       }, undefined, false, undefined, this),
-                      /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+                      /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                         children: row.repository
                       }, undefined, false, undefined, this),
-                      /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+                      /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                         children: row.owner
                       }, undefined, false, undefined, this),
-                      /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+                      /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                         children: row.dateLabel
                       }, undefined, false, undefined, this)
                     ]
                   }, row.id, true, undefined, this))
                 ]
               }, group.month, true, undefined, this)),
-              loading && /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+              loading && /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
                 className: "archive-loading",
                 role: "status",
                 "aria-live": "polite",
                 "aria-label": "Loading more specs",
                 children: [
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
                     className: "skeleton-row"
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
                     className: "skeleton-row"
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
                     className: "skeleton-row"
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
                     className: "skeleton-row"
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
                     className: "skeleton-row"
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
                     className: "skeleton-row"
                   }, undefined, false, undefined, this)
                 ]
               }, undefined, true, undefined, this),
-              !loading && filtered.length === 0 && /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+              !loading && filtered.length === 0 && /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
                 className: "archive-empty",
                 children: "No archived specs match your filters. Filters have been retained so you can adjust them."
               }, undefined, false, undefined, this)
             ]
           }, undefined, true, undefined, this),
-          monthIndex.length > 0 && /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("nav", {
+          monthIndex.length > 0 && /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("nav", {
             className: "month-index",
             "aria-label": "Jump to month",
-            children: monthIndex.map((m) => /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("button", {
+            children: monthIndex.map((m) => /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("button", {
               type: "button",
               className: activeMonth === m.label ? "active" : undefined,
               onClick: () => scrollToMonth(m.label),
@@ -28257,21 +28725,21 @@ function ArchiveView() {
           }, undefined, false, undefined, this)
         ]
       }, undefined, true, undefined, this),
-      !isNarrow && selected2 && /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+      !isNarrow && selected2 && /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
         className: "archive-detail-region",
         children: [
           detail,
-          selected2.specKey && /* @__PURE__ */ jsx_dev_runtime11.jsxDEV(DetailPanel, {
+          selected2.specKey && /* @__PURE__ */ jsx_dev_runtime12.jsxDEV(DetailPanel, {
             specKey: selected2.specKey,
             variant: "drawer"
           }, undefined, false, undefined, this)
         ]
       }, undefined, true, undefined, this),
-      isNarrow && drawerOpen && selected2 && /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+      isNarrow && drawerOpen && selected2 && /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
         className: "archive-drawer-backdrop",
         role: "presentation",
         onMouseDown: () => setDrawerOpen(false),
-        children: /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("aside", {
+        children: /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("aside", {
           className: "archive-drawer",
           role: "dialog",
           "aria-modal": "true",
@@ -28279,7 +28747,7 @@ function ArchiveView() {
           ref: drawerRef,
           onMouseDown: (e) => e.stopPropagation(),
           children: [
-            /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("button", {
+            /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("button", {
               type: "button",
               className: "archive-drawer__close",
               onClick: () => setDrawerOpen(false),
@@ -28287,7 +28755,7 @@ function ArchiveView() {
               children: "✕"
             }, undefined, false, undefined, this),
             detail,
-            selected2.specKey && /* @__PURE__ */ jsx_dev_runtime11.jsxDEV(DetailPanel, {
+            selected2.specKey && /* @__PURE__ */ jsx_dev_runtime12.jsxDEV(DetailPanel, {
               specKey: selected2.specKey,
               variant: "drawer"
             }, undefined, false, undefined, this)
@@ -28301,52 +28769,52 @@ function SnapshotDetail({
   snapshot
 }) {
   const completenessPct = snapshot.metadataComplete ? 100 : 50;
-  return /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("section", {
+  return /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("section", {
     className: "archive-detail",
     "aria-label": `Details for ${snapshot.title}`,
     children: [
-      /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+      /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
         className: "archive-detail__intro",
-        children: /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+        children: /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
           children: [
-            /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+            /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
               className: "archive-detail__title",
               children: [
-                /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("h2", {
+                /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("h2", {
                   children: snapshot.title
                 }, undefined, false, undefined, this),
-                /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+                /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                   children: "Completed"
                 }, undefined, false, undefined, this)
               ]
             }, undefined, true, undefined, this),
-            snapshot.tags.length > 0 && /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+            snapshot.tags.length > 0 && /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
               className: "archive-tags",
-              children: snapshot.tags.map((tag) => /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+              children: snapshot.tags.map((tag) => /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                 children: tag
               }, tag, false, undefined, this))
             }, undefined, false, undefined, this)
           ]
         }, undefined, true, undefined, this)
       }, undefined, false, undefined, this),
-      /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+      /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
         className: "archive-columns",
         children: [
-          /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("section", {
+          /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("section", {
             children: [
-              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("h3", {
+              /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("h3", {
                 children: "Artifact completeness"
               }, undefined, false, undefined, this),
-              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+              /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
                 className: "archive-fact",
                 children: [
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                     children: "Metadata"
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("strong", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("strong", {
                     children: snapshot.metadataComplete ? "Complete" : "Incomplete"
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("progress", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("progress", {
                     max: 100,
                     value: completenessPct
                   }, undefined, false, undefined, this)
@@ -28354,131 +28822,131 @@ function SnapshotDetail({
               }, undefined, true, undefined, this)
             ]
           }, undefined, true, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("section", {
+          /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("section", {
             children: [
-              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("h3", {
+              /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("h3", {
                 children: "Source"
               }, undefined, false, undefined, this),
-              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+              /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
                 className: "archive-fact",
                 children: [
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                     children: "Repository"
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("strong", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("strong", {
                     children: snapshot.provenance.repository
                   }, undefined, false, undefined, this)
                 ]
               }, undefined, true, undefined, this),
-              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+              /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
                 className: "archive-fact",
                 children: [
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                     children: "Path"
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("strong", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("strong", {
                     children: snapshot.provenance.relativePath
                   }, undefined, false, undefined, this)
                 ]
               }, undefined, true, undefined, this),
-              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+              /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
                 className: "archive-fact",
                 children: [
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                     children: "Branch"
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("strong", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("strong", {
                     children: snapshot.provenance.branch
                   }, undefined, false, undefined, this)
                 ]
               }, undefined, true, undefined, this),
-              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+              /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
                 className: "archive-fact",
                 children: [
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                     children: "Commit"
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("strong", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("strong", {
                     children: snapshot.provenance.commitHash.slice(0, 12) || "—"
                   }, undefined, false, undefined, this)
                 ]
               }, undefined, true, undefined, this)
             ]
           }, undefined, true, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("section", {
+          /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("section", {
             children: [
-              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("h3", {
+              /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("h3", {
                 children: "Provenance"
               }, undefined, false, undefined, this),
-              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+              /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
                 className: "archive-fact",
                 children: [
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                     children: "Owner"
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("strong", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("strong", {
                     children: snapshot.owner
                   }, undefined, false, undefined, this)
                 ]
               }, undefined, true, undefined, this),
-              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+              /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
                 className: "archive-fact",
                 children: [
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                     children: "Archived on"
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("strong", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("strong", {
                     children: snapshot.dateLabel
                   }, undefined, false, undefined, this)
                 ]
               }, undefined, true, undefined, this),
-              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+              /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
                 className: "archive-fact",
                 children: [
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                     children: "Spec key"
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("strong", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("strong", {
                     children: snapshot.specKey || "—"
                   }, undefined, false, undefined, this)
                 ]
               }, undefined, true, undefined, this),
-              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+              /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
                 className: "archive-fact",
                 children: [
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                     children: "Content digest"
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("strong", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("strong", {
                     children: snapshot.contentDigest.slice(0, 12) || "—"
                   }, undefined, false, undefined, this)
                 ]
               }, undefined, true, undefined, this)
             ]
           }, undefined, true, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("section", {
+          /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("section", {
             children: [
-              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("h3", {
+              /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("h3", {
                 children: "Disposition"
               }, undefined, false, undefined, this),
-              /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+              /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
                 className: "archive-fact",
                 children: [
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                     children: "Status"
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("strong", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("strong", {
                     children: snapshot.legalHoldActive ? "Superseded" : "Active"
                   }, undefined, false, undefined, this)
                 ]
               }, undefined, true, undefined, this),
-              snapshot.legalHoldActive && snapshot.legalHoldReason && /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("div", {
+              snapshot.legalHoldActive && snapshot.legalHoldReason && /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
                 className: "archive-fact",
                 children: [
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("span", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                     children: "Successor"
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsx_dev_runtime11.jsxDEV("strong", {
+                  /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("strong", {
                     children: snapshot.legalHoldReason
                   }, undefined, false, undefined, this)
                 ]
@@ -28491,9 +28959,9 @@ function SnapshotDetail({
   }, undefined, true, undefined, this);
 }
 
-// ui/src/components/AppChrome.tsx
-var import_react16 = __toESM(require_react(), 1);
-var jsx_dev_runtime12 = __toESM(require_jsx_dev_runtime(), 1);
+// src/components/AppChrome.tsx
+var import_react19 = __toESM(require_react(), 1);
+var jsx_dev_runtime13 = __toESM(require_jsx_dev_runtime(), 1);
 function AppChrome({
   view,
   themeMode,
@@ -28501,21 +28969,21 @@ function AppChrome({
   onThemeChange
 }) {
   const nextTheme = themeMode === "dark" ? "light" : "dark";
-  const [copyLabel, setCopyLabel] = import_react16.useState("Copy link");
+  const [copyLabel, setCopyLabel] = import_react19.useState("Copy link");
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
     setCopyLabel("Copied!");
     setTimeout(() => setCopyLabel("Copy link"), 1500);
   };
-  return /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
+  return /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("div", {
     className: "app-chrome",
     children: [
-      /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
+      /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("div", {
         className: "view-switcher",
         role: "tablist",
         "aria-label": "View",
         children: [
-          /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("button", {
+          /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("button", {
             type: "button",
             role: "tab",
             "aria-selected": view === "relationship",
@@ -28523,7 +28991,7 @@ function AppChrome({
             onClick: () => onViewChange("relationship"),
             children: "Relationships"
           }, undefined, false, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("button", {
+          /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("button", {
             type: "button",
             role: "tab",
             "aria-selected": view === "archive",
@@ -28533,72 +29001,60 @@ function AppChrome({
           }, undefined, false, undefined, this)
         ]
       }, undefined, true, undefined, this),
-      /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
+      /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("div", {
         className: "chrome-actions",
         children: [
-          /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("button", {
+          /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("button", {
             type: "button",
             className: "copy-link-btn",
             onClick: handleCopyLink,
             "aria-label": "Copy current page link",
             title: "Copy current page link",
-            children: copyLabel
-          }, undefined, false, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("button", {
+            children: [
+              /* @__PURE__ */ jsx_dev_runtime13.jsxDEV(Link, {
+                size: 14,
+                "aria-hidden": "true"
+              }, undefined, false, undefined, this),
+              copyLabel
+            ]
+          }, undefined, true, undefined, this),
+          /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("button", {
             type: "button",
             className: "theme-switcher",
             onClick: () => onThemeChange(nextTheme),
             "aria-label": `Switch to ${nextTheme} theme`,
             title: `Switch to ${nextTheme} theme`,
-            children: themeMode === "dark" ? "☾ Dark" : "☀ Light"
-          }, undefined, false, undefined, this)
+            children: [
+              themeMode === "dark" ? /* @__PURE__ */ jsx_dev_runtime13.jsxDEV(Moon, {
+                size: 14,
+                "aria-hidden": "true"
+              }, undefined, false, undefined, this) : /* @__PURE__ */ jsx_dev_runtime13.jsxDEV(Sun, {
+                size: 14,
+                "aria-hidden": "true"
+              }, undefined, false, undefined, this),
+              themeMode === "dark" ? "Dark" : "Light"
+            ]
+          }, undefined, true, undefined, this)
         ]
       }, undefined, true, undefined, this)
     ]
   }, undefined, true, undefined, this);
 }
 
-// ui/src/App.tsx
-var jsx_dev_runtime13 = __toESM(require_jsx_dev_runtime(), 1);
-
-class ErrorBoundary extends import_react17.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
-  static getDerivedStateFromError(error) {
-    return { hasError: true, error };
-  }
-  componentDidCatch(error, errorInfo) {
-    console.error("[SpecLibrary] Uncaught error:", error, errorInfo);
-  }
-  render() {
-    if (this.state.hasError) {
-      return /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("div", {
-        role: "alert",
-        className: "error-boundary",
-        children: [
-          /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("h2", {
-            children: "Something went wrong"
-          }, undefined, false, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("pre", {
-            children: this.state.error?.message
-          }, undefined, false, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("button", {
-            onClick: () => this.setState({ hasError: false, error: null }),
-            children: "Try again"
-          }, undefined, false, undefined, this)
-        ]
-      }, undefined, true, undefined, this);
-    }
-    return this.props.children;
-  }
+// src/App.tsx
+var jsx_dev_runtime14 = __toESM(require_jsx_dev_runtime(), 1);
+var cssUrl = new URL("./index.css", import.meta.url).href;
+if (typeof document !== "undefined" && !document.querySelector(`link[href="${cssUrl}"]`)) {
+  const link2 = document.createElement("link");
+  link2.rel = "stylesheet";
+  link2.href = cssUrl;
+  document.head.appendChild(link2);
 }
 function AppProvider({
   children: children2,
   overrides
 }) {
-  return /* @__PURE__ */ jsx_dev_runtime13.jsxDEV(CrewProvider, {
+  return /* @__PURE__ */ jsx_dev_runtime14.jsxDEV(CrewProvider, {
     overrides,
     children: children2
   }, undefined, false, undefined, this);
@@ -28607,60 +29063,58 @@ function AppContent() {
   const { ready, error } = useCrew();
   const [urlState, setUrlState] = useUrlState();
   if (error) {
-    return /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("div", {
+    return /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("div", {
       role: "alert",
       className: "crew-error",
       children: [
-        /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("h2", {
+        /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("h2", {
           children: "Integration Error"
         }, undefined, false, undefined, this),
-        /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("p", {
+        /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("p", {
           children: error
         }, undefined, false, undefined, this)
       ]
     }, undefined, true, undefined, this);
   }
   if (!ready) {
-    return /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("div", {
+    return /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("div", {
       className: "loading",
       "aria-busy": "true",
-      children: /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("p", {
+      children: /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("p", {
         children: "Initializing…"
       }, undefined, false, undefined, this)
     }, undefined, false, undefined, this);
   }
   const { view, themeMode } = urlState;
-  return /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("div", {
+  return /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("div", {
     "data-theme": themeMode,
     className: `app-root theme-${themeMode}`,
     children: [
-      /* @__PURE__ */ jsx_dev_runtime13.jsxDEV(AppChrome, {
+      /* @__PURE__ */ jsx_dev_runtime14.jsxDEV(AppChrome, {
         view,
         themeMode,
         onViewChange: (v) => setUrlState({ view: v }),
         onThemeChange: (m) => setUrlState({ themeMode: m })
       }, undefined, false, undefined, this),
-      view === "relationship" ? /* @__PURE__ */ jsx_dev_runtime13.jsxDEV(RelationshipView, {}, undefined, false, undefined, this) : /* @__PURE__ */ jsx_dev_runtime13.jsxDEV(ArchiveView, {}, undefined, false, undefined, this)
+      view === "relationship" ? /* @__PURE__ */ jsx_dev_runtime14.jsxDEV(RelationshipView, {}, undefined, false, undefined, this) : /* @__PURE__ */ jsx_dev_runtime14.jsxDEV(ArchiveView, {}, undefined, false, undefined, this)
     ]
   }, undefined, true, undefined, this);
 }
 function App({ crewOverrides } = {}) {
-  return /* @__PURE__ */ jsx_dev_runtime13.jsxDEV(ErrorBoundary, {
-    children: /* @__PURE__ */ jsx_dev_runtime13.jsxDEV(AppProvider, {
-      overrides: crewOverrides,
-      children: /* @__PURE__ */ jsx_dev_runtime13.jsxDEV(AppContent, {}, undefined, false, undefined, this)
-    }, undefined, false, undefined, this)
+  return /* @__PURE__ */ jsx_dev_runtime14.jsxDEV(AppProvider, {
+    overrides: crewOverrides,
+    children: /* @__PURE__ */ jsx_dev_runtime14.jsxDEV(AppContent, {}, undefined, false, undefined, this)
   }, undefined, false, undefined, this);
 }
 
-// ui/src/preview.tsx
-var jsx_dev_runtime14 = __toESM(require_jsx_dev_runtime(), 1);
+// src/preview.tsx
+var jsx_dev_runtime15 = __toESM(require_jsx_dev_runtime(), 1);
 var sampleSpecs = [
-  { key: "agent-memory", title: "Agent Memory v2", type: "feature", stage: "design", progress: 66, owner: "Maya Chen", theme: "AI Foundations", repository: "crew-platform", relationships: [{ targetKey: "retention", type: "depends_on" }] },
-  { key: "retention", title: "Memory retention controls", type: "feature", stage: "tasks", progress: 78, owner: "Maya Chen", theme: "AI Foundations", repository: "crew-platform", suggestions: [{ targetKey: "usage-alerts", type: "related" }] },
-  { key: "usage-alerts", title: "Usage anomaly alerts", type: "feature", stage: "requirements", progress: 33, owner: "Daniel Kim", theme: "Platform Reliability", repository: "crew-platform" },
-  { key: "observability", title: "Trace correlation", type: "quick", stage: "completed", progress: 100, owner: "Ravi Patel", theme: "Platform Reliability", repository: "crew-platform" },
-  { key: "workspace-export", title: "Workspace export fixes", type: "bugfix", stage: "tasks", progress: 68, owner: "Maya Chen", theme: "Developer Experience", repository: "crew-platform", relationships: [{ targetKey: "agent-memory", type: "blocks" }] }
+  { key: "agent-memory", title: "Agent Memory v2", type: "feature", stage: "scoped", progress: 66, owner: "Maya Chen", theme: "AI Foundations", repository: "crew-platform", relationships: [{ targetKey: "retention", type: "depends_on" }] },
+  { key: "retention", title: "Memory retention controls", type: "feature", stage: "in-flight", progress: 78, owner: "Maya Chen", theme: "AI Foundations", repository: "crew-platform", suggestions: [{ targetKey: "usage-alerts", type: "related" }] },
+  { key: "usage-alerts", title: "Usage anomaly alerts", type: "feature", stage: "new", progress: 33, owner: "Daniel Kim", theme: "Platform Reliability", repository: "crew-platform" },
+  { key: "observability", title: "Trace correlation", type: "quick", stage: "done", progress: 100, owner: "Ravi Patel", theme: "Platform Reliability", repository: "crew-platform" },
+  { key: "workspace-export", title: "Workspace export fixes", type: "bugfix", stage: "in-flight", progress: 68, owner: "Maya Chen", theme: "Developer Experience", repository: "crew-platform", relationships: [{ targetKey: "agent-memory", type: "blocks" }] }
 ];
 var sampleSnapshots = [
   {
@@ -28711,7 +29165,8 @@ var overrides = {
   theme: { mode: "dark", colors: {} },
   api: {
     async fetch(path, init2) {
-      const json = (data) => new Response(JSON.stringify(data), {
+      const json = (data, status = 200) => new Response(JSON.stringify(data), {
+        status,
         headers: { "Content-Type": "application/json" }
       });
       if (init2?.method === "PATCH" && /\/specs\/.+\/metadata$/.test(path)) {
@@ -28740,6 +29195,28 @@ var overrides = {
           }
         ] : [];
         return json({ suggestions });
+      }
+      if (init2?.method === "POST" && /\/proposals\/.+\/(accept|reject)$/.test(path)) {
+        return json({ id: "mock", status: "accepted", resolved_at: new Date().toISOString() });
+      }
+      const prop = path.match(/\/specs\/([^/]+)\/proposals/);
+      if (prop) {
+        if (init2?.method === "POST") {
+          return json({ id: crypto.randomUUID(), status: "pending" }, 201);
+        }
+        const key = decodeURIComponent(prop[1] ?? "");
+        const proposals = key === "retention" ? [
+          {
+            id: "prop-1",
+            spec_key: "retention",
+            patch: JSON.stringify({ summary: "Updated memory retention controls with 30-day window", tags: ["retention", "memory", "controls"] }),
+            status: "pending",
+            submitted_at: "2026-08-15T06:30:00Z",
+            rationale: "Auto-populated from code analysis: the implementation defines a 30-day retention window.",
+            source: "agent"
+          }
+        ] : [];
+        return json({ proposals });
       }
       const det = path.match(/^\/specs\/([^/?]+)$/);
       if (det) {
@@ -28788,6 +29265,6 @@ var overrides = {
     }
   }
 };
-import_client.createRoot(document.getElementById("root")).render(/* @__PURE__ */ jsx_dev_runtime14.jsxDEV(App, {
+import_client.createRoot(document.getElementById("root")).render(/* @__PURE__ */ jsx_dev_runtime15.jsxDEV(App, {
   crewOverrides: overrides
 }, undefined, false, undefined, this));

@@ -45,6 +45,21 @@ export function listBySpec(db: Database, specKey: string): RelationshipRow[] {
   return stmt.all({ $spec_key: specKey }) as RelationshipRow[];
 }
 
+/** Bulk-fetch relationships whose source is one of the given spec keys (for graph edge building). */
+export function listBySourceKeys(db: Database, specKeys: string[]): RelationshipRow[] {
+  if (specKeys.length === 0) return [];
+  const placeholders = specKeys.map((_, i) => `$k${i}`).join(", ");
+  const params: Record<string, string> = {};
+  specKeys.forEach((key, i) => {
+    params[`$k${i}`] = key;
+  });
+  const stmt = db.prepare(`
+    SELECT * FROM relationships
+    WHERE source_spec_key IN (${placeholders})
+  `);
+  return stmt.all(params) as RelationshipRow[];
+}
+
 export function checkDuplicate(
   db: Database,
   sourceSpecKey: string,

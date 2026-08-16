@@ -4,11 +4,11 @@ import { App } from "./App.js";
 import "./styles/global.css";
 
 const sampleSpecs = [
-  { key: "agent-memory", title: "Agent Memory v2", type: "feature", stage: "design", progress: 66, owner: "Maya Chen", theme: "AI Foundations", repository: "crew-platform", relationships: [{ targetKey: "retention", type: "depends_on" }] },
-  { key: "retention", title: "Memory retention controls", type: "feature", stage: "tasks", progress: 78, owner: "Maya Chen", theme: "AI Foundations", repository: "crew-platform", suggestions: [{ targetKey: "usage-alerts", type: "related" }] },
-  { key: "usage-alerts", title: "Usage anomaly alerts", type: "feature", stage: "requirements", progress: 33, owner: "Daniel Kim", theme: "Platform Reliability", repository: "crew-platform" },
-  { key: "observability", title: "Trace correlation", type: "quick", stage: "completed", progress: 100, owner: "Ravi Patel", theme: "Platform Reliability", repository: "crew-platform" },
-  { key: "workspace-export", title: "Workspace export fixes", type: "bugfix", stage: "tasks", progress: 68, owner: "Maya Chen", theme: "Developer Experience", repository: "crew-platform", relationships: [{ targetKey: "agent-memory", type: "blocks" }] },
+  { key: "agent-memory", title: "Agent Memory v2", type: "feature", stage: "scoped", progress: 66, owner: "Maya Chen", theme: "AI Foundations", repository: "crew-platform", relationships: [{ targetKey: "retention", type: "depends_on" }] },
+  { key: "retention", title: "Memory retention controls", type: "feature", stage: "in-flight", progress: 78, owner: "Maya Chen", theme: "AI Foundations", repository: "crew-platform", suggestions: [{ targetKey: "usage-alerts", type: "related" }] },
+  { key: "usage-alerts", title: "Usage anomaly alerts", type: "feature", stage: "new", progress: 33, owner: "Daniel Kim", theme: "Platform Reliability", repository: "crew-platform" },
+  { key: "observability", title: "Trace correlation", type: "quick", stage: "done", progress: 100, owner: "Ravi Patel", theme: "Platform Reliability", repository: "crew-platform" },
+  { key: "workspace-export", title: "Workspace export fixes", type: "bugfix", stage: "in-flight", progress: 68, owner: "Maya Chen", theme: "Developer Experience", repository: "crew-platform", relationships: [{ targetKey: "agent-memory", type: "blocks" }] },
 ];
 
 // Representative archive snapshots (backend row shape: JSON string columns).

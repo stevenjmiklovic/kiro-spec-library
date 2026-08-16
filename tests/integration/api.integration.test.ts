@@ -43,7 +43,7 @@ function makeSpec(overrides: Partial<NormalizedSpec> = {}): NormalizedSpec {
     workflow: "requirements-first",
     title: "Test Spec Title",
     owner: "tester",
-    stage: "design",
+    stage: "scoped",
     progress: 50,
     provenance: {
       repository: "test-repo",
@@ -167,6 +167,36 @@ describe("REST API integration tests", () => {
       const keys = (data.specs as Array<{ key: string }>).map((s) => s.key);
       expect(keys).toContain("test-source::test-spec");
       expect(keys).toContain("test-source::target-spec");
+    });
+
+    test("attaches each spec's relationships and pending suggestions", async () => {
+      const res = await handleRequest("GET", "/specs");
+      expect(res.status).toBe(200);
+
+      const data = await res.json() as {
+        specs: Array<{
+          key: string;
+          relationships: Array<{ targetKey: string; type: string }>;
+          suggestions: Array<{ targetKey: string; type: string }>;
+        }>;
+      };
+
+      const testSpec = data.specs.find((s) => s.key === "test-source::test-spec");
+      expect(testSpec).toBeDefined();
+      // No accepted relationship exists yet at this point in the suite.
+      expect(testSpec!.relationships).toEqual([]);
+      // Both suggestions seeded in beforeAll are still pending here.
+      expect(testSpec!.suggestions).toEqual(
+        expect.arrayContaining([
+          { targetKey: "test-source::target-spec", type: "related" },
+          { targetKey: "test-source::target-spec", type: "depends_on" },
+        ]),
+      );
+
+      const targetSpec = data.specs.find((s) => s.key === "test-source::target-spec");
+      expect(targetSpec).toBeDefined();
+      expect(targetSpec!.relationships).toEqual([]);
+      expect(targetSpec!.suggestions).toEqual([]);
     });
 
     test("supports type filter", async () => {

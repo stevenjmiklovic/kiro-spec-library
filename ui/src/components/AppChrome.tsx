@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link, Moon, Sun } from 'lucide-react';
 import type { ThemeMode, ViewMode } from '../hooks/useUrlState.js';
 
 interface Props {
@@ -62,6 +63,7 @@ export function AppChrome({
           aria-label="Copy current page link"
           title="Copy current page link"
         >
+          <Link size={14} aria-hidden="true" />
           {copyLabel}
         </button>
 
@@ -72,7 +74,8 @@ export function AppChrome({
           aria-label={`Switch to ${nextTheme} theme`}
           title={`Switch to ${nextTheme} theme`}
         >
-          {themeMode === 'dark' ? '☾ Dark' : '☀ Light'}
+          {themeMode === 'dark' ? <Moon size={14} aria-hidden="true" /> : <Sun size={14} aria-hidden="true" />}
+          {themeMode === 'dark' ? 'Dark' : 'Light'}
         </button>
       </div>
     </div>

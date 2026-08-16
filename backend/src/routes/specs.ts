@@ -10,6 +10,35 @@ import {
 import { getOverlay } from "../db/queries/metadata.js";
 import { RevisionConflictError } from "../db/queries/metadata.js";
 import { applyPatch, resolveMetadata, evaluateCompleteness } from "../services/metadata.js";
+import { listBySourceKeys } from "../db/queries/relationships.js";
+import { listPendingBySourceKeys } from "../db/queries/suggestions.js";
+
+/** Attach each spec's outgoing accepted relationships and pending suggestions (for the graph view). */
+function attachRelationshipData(db: Database, specs: SpecRow[]) {
+  const keys = specs.map((spec) => spec.key);
+  const relationships = listBySourceKeys(db, keys);
+  const suggestions = listPendingBySourceKeys(db, keys);
+
+  const relsByKey = new Map<string, Array<{ targetKey: string; type: string }>>();
+  for (const rel of relationships) {
+    const list = relsByKey.get(rel.source_spec_key) ?? [];
+    list.push({ targetKey: rel.target_spec_key, type: rel.type });
+    relsByKey.set(rel.source_spec_key, list);
+  }
+
+  const sugsByKey = new Map<string, Array<{ targetKey: string; type: string }>>();
+  for (const sug of suggestions) {
+    const list = sugsByKey.get(sug.source_spec_key) ?? [];
+    list.push({ targetKey: sug.target_spec_key, type: sug.type });
+    sugsByKey.set(sug.source_spec_key, list);
+  }
+
+  return specs.map((spec) => ({
+    ...spec,
+    relationships: relsByKey.get(spec.key) ?? [],
+    suggestions: sugsByKey.get(spec.key) ?? [],
+  }));
+}
 
 export function specRoutes(deps: { db: Database }) {
   const { db } = deps;
@@ -79,7 +108,7 @@ export function specRoutes(deps: { db: Database }) {
           total = countSpecs(db, { type, stage, owner, theme, repository });
         }
 
-        return { specs, total, limit, offset };
+        return { specs: attachRelationshipData(db, specs), total, limit, offset };
       },
       {
         query: t.Object({
