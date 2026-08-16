@@ -26092,8 +26092,15 @@ var __iconNode2 = [
   ["path", { d: "M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662", key: "154egf" }]
 ];
 var CircleUser = createLucideIcon("circle-user", __iconNode2);
-// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/triangle-alert.mjs
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/rotate-ccw-clock.mjs
 var __iconNode3 = [
+  ["path", { d: "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8", key: "1357e3" }],
+  ["path", { d: "M3 3v5h5", key: "1xhq8a" }],
+  ["path", { d: "M12 7v5l4 2", key: "1fdv2h" }]
+];
+var RotateCcwClock = createLucideIcon("rotate-ccw-clock", __iconNode3);
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/triangle-alert.mjs
+var __iconNode4 = [
   [
     "path",
     {
@@ -26104,9 +26111,9 @@ var __iconNode3 = [
   ["path", { d: "M12 9v4", key: "juzpu7" }],
   ["path", { d: "M12 17h.01", key: "p32p05" }]
 ];
-var TriangleAlert = createLucideIcon("triangle-alert", __iconNode3);
+var TriangleAlert = createLucideIcon("triangle-alert", __iconNode4);
 // ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/database-backup.mjs
-var __iconNode4 = [
+var __iconNode5 = [
   ["ellipse", { cx: "12", cy: "5", rx: "9", ry: "3", key: "msslwz" }],
   ["path", { d: "M3 12a9 3 0 0 0 5 2.69", key: "1ui2ym" }],
   ["path", { d: "M21 9.3V5", key: "6k6cib" }],
@@ -26120,15 +26127,15 @@ var __iconNode4 = [
     }
   ]
 ];
-var DatabaseBackup = createLucideIcon("database-backup", __iconNode4);
+var DatabaseBackup = createLucideIcon("database-backup", __iconNode5);
 // ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/link.mjs
-var __iconNode5 = [
+var __iconNode6 = [
   ["path", { d: "M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71", key: "1cjeqo" }],
   ["path", { d: "M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71", key: "19qd67" }]
 ];
-var Link = createLucideIcon("link", __iconNode5);
+var Link = createLucideIcon("link", __iconNode6);
 // ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/moon.mjs
-var __iconNode6 = [
+var __iconNode7 = [
   [
     "path",
     {
@@ -26137,9 +26144,9 @@ var __iconNode6 = [
     }
   ]
 ];
-var Moon = createLucideIcon("moon", __iconNode6);
+var Moon = createLucideIcon("moon", __iconNode7);
 // ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/sun.mjs
-var __iconNode7 = [
+var __iconNode8 = [
   ["circle", { cx: "12", cy: "12", r: "4", key: "4exip2" }],
   ["path", { d: "M12 2v2", key: "tus03m" }],
   ["path", { d: "M12 20v2", key: "1lh1kg" }],
@@ -26150,22 +26157,22 @@ var __iconNode7 = [
   ["path", { d: "m6.34 17.66-1.41 1.41", key: "1m8zz5" }],
   ["path", { d: "m19.07 4.93-1.41 1.41", key: "1shlcs" }]
 ];
-var Sun = createLucideIcon("sun", __iconNode7);
+var Sun = createLucideIcon("sun", __iconNode8);
 // ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/target.mjs
-var __iconNode8 = [
+var __iconNode9 = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
   ["circle", { cx: "12", cy: "12", r: "6", key: "1vlfrh" }],
   ["circle", { cx: "12", cy: "12", r: "2", key: "1c9p78" }]
 ];
-var Target = createLucideIcon("target", __iconNode8);
+var Target = createLucideIcon("target", __iconNode9);
 // ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/x.mjs
-var __iconNode9 = [
+var __iconNode10 = [
   ["path", { d: "M18 6 6 18", key: "1bl5f8" }],
   ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
 ];
-var X = createLucideIcon("x", __iconNode9);
+var X = createLucideIcon("x", __iconNode10);
 // ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/zap.mjs
-var __iconNode10 = [
+var __iconNode11 = [
   [
     "path",
     {
@@ -26174,7 +26181,7 @@ var __iconNode10 = [
     }
   ]
 ];
-var Zap = createLucideIcon("zap", __iconNode10);
+var Zap = createLucideIcon("zap", __iconNode11);
 // src/components/NodeComponent.tsx
 var jsx_dev_runtime3 = __toESM(require_jsx_dev_runtime(), 1);
 var TYPE_GLYPHS = {
@@ -29054,7 +29061,7 @@ function SnapshotDetail({
 }
 
 // src/components/AppChrome.tsx
-var import_react21 = __toESM(require_react(), 1);
+var import_react22 = __toESM(require_react(), 1);
 
 // src/components/BackupPanel.tsx
 var import_react19 = __toESM(require_react(), 1);
@@ -29413,8 +29420,193 @@ function AliasesPanel({ onClose }) {
   }, undefined, false, undefined, this);
 }
 
-// src/components/AppChrome.tsx
+// src/components/AuditLogPanel.tsx
+var import_react21 = __toESM(require_react(), 1);
 var jsx_dev_runtime15 = __toESM(require_jsx_dev_runtime(), 1);
+var AUDIT_OPERATIONS = [
+  "metadata_created",
+  "metadata_updated",
+  "metadata_deleted",
+  "relationship_created",
+  "relationship_deleted",
+  "suggestion_accepted",
+  "suggestion_rejected",
+  "snapshot_created",
+  "snapshot_purged",
+  "backup_created",
+  "backup_restored",
+  "text_export_created",
+  "text_export_applied"
+];
+function formatOperation(op) {
+  return op.replace(/_/g, " ");
+}
+function formatTimestamp(iso) {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? iso : d.toLocaleString();
+}
+function AuditLogPanel({ onClose }) {
+  const { api } = useCrew();
+  const [operation, setOperation] = import_react21.useState("");
+  const [events, setEvents] = import_react21.useState([]);
+  const [loading, setLoading] = import_react21.useState(false);
+  const [error, setError] = import_react21.useState(null);
+  import_react21.useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === "Escape")
+        onClose();
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+  import_react21.useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    const params = new URLSearchParams({ limit: "100" });
+    if (operation)
+      params.set("operation", operation);
+    api.fetch(`/audit?${params}`).then(async (res) => {
+      if (!res.ok)
+        throw new Error(`Failed to load audit log: ${res.status}`);
+      const data = await res.json();
+      if (!cancelled)
+        setEvents(data.events);
+    }).catch((err) => {
+      if (!cancelled)
+        setError(err instanceof Error ? err.message : "Failed to load audit log.");
+    }).finally(() => {
+      if (!cancelled)
+        setLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [api, operation]);
+  return /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("div", {
+    className: "modal-backdrop",
+    role: "presentation",
+    onMouseDown: onClose,
+    children: /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("div", {
+      className: "backup-panel audit-log-panel",
+      role: "dialog",
+      "aria-modal": "true",
+      "aria-label": "Audit log",
+      onMouseDown: (e) => e.stopPropagation(),
+      children: [
+        /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("header", {
+          className: "backup-panel__header",
+          children: [
+            /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("h2", {
+              children: "Audit log"
+            }, undefined, false, undefined, this),
+            /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("button", {
+              type: "button",
+              className: "backup-panel__close",
+              onClick: onClose,
+              "aria-label": "Close",
+              children: /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(X, {
+                size: 16
+              }, undefined, false, undefined, this)
+            }, undefined, false, undefined, this)
+          ]
+        }, undefined, true, undefined, this),
+        /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("section", {
+          className: "backup-panel__section",
+          children: [
+            /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("label", {
+              className: "backup-panel__confirm-label",
+              children: [
+                /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("span", {
+                  children: "Operation"
+                }, undefined, false, undefined, this),
+                /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("select", {
+                  value: operation,
+                  onChange: (e) => setOperation(e.target.value),
+                  "aria-label": "Filter by operation",
+                  children: [
+                    /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("option", {
+                      value: "",
+                      children: "All operations"
+                    }, undefined, false, undefined, this),
+                    AUDIT_OPERATIONS.map((op) => /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("option", {
+                      value: op,
+                      children: formatOperation(op)
+                    }, op, false, undefined, this))
+                  ]
+                }, undefined, true, undefined, this)
+              ]
+            }, undefined, true, undefined, this),
+            loading && /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("p", {
+              role: "status",
+              children: "Loading…"
+            }, undefined, false, undefined, this),
+            error && /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("p", {
+              role: "alert",
+              className: "audit-log-panel__error",
+              children: error
+            }, undefined, false, undefined, this),
+            !loading && !error && /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("div", {
+              className: "audit-log-panel__table-wrap",
+              children: /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("table", {
+                className: "audit-log-panel__table",
+                children: [
+                  /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("thead", {
+                    children: /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("tr", {
+                      children: [
+                        /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("th", {
+                          children: "When"
+                        }, undefined, false, undefined, this),
+                        /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("th", {
+                          children: "Operation"
+                        }, undefined, false, undefined, this),
+                        /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("th", {
+                          children: "Actor"
+                        }, undefined, false, undefined, this),
+                        /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("th", {
+                          children: "Spec"
+                        }, undefined, false, undefined, this)
+                      ]
+                    }, undefined, true, undefined, this)
+                  }, undefined, false, undefined, this),
+                  /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("tbody", {
+                    children: [
+                      events.length === 0 && /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("tr", {
+                        children: /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("td", {
+                          colSpan: 4,
+                          children: "No matching events."
+                        }, undefined, false, undefined, this)
+                      }, undefined, false, undefined, this),
+                      events.map((event) => /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("tr", {
+                        children: [
+                          /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("td", {
+                            children: formatTimestamp(event.timestamp)
+                          }, undefined, false, undefined, this),
+                          /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("td", {
+                            children: formatOperation(event.operation)
+                          }, undefined, false, undefined, this),
+                          /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("td", {
+                            children: event.actor
+                          }, undefined, false, undefined, this),
+                          /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("td", {
+                            children: event.spec_key ?? event.snapshot_id ?? "—"
+                          }, undefined, false, undefined, this)
+                        ]
+                      }, event.id, true, undefined, this))
+                    ]
+                  }, undefined, true, undefined, this)
+                ]
+              }, undefined, true, undefined, this)
+            }, undefined, false, undefined, this)
+          ]
+        }, undefined, true, undefined, this)
+      ]
+    }, undefined, true, undefined, this)
+  }, undefined, false, undefined, this);
+}
+
+// src/components/AppChrome.tsx
+var jsx_dev_runtime16 = __toESM(require_jsx_dev_runtime(), 1);
 function AppChrome({
   view,
   themeMode,
@@ -29422,23 +29614,24 @@ function AppChrome({
   onThemeChange
 }) {
   const nextTheme = themeMode === "dark" ? "light" : "dark";
-  const [copyLabel, setCopyLabel] = import_react21.useState("Copy link");
-  const [backupPanelOpen, setBackupPanelOpen] = import_react21.useState(false);
-  const [aliasesPanelOpen, setAliasesPanelOpen] = import_react21.useState(false);
+  const [copyLabel, setCopyLabel] = import_react22.useState("Copy link");
+  const [backupPanelOpen, setBackupPanelOpen] = import_react22.useState(false);
+  const [aliasesPanelOpen, setAliasesPanelOpen] = import_react22.useState(false);
+  const [auditLogPanelOpen, setAuditLogPanelOpen] = import_react22.useState(false);
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
     setCopyLabel("Copied!");
     setTimeout(() => setCopyLabel("Copy link"), 1500);
   };
-  return /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("div", {
+  return /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("div", {
     className: "app-chrome",
     children: [
-      /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("div", {
+      /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("div", {
         className: "view-switcher",
         role: "tablist",
         "aria-label": "View",
         children: [
-          /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("button", {
+          /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("button", {
             type: "button",
             role: "tab",
             "aria-selected": view === "relationship",
@@ -29446,7 +29639,7 @@ function AppChrome({
             onClick: () => onViewChange("relationship"),
             children: "Relationships"
           }, undefined, false, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("button", {
+          /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("button", {
             type: "button",
             role: "tab",
             "aria-selected": view === "archive",
@@ -29456,62 +29649,76 @@ function AppChrome({
           }, undefined, false, undefined, this)
         ]
       }, undefined, true, undefined, this),
-      /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("div", {
+      /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("div", {
         className: "chrome-actions",
         children: [
-          /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("button", {
+          /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("button", {
             type: "button",
             className: "chrome-icon-btn",
             onClick: () => setAliasesPanelOpen(true),
             "aria-label": "Set your aliases for the Mine filter",
             title: "Set your aliases for the Mine filter",
             children: [
-              /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(CircleUser, {
+              /* @__PURE__ */ jsx_dev_runtime16.jsxDEV(CircleUser, {
                 size: 14,
                 "aria-hidden": "true"
               }, undefined, false, undefined, this),
               "Mine"
             ]
           }, undefined, true, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("button", {
+          /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("button", {
             type: "button",
             className: "chrome-icon-btn",
             onClick: () => setBackupPanelOpen(true),
             "aria-label": "Backup and restore",
             title: "Backup and restore",
             children: [
-              /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(DatabaseBackup, {
+              /* @__PURE__ */ jsx_dev_runtime16.jsxDEV(DatabaseBackup, {
                 size: 14,
                 "aria-hidden": "true"
               }, undefined, false, undefined, this),
               "Backup"
             ]
           }, undefined, true, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("button", {
+          /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("button", {
+            type: "button",
+            className: "chrome-icon-btn",
+            onClick: () => setAuditLogPanelOpen(true),
+            "aria-label": "View audit log",
+            title: "View audit log",
+            children: [
+              /* @__PURE__ */ jsx_dev_runtime16.jsxDEV(RotateCcwClock, {
+                size: 14,
+                "aria-hidden": "true"
+              }, undefined, false, undefined, this),
+              "Audit"
+            ]
+          }, undefined, true, undefined, this),
+          /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("button", {
             type: "button",
             className: "copy-link-btn",
             onClick: handleCopyLink,
             "aria-label": "Copy current page link",
             title: "Copy current page link",
             children: [
-              /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(Link, {
+              /* @__PURE__ */ jsx_dev_runtime16.jsxDEV(Link, {
                 size: 14,
                 "aria-hidden": "true"
               }, undefined, false, undefined, this),
               copyLabel
             ]
           }, undefined, true, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("button", {
+          /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("button", {
             type: "button",
             className: "theme-switcher",
             onClick: () => onThemeChange(nextTheme),
             "aria-label": `Switch to ${nextTheme} theme`,
             title: `Switch to ${nextTheme} theme`,
             children: [
-              themeMode === "dark" ? /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(Moon, {
+              themeMode === "dark" ? /* @__PURE__ */ jsx_dev_runtime16.jsxDEV(Moon, {
                 size: 14,
                 "aria-hidden": "true"
-              }, undefined, false, undefined, this) : /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(Sun, {
+              }, undefined, false, undefined, this) : /* @__PURE__ */ jsx_dev_runtime16.jsxDEV(Sun, {
                 size: 14,
                 "aria-hidden": "true"
               }, undefined, false, undefined, this),
@@ -29520,18 +29727,21 @@ function AppChrome({
           }, undefined, true, undefined, this)
         ]
       }, undefined, true, undefined, this),
-      backupPanelOpen && /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(BackupPanel, {
+      backupPanelOpen && /* @__PURE__ */ jsx_dev_runtime16.jsxDEV(BackupPanel, {
         onClose: () => setBackupPanelOpen(false)
       }, undefined, false, undefined, this),
-      aliasesPanelOpen && /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(AliasesPanel, {
+      aliasesPanelOpen && /* @__PURE__ */ jsx_dev_runtime16.jsxDEV(AliasesPanel, {
         onClose: () => setAliasesPanelOpen(false)
+      }, undefined, false, undefined, this),
+      auditLogPanelOpen && /* @__PURE__ */ jsx_dev_runtime16.jsxDEV(AuditLogPanel, {
+        onClose: () => setAuditLogPanelOpen(false)
       }, undefined, false, undefined, this)
     ]
   }, undefined, true, undefined, this);
 }
 
 // src/App.tsx
-var jsx_dev_runtime16 = __toESM(require_jsx_dev_runtime(), 1);
+var jsx_dev_runtime17 = __toESM(require_jsx_dev_runtime(), 1);
 var cssUrl = new URL("./index.css", import.meta.url).href;
 if (typeof document !== "undefined" && !document.querySelector(`link[href="${cssUrl}"]`)) {
   const link2 = document.createElement("link");
@@ -29543,7 +29753,7 @@ function AppProvider({
   children: children2,
   overrides
 }) {
-  return /* @__PURE__ */ jsx_dev_runtime16.jsxDEV(CrewProvider, {
+  return /* @__PURE__ */ jsx_dev_runtime17.jsxDEV(CrewProvider, {
     overrides,
     children: children2
   }, undefined, false, undefined, this);
@@ -29552,52 +29762,52 @@ function AppContent() {
   const { ready, error } = useCrew();
   const [urlState, setUrlState] = useUrlState();
   if (error) {
-    return /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("div", {
+    return /* @__PURE__ */ jsx_dev_runtime17.jsxDEV("div", {
       role: "alert",
       className: "crew-error",
       children: [
-        /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("h2", {
+        /* @__PURE__ */ jsx_dev_runtime17.jsxDEV("h2", {
           children: "Integration Error"
         }, undefined, false, undefined, this),
-        /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("p", {
+        /* @__PURE__ */ jsx_dev_runtime17.jsxDEV("p", {
           children: error
         }, undefined, false, undefined, this)
       ]
     }, undefined, true, undefined, this);
   }
   if (!ready) {
-    return /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("div", {
+    return /* @__PURE__ */ jsx_dev_runtime17.jsxDEV("div", {
       className: "loading",
       "aria-busy": "true",
-      children: /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("p", {
+      children: /* @__PURE__ */ jsx_dev_runtime17.jsxDEV("p", {
         children: "Initializing…"
       }, undefined, false, undefined, this)
     }, undefined, false, undefined, this);
   }
   const { view, themeMode } = urlState;
-  return /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("div", {
+  return /* @__PURE__ */ jsx_dev_runtime17.jsxDEV("div", {
     "data-theme": themeMode,
     className: `app-root theme-${themeMode}`,
     children: [
-      /* @__PURE__ */ jsx_dev_runtime16.jsxDEV(AppChrome, {
+      /* @__PURE__ */ jsx_dev_runtime17.jsxDEV(AppChrome, {
         view,
         themeMode,
         onViewChange: (v) => setUrlState({ view: v }),
         onThemeChange: (m) => setUrlState({ themeMode: m })
       }, undefined, false, undefined, this),
-      view === "relationship" ? /* @__PURE__ */ jsx_dev_runtime16.jsxDEV(RelationshipView, {}, undefined, false, undefined, this) : /* @__PURE__ */ jsx_dev_runtime16.jsxDEV(ArchiveView, {}, undefined, false, undefined, this)
+      view === "relationship" ? /* @__PURE__ */ jsx_dev_runtime17.jsxDEV(RelationshipView, {}, undefined, false, undefined, this) : /* @__PURE__ */ jsx_dev_runtime17.jsxDEV(ArchiveView, {}, undefined, false, undefined, this)
     ]
   }, undefined, true, undefined, this);
 }
 function App({ crewOverrides } = {}) {
-  return /* @__PURE__ */ jsx_dev_runtime16.jsxDEV(AppProvider, {
+  return /* @__PURE__ */ jsx_dev_runtime17.jsxDEV(AppProvider, {
     overrides: crewOverrides,
-    children: /* @__PURE__ */ jsx_dev_runtime16.jsxDEV(AppContent, {}, undefined, false, undefined, this)
+    children: /* @__PURE__ */ jsx_dev_runtime17.jsxDEV(AppContent, {}, undefined, false, undefined, this)
   }, undefined, false, undefined, this);
 }
 
 // src/preview.tsx
-var jsx_dev_runtime17 = __toESM(require_jsx_dev_runtime(), 1);
+var jsx_dev_runtime18 = __toESM(require_jsx_dev_runtime(), 1);
 var sampleSpecs = [
   { key: "agent-memory", title: "Agent Memory v2", type: "feature", stage: "scoped", progress: 66, owner: "Maya Chen", theme: "AI Foundations", repository: "crew-platform", indexed_at: "2026-06-02T10:00:00Z", relationships: [{ targetKey: "retention", type: "depends_on" }] },
   { key: "retention", title: "Memory retention controls", type: "feature", stage: "in-flight", progress: 78, owner: "Maya Chen", theme: "AI Foundations", repository: "crew-platform", indexed_at: "2026-07-14T10:00:00Z", suggestions: [{ targetKey: "usage-alerts", type: "related" }] },
@@ -29746,10 +29956,41 @@ var overrides = {
       if (path.startsWith("/archive")) {
         return json({ snapshots: sampleSnapshots, nextCursor: null });
       }
+      if (path.startsWith("/audit")) {
+        const params = new URLSearchParams(path.split("?")[1] ?? "");
+        const operationFilter = params.get("operation");
+        const events = [
+          {
+            id: "audit-1",
+            operation: "metadata_updated",
+            spec_key: "retention",
+            snapshot_id: null,
+            actor: "Maya Chen",
+            timestamp: "2026-08-15T09:12:00Z"
+          },
+          {
+            id: "audit-2",
+            operation: "suggestion_accepted",
+            spec_key: "retention",
+            snapshot_id: null,
+            actor: "system",
+            timestamp: "2026-08-14T16:40:00Z"
+          },
+          {
+            id: "audit-3",
+            operation: "snapshot_created",
+            spec_key: "workspace-index",
+            snapshot_id: "snap-workspace",
+            actor: "system",
+            timestamp: "2026-08-07T10:14:00Z"
+          }
+        ].filter((e) => !operationFilter || e.operation === operationFilter);
+        return json({ events, total: events.length });
+      }
       return json({ specs: sampleSpecs, total: sampleSpecs.length });
     }
   }
 };
-import_client.createRoot(document.getElementById("root")).render(/* @__PURE__ */ jsx_dev_runtime17.jsxDEV(App, {
+import_client.createRoot(document.getElementById("root")).render(/* @__PURE__ */ jsx_dev_runtime18.jsxDEV(App, {
   crewOverrides: overrides
 }, undefined, false, undefined, this));

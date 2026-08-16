@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { DatabaseBackup, Link, Moon, Sun, UserCircle } from 'lucide-react';
+import { DatabaseBackup, History, Link, Moon, Sun, UserCircle } from 'lucide-react';
 import type { ThemeMode, ViewMode } from '../hooks/useUrlState.js';
 import { BackupPanel } from './BackupPanel.js';
 import { AliasesPanel } from './AliasesPanel.js';
+import { AuditLogPanel } from './AuditLogPanel.js';
 
 interface Props {
   view: ViewMode;
@@ -25,6 +26,7 @@ export function AppChrome({
   const [copyLabel, setCopyLabel] = useState('Copy link');
   const [backupPanelOpen, setBackupPanelOpen] = useState(false);
   const [aliasesPanelOpen, setAliasesPanelOpen] = useState(false);
+  const [auditLogPanelOpen, setAuditLogPanelOpen] = useState(false);
 
   const handleCopyLink = (): void => {
     navigator.clipboard.writeText(window.location.href);
@@ -84,6 +86,17 @@ export function AppChrome({
 
         <button
           type="button"
+          className="chrome-icon-btn"
+          onClick={() => setAuditLogPanelOpen(true)}
+          aria-label="View audit log"
+          title="View audit log"
+        >
+          <History size={14} aria-hidden="true" />
+          Audit
+        </button>
+
+        <button
+          type="button"
           className="copy-link-btn"
           onClick={handleCopyLink}
           aria-label="Copy current page link"
@@ -107,6 +120,7 @@ export function AppChrome({
 
       {backupPanelOpen && <BackupPanel onClose={() => setBackupPanelOpen(false)} />}
       {aliasesPanelOpen && <AliasesPanel onClose={() => setAliasesPanelOpen(false)} />}
+      {auditLogPanelOpen && <AuditLogPanel onClose={() => setAuditLogPanelOpen(false)} />}
     </div>
   );
 }

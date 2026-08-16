@@ -2863,7 +2863,7 @@ button.archive-row:hover {
   padding: .05rem .4rem;
 }
 
-.backup-panel__confirm-label input {
+.backup-panel__confirm-label input, .backup-panel__confirm-label select {
   border: 1px solid var(--canvas-border, #3a3843);
   background: var(--canvas-bg, #111115);
   color: var(--canvas-text, #e9ecef);
@@ -2916,6 +2916,51 @@ button.archive-row:hover {
   line-height: 1.5;
 }
 
+.audit-log-panel {
+  width: min(42rem, 100%);
+}
+
+.audit-log-panel__error {
+  color: #ff8787;
+  font-size: .82rem;
+}
+
+.audit-log-panel__table-wrap {
+  overflow: auto;
+  border: 1px solid var(--canvas-border, #3a3843);
+  border-radius: .5rem;
+  max-height: 22rem;
+  margin-top: .9rem;
+}
+
+.audit-log-panel__table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: .8rem;
+}
+
+.audit-log-panel__table th, .audit-log-panel__table td {
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--canvas-border, #3a3843);
+  padding: .5rem .7rem;
+}
+
+.audit-log-panel__table th {
+  position: sticky;
+  background: var(--canvas-surface, #1d1d24);
+  color: var(--canvas-text-muted, #909296);
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  font-size: .7rem;
+  font-weight: 600;
+  top: 0;
+}
+
+.audit-log-panel__table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
 [data-theme="light"] .backup-panel {
   color: #343a40;
   background: #fff;
@@ -2957,7 +3002,7 @@ button.archive-row:hover {
   background: #f1f3f5;
 }
 
-[data-theme="light"] .backup-panel__confirm-label input {
+[data-theme="light"] .backup-panel__confirm-label input, [data-theme="light"] .backup-panel__confirm-label select {
   color: #343a40;
   background: #fff;
   border-color: #dee2e6;
@@ -2972,4 +3017,21 @@ button.archive-row:hover {
   color: #343a40;
   background: #f8f9fa;
   border-color: #dee2e6;
+}
+
+[data-theme="light"] .audit-log-panel__table-wrap {
+  border-color: #dee2e6;
+}
+
+[data-theme="light"] .audit-log-panel__table th, [data-theme="light"] .audit-log-panel__table td {
+  border-bottom-color: #dee2e6;
+}
+
+[data-theme="light"] .audit-log-panel__table th {
+  color: #868e96;
+  background: #fff;
+}
+
+[data-theme="light"] .audit-log-panel__error {
+  color: #e03131;
 }

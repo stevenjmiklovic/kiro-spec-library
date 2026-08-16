@@ -171,6 +171,38 @@ const overrides: Partial<CrewIntegration> = {
       if (path.startsWith("/archive")) {
         return json({ snapshots: sampleSnapshots, nextCursor: null });
       }
+      // Audit log.
+      if (path.startsWith("/audit")) {
+        const params = new URLSearchParams(path.split("?")[1] ?? "");
+        const operationFilter = params.get("operation");
+        const events = [
+          {
+            id: "audit-1",
+            operation: "metadata_updated",
+            spec_key: "retention",
+            snapshot_id: null,
+            actor: "Maya Chen",
+            timestamp: "2026-08-15T09:12:00Z",
+          },
+          {
+            id: "audit-2",
+            operation: "suggestion_accepted",
+            spec_key: "retention",
+            snapshot_id: null,
+            actor: "system",
+            timestamp: "2026-08-14T16:40:00Z",
+          },
+          {
+            id: "audit-3",
+            operation: "snapshot_created",
+            spec_key: "workspace-index",
+            snapshot_id: "snap-workspace",
+            actor: "system",
+            timestamp: "2026-08-07T10:14:00Z",
+          },
+        ].filter((e) => !operationFilter || e.operation === operationFilter);
+        return json({ events, total: events.length });
+      }
       // Spec listing.
       return json({ specs: sampleSpecs, total: sampleSpecs.length });
     },
