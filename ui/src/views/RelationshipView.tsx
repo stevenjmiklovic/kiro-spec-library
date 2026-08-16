@@ -12,32 +12,13 @@ import type { GraphSpec } from '../components/GraphCanvas.js';
 import { Y_AXIS_OPTIONS, type YAxisField } from '../components/GraphCanvas.js';
 import { X_AXIS_OPTIONS, type XAxisField } from '../components/GraphCanvas.js';
 import { DetailPanel } from '../components/DetailPanel.js';
+import { getLocalAliases } from '../hooks/useLocalAliases.js';
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
 const MAX_VISIBLE_NODES = 250;
-const LOCAL_ALIASES_KEY = 'kiro-spec-library:aliases';
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/** Read user aliases from localStorage (never throws; not an auth boundary). */
-function getLocalAliases(): string[] {
-  try {
-    const raw = localStorage.getItem(LOCAL_ALIASES_KEY);
-    if (!raw) return [];
-    const parsed: unknown = JSON.parse(raw);
-    if (Array.isArray(parsed)) {
-      return parsed.filter((v): v is string => typeof v === 'string');
-    }
-    return [];
-  } catch {
-    return [];
-  }
-}
 
 /** Cautiously normalize an unknown backend record into a GraphSpec. */
 function normalizeSpec(record: unknown): GraphSpec {

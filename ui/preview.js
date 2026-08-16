@@ -26085,8 +26085,15 @@ var __iconNode = [
   ["path", { d: "M12 17h.01", key: "p32p05" }]
 ];
 var CircleQuestionMark = createLucideIcon("circle-question-mark", __iconNode);
-// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/triangle-alert.mjs
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/circle-user.mjs
 var __iconNode2 = [
+  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
+  ["circle", { cx: "12", cy: "10", r: "3", key: "ilqhr7" }],
+  ["path", { d: "M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662", key: "154egf" }]
+];
+var CircleUser = createLucideIcon("circle-user", __iconNode2);
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/triangle-alert.mjs
+var __iconNode3 = [
   [
     "path",
     {
@@ -26097,9 +26104,9 @@ var __iconNode2 = [
   ["path", { d: "M12 9v4", key: "juzpu7" }],
   ["path", { d: "M12 17h.01", key: "p32p05" }]
 ];
-var TriangleAlert = createLucideIcon("triangle-alert", __iconNode2);
+var TriangleAlert = createLucideIcon("triangle-alert", __iconNode3);
 // ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/database-backup.mjs
-var __iconNode3 = [
+var __iconNode4 = [
   ["ellipse", { cx: "12", cy: "5", rx: "9", ry: "3", key: "msslwz" }],
   ["path", { d: "M3 12a9 3 0 0 0 5 2.69", key: "1ui2ym" }],
   ["path", { d: "M21 9.3V5", key: "6k6cib" }],
@@ -26113,15 +26120,15 @@ var __iconNode3 = [
     }
   ]
 ];
-var DatabaseBackup = createLucideIcon("database-backup", __iconNode3);
+var DatabaseBackup = createLucideIcon("database-backup", __iconNode4);
 // ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/link.mjs
-var __iconNode4 = [
+var __iconNode5 = [
   ["path", { d: "M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71", key: "1cjeqo" }],
   ["path", { d: "M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71", key: "19qd67" }]
 ];
-var Link = createLucideIcon("link", __iconNode4);
+var Link = createLucideIcon("link", __iconNode5);
 // ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/moon.mjs
-var __iconNode5 = [
+var __iconNode6 = [
   [
     "path",
     {
@@ -26130,9 +26137,9 @@ var __iconNode5 = [
     }
   ]
 ];
-var Moon = createLucideIcon("moon", __iconNode5);
+var Moon = createLucideIcon("moon", __iconNode6);
 // ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/sun.mjs
-var __iconNode6 = [
+var __iconNode7 = [
   ["circle", { cx: "12", cy: "12", r: "4", key: "4exip2" }],
   ["path", { d: "M12 2v2", key: "tus03m" }],
   ["path", { d: "M12 20v2", key: "1lh1kg" }],
@@ -26143,22 +26150,22 @@ var __iconNode6 = [
   ["path", { d: "m6.34 17.66-1.41 1.41", key: "1m8zz5" }],
   ["path", { d: "m19.07 4.93-1.41 1.41", key: "1shlcs" }]
 ];
-var Sun = createLucideIcon("sun", __iconNode6);
+var Sun = createLucideIcon("sun", __iconNode7);
 // ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/target.mjs
-var __iconNode7 = [
+var __iconNode8 = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
   ["circle", { cx: "12", cy: "12", r: "6", key: "1vlfrh" }],
   ["circle", { cx: "12", cy: "12", r: "2", key: "1c9p78" }]
 ];
-var Target = createLucideIcon("target", __iconNode7);
+var Target = createLucideIcon("target", __iconNode8);
 // ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/x.mjs
-var __iconNode8 = [
+var __iconNode9 = [
   ["path", { d: "M18 6 6 18", key: "1bl5f8" }],
   ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
 ];
-var X = createLucideIcon("x", __iconNode8);
+var X = createLucideIcon("x", __iconNode9);
 // ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/zap.mjs
-var __iconNode9 = [
+var __iconNode10 = [
   [
     "path",
     {
@@ -26167,7 +26174,7 @@ var __iconNode9 = [
     }
   ]
 ];
-var Zap = createLucideIcon("zap", __iconNode9);
+var Zap = createLucideIcon("zap", __iconNode10);
 // src/components/NodeComponent.tsx
 var jsx_dev_runtime3 = __toESM(require_jsx_dev_runtime(), 1);
 var TYPE_GLYPHS = {
@@ -27665,13 +27672,11 @@ function DetailPanel({
   }, undefined, true, undefined, this);
 }
 
-// src/views/RelationshipView.tsx
-var jsx_dev_runtime10 = __toESM(require_jsx_dev_runtime(), 1);
-var MAX_VISIBLE_NODES = 250;
-var LOCAL_ALIASES_KEY = "kiro-spec-library:aliases";
+// src/hooks/useLocalAliases.ts
+var ALIASES_STORAGE_KEY = "kiro-spec-library:aliases";
 function getLocalAliases() {
   try {
-    const raw = localStorage.getItem(LOCAL_ALIASES_KEY);
+    const raw = localStorage.getItem(ALIASES_STORAGE_KEY);
     if (!raw)
       return [];
     const parsed = JSON.parse(raw);
@@ -27683,6 +27688,13 @@ function getLocalAliases() {
     return [];
   }
 }
+function setLocalAliases(aliases) {
+  localStorage.setItem(ALIASES_STORAGE_KEY, JSON.stringify(aliases));
+}
+
+// src/views/RelationshipView.tsx
+var jsx_dev_runtime10 = __toESM(require_jsx_dev_runtime(), 1);
+var MAX_VISIBLE_NODES = 250;
 function normalizeSpec(record) {
   const r = record;
   if (!r || typeof r !== "object") {
@@ -28436,7 +28448,8 @@ function normalizeSnapshot(record) {
   const dateLabel = valid ? `${SHORT_MONTHS[date.getUTCMonth()]} ${date.getUTCDate()}, ${date.getUTCFullYear()}` : "—";
   const tags = Array.isArray(metadata["tags"]) ? metadata["tags"].filter((t) => typeof t === "string") : [];
   const metadataComplete = r["metadataComplete"] === true || str2(metadata["title"]) !== "" && str2(metadata["owner"]) !== "" && str2(metadata["theme"]) !== "" && tags.length > 0;
-  const legalHoldActive = r["legal_hold_active"] === 1 || r["legal_hold_active"] === true;
+  const supersededByRaw = r["supersededBy"];
+  const supersededBy = supersededByRaw && typeof supersededByRaw === "object" ? { specKey: str2(supersededByRaw["specKey"]), title: str2(supersededByRaw["title"]) } : undefined;
   return {
     id: str2(r["id"]) || str2(r["spec_key"]) || crypto.randomUUID(),
     specKey: str2(r["spec_key"] ?? r["specKey"]),
@@ -28450,8 +28463,7 @@ function normalizeSnapshot(record) {
     monthLabel,
     dateLabel,
     retentionLabel: retentionLabel(r["retention_policy"] ?? metadata["retentionPolicy"], metadataComplete),
-    legalHoldActive,
-    legalHoldReason: str2(r["legal_hold_reason"]) || undefined,
+    supersededBy,
     metadataComplete,
     contentDigest: str2(r["content_digest"] ?? r["contentDigest"]),
     provenance: {
@@ -28477,10 +28489,6 @@ function applyFilters(snapshots, filters) {
     if (filters.repository && s.repository !== filters.repository)
       return false;
     if (filters.owner && s.owner !== filters.owner)
-      return false;
-    if (filters.legalHold === "active" && s.legalHoldActive)
-      return false;
-    if (filters.legalHold === "none" && !s.legalHoldActive)
       return false;
     if (filters.metadataComplete === true && !s.metadataComplete)
       return false;
@@ -29022,18 +29030,18 @@ function SnapshotDetail({
                     children: "Status"
                   }, undefined, false, undefined, this),
                   /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("strong", {
-                    children: snapshot.legalHoldActive ? "Superseded" : "Active"
+                    children: snapshot.supersededBy ? "Superseded" : "Active"
                   }, undefined, false, undefined, this)
                 ]
               }, undefined, true, undefined, this),
-              snapshot.legalHoldActive && snapshot.legalHoldReason && /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
+              snapshot.supersededBy && /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("div", {
                 className: "archive-fact",
                 children: [
                   /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("span", {
                     children: "Successor"
                   }, undefined, false, undefined, this),
                   /* @__PURE__ */ jsx_dev_runtime12.jsxDEV("strong", {
-                    children: snapshot.legalHoldReason
+                    children: snapshot.supersededBy.title || snapshot.supersededBy.specKey
                   }, undefined, false, undefined, this)
                 ]
               }, undefined, true, undefined, this)
@@ -29046,7 +29054,7 @@ function SnapshotDetail({
 }
 
 // src/components/AppChrome.tsx
-var import_react20 = __toESM(require_react(), 1);
+var import_react21 = __toESM(require_react(), 1);
 
 // src/components/BackupPanel.tsx
 var import_react19 = __toESM(require_react(), 1);
@@ -29323,8 +29331,90 @@ function BackupPanel({ onClose }) {
   }, undefined, false, undefined, this);
 }
 
-// src/components/AppChrome.tsx
+// src/components/AliasesPanel.tsx
+var import_react20 = __toESM(require_react(), 1);
 var jsx_dev_runtime14 = __toESM(require_jsx_dev_runtime(), 1);
+function AliasesPanel({ onClose }) {
+  const [text, setText] = import_react20.useState(() => getLocalAliases().join(", "));
+  const [saved, setSaved] = import_react20.useState(false);
+  import_react20.useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === "Escape")
+        onClose();
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+  const handleSave = () => {
+    const aliases = text.split(",").map((s) => s.trim()).filter(Boolean);
+    setLocalAliases(aliases);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1500);
+  };
+  return /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("div", {
+    className: "modal-backdrop",
+    role: "presentation",
+    onMouseDown: onClose,
+    children: /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("div", {
+      className: "backup-panel",
+      role: "dialog",
+      "aria-modal": "true",
+      "aria-label": "Mine — your aliases",
+      onMouseDown: (e) => e.stopPropagation(),
+      children: [
+        /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("header", {
+          className: "backup-panel__header",
+          children: [
+            /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("h2", {
+              children: "Mine — your aliases"
+            }, undefined, false, undefined, this),
+            /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("button", {
+              type: "button",
+              className: "backup-panel__close",
+              onClick: onClose,
+              "aria-label": "Close",
+              children: /* @__PURE__ */ jsx_dev_runtime14.jsxDEV(X, {
+                size: 16
+              }, undefined, false, undefined, this)
+            }, undefined, false, undefined, this)
+          ]
+        }, undefined, true, undefined, this),
+        /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("section", {
+          className: "backup-panel__section",
+          children: [
+            /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("p", {
+              children: "Comma-separated git author names or emails that are yours. The Relationship view’s “Mine” scope filter uses this list — stored only in this browser, not shared with anyone else."
+            }, undefined, false, undefined, this),
+            /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("label", {
+              className: "backup-panel__confirm-label",
+              children: [
+                /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("span", {
+                  children: "Your aliases"
+                }, undefined, false, undefined, this),
+                /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("input", {
+                  type: "text",
+                  value: text,
+                  onChange: (e) => setText(e.target.value),
+                  placeholder: "Maya Chen, maya@example.com",
+                  "aria-label": "Comma-separated aliases"
+                }, undefined, false, undefined, this)
+              ]
+            }, undefined, true, undefined, this),
+            /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("button", {
+              type: "button",
+              className: "backup-panel__primary",
+              onClick: handleSave,
+              children: saved ? "Saved!" : "Save"
+            }, undefined, false, undefined, this)
+          ]
+        }, undefined, true, undefined, this)
+      ]
+    }, undefined, true, undefined, this)
+  }, undefined, false, undefined, this);
+}
+
+// src/components/AppChrome.tsx
+var jsx_dev_runtime15 = __toESM(require_jsx_dev_runtime(), 1);
 function AppChrome({
   view,
   themeMode,
@@ -29332,22 +29422,23 @@ function AppChrome({
   onThemeChange
 }) {
   const nextTheme = themeMode === "dark" ? "light" : "dark";
-  const [copyLabel, setCopyLabel] = import_react20.useState("Copy link");
-  const [backupPanelOpen, setBackupPanelOpen] = import_react20.useState(false);
+  const [copyLabel, setCopyLabel] = import_react21.useState("Copy link");
+  const [backupPanelOpen, setBackupPanelOpen] = import_react21.useState(false);
+  const [aliasesPanelOpen, setAliasesPanelOpen] = import_react21.useState(false);
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
     setCopyLabel("Copied!");
     setTimeout(() => setCopyLabel("Copy link"), 1500);
   };
-  return /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("div", {
+  return /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("div", {
     className: "app-chrome",
     children: [
-      /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("div", {
+      /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("div", {
         className: "view-switcher",
         role: "tablist",
         "aria-label": "View",
         children: [
-          /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("button", {
+          /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("button", {
             type: "button",
             role: "tab",
             "aria-selected": view === "relationship",
@@ -29355,7 +29446,7 @@ function AppChrome({
             onClick: () => onViewChange("relationship"),
             children: "Relationships"
           }, undefined, false, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("button", {
+          /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("button", {
             type: "button",
             role: "tab",
             "aria-selected": view === "archive",
@@ -29365,48 +29456,62 @@ function AppChrome({
           }, undefined, false, undefined, this)
         ]
       }, undefined, true, undefined, this),
-      /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("div", {
+      /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("div", {
         className: "chrome-actions",
         children: [
-          /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("button", {
+          /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("button", {
+            type: "button",
+            className: "chrome-icon-btn",
+            onClick: () => setAliasesPanelOpen(true),
+            "aria-label": "Set your aliases for the Mine filter",
+            title: "Set your aliases for the Mine filter",
+            children: [
+              /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(CircleUser, {
+                size: 14,
+                "aria-hidden": "true"
+              }, undefined, false, undefined, this),
+              "Mine"
+            ]
+          }, undefined, true, undefined, this),
+          /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("button", {
             type: "button",
             className: "chrome-icon-btn",
             onClick: () => setBackupPanelOpen(true),
             "aria-label": "Backup and restore",
             title: "Backup and restore",
             children: [
-              /* @__PURE__ */ jsx_dev_runtime14.jsxDEV(DatabaseBackup, {
+              /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(DatabaseBackup, {
                 size: 14,
                 "aria-hidden": "true"
               }, undefined, false, undefined, this),
               "Backup"
             ]
           }, undefined, true, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("button", {
+          /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("button", {
             type: "button",
             className: "copy-link-btn",
             onClick: handleCopyLink,
             "aria-label": "Copy current page link",
             title: "Copy current page link",
             children: [
-              /* @__PURE__ */ jsx_dev_runtime14.jsxDEV(Link, {
+              /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(Link, {
                 size: 14,
                 "aria-hidden": "true"
               }, undefined, false, undefined, this),
               copyLabel
             ]
           }, undefined, true, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("button", {
+          /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("button", {
             type: "button",
             className: "theme-switcher",
             onClick: () => onThemeChange(nextTheme),
             "aria-label": `Switch to ${nextTheme} theme`,
             title: `Switch to ${nextTheme} theme`,
             children: [
-              themeMode === "dark" ? /* @__PURE__ */ jsx_dev_runtime14.jsxDEV(Moon, {
+              themeMode === "dark" ? /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(Moon, {
                 size: 14,
                 "aria-hidden": "true"
-              }, undefined, false, undefined, this) : /* @__PURE__ */ jsx_dev_runtime14.jsxDEV(Sun, {
+              }, undefined, false, undefined, this) : /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(Sun, {
                 size: 14,
                 "aria-hidden": "true"
               }, undefined, false, undefined, this),
@@ -29415,15 +29520,18 @@ function AppChrome({
           }, undefined, true, undefined, this)
         ]
       }, undefined, true, undefined, this),
-      backupPanelOpen && /* @__PURE__ */ jsx_dev_runtime14.jsxDEV(BackupPanel, {
+      backupPanelOpen && /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(BackupPanel, {
         onClose: () => setBackupPanelOpen(false)
+      }, undefined, false, undefined, this),
+      aliasesPanelOpen && /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(AliasesPanel, {
+        onClose: () => setAliasesPanelOpen(false)
       }, undefined, false, undefined, this)
     ]
   }, undefined, true, undefined, this);
 }
 
 // src/App.tsx
-var jsx_dev_runtime15 = __toESM(require_jsx_dev_runtime(), 1);
+var jsx_dev_runtime16 = __toESM(require_jsx_dev_runtime(), 1);
 var cssUrl = new URL("./index.css", import.meta.url).href;
 if (typeof document !== "undefined" && !document.querySelector(`link[href="${cssUrl}"]`)) {
   const link2 = document.createElement("link");
@@ -29435,7 +29543,7 @@ function AppProvider({
   children: children2,
   overrides
 }) {
-  return /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(CrewProvider, {
+  return /* @__PURE__ */ jsx_dev_runtime16.jsxDEV(CrewProvider, {
     overrides,
     children: children2
   }, undefined, false, undefined, this);
@@ -29444,52 +29552,52 @@ function AppContent() {
   const { ready, error } = useCrew();
   const [urlState, setUrlState] = useUrlState();
   if (error) {
-    return /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("div", {
+    return /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("div", {
       role: "alert",
       className: "crew-error",
       children: [
-        /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("h2", {
+        /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("h2", {
           children: "Integration Error"
         }, undefined, false, undefined, this),
-        /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("p", {
+        /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("p", {
           children: error
         }, undefined, false, undefined, this)
       ]
     }, undefined, true, undefined, this);
   }
   if (!ready) {
-    return /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("div", {
+    return /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("div", {
       className: "loading",
       "aria-busy": "true",
-      children: /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("p", {
+      children: /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("p", {
         children: "Initializing…"
       }, undefined, false, undefined, this)
     }, undefined, false, undefined, this);
   }
   const { view, themeMode } = urlState;
-  return /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("div", {
+  return /* @__PURE__ */ jsx_dev_runtime16.jsxDEV("div", {
     "data-theme": themeMode,
     className: `app-root theme-${themeMode}`,
     children: [
-      /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(AppChrome, {
+      /* @__PURE__ */ jsx_dev_runtime16.jsxDEV(AppChrome, {
         view,
         themeMode,
         onViewChange: (v) => setUrlState({ view: v }),
         onThemeChange: (m) => setUrlState({ themeMode: m })
       }, undefined, false, undefined, this),
-      view === "relationship" ? /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(RelationshipView, {}, undefined, false, undefined, this) : /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(ArchiveView, {}, undefined, false, undefined, this)
+      view === "relationship" ? /* @__PURE__ */ jsx_dev_runtime16.jsxDEV(RelationshipView, {}, undefined, false, undefined, this) : /* @__PURE__ */ jsx_dev_runtime16.jsxDEV(ArchiveView, {}, undefined, false, undefined, this)
     ]
   }, undefined, true, undefined, this);
 }
 function App({ crewOverrides } = {}) {
-  return /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(AppProvider, {
+  return /* @__PURE__ */ jsx_dev_runtime16.jsxDEV(AppProvider, {
     overrides: crewOverrides,
-    children: /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(AppContent, {}, undefined, false, undefined, this)
+    children: /* @__PURE__ */ jsx_dev_runtime16.jsxDEV(AppContent, {}, undefined, false, undefined, this)
   }, undefined, false, undefined, this);
 }
 
 // src/preview.tsx
-var jsx_dev_runtime16 = __toESM(require_jsx_dev_runtime(), 1);
+var jsx_dev_runtime17 = __toESM(require_jsx_dev_runtime(), 1);
 var sampleSpecs = [
   { key: "agent-memory", title: "Agent Memory v2", type: "feature", stage: "scoped", progress: 66, owner: "Maya Chen", theme: "AI Foundations", repository: "crew-platform", indexed_at: "2026-06-02T10:00:00Z", relationships: [{ targetKey: "retention", type: "depends_on" }] },
   { key: "retention", title: "Memory retention controls", type: "feature", stage: "in-flight", progress: 78, owner: "Maya Chen", theme: "AI Foundations", repository: "crew-platform", indexed_at: "2026-07-14T10:00:00Z", suggestions: [{ targetKey: "usage-alerts", type: "related" }] },
@@ -29505,8 +29613,7 @@ var sampleSnapshots = [
     content_digest: "a1b2c3d4e5f60011",
     metadata_projection: JSON.stringify({ title: "Workspace semantic index", type: "quick", theme: "AI Foundations", owner: "Priya Shah", tags: ["search", "index"] }),
     provenance: JSON.stringify({ repository: "crew-platform", relativePath: ".kiro/specs/workspace-index", branch: "main", commitHash: "a1b2c3d4e5f6" }),
-    retention_policy: JSON.stringify({ type: "active_plus_2_years" }),
-    legal_hold_active: 0
+    retention_policy: JSON.stringify({ type: "active_plus_2_years" })
   },
   {
     id: "snap-billing",
@@ -29516,8 +29623,7 @@ var sampleSnapshots = [
     metadata_projection: JSON.stringify({ title: "Billing export v3", type: "feature", theme: "Commerce", owner: "Lena Ortiz", tags: ["billing", "export"] }),
     provenance: JSON.stringify({ repository: "web-console", relativePath: ".kiro/specs/billing-export-v3", branch: "main", commitHash: "b2c3d4e5f600" }),
     retention_policy: JSON.stringify({ type: "permanent" }),
-    legal_hold_active: 1,
-    legal_hold_reason: "Under audit"
+    supersededBy: { specKey: "billing-export-v4", title: "Billing export v4" }
   },
   {
     id: "snap-oauth",
@@ -29526,8 +29632,7 @@ var sampleSnapshots = [
     content_digest: "c3d4e5f600112233",
     metadata_projection: JSON.stringify({ title: "OAuth callback loop", type: "bugfix", theme: "Security", owner: "Theo Grant", tags: [] }),
     provenance: JSON.stringify({ repository: "identity-service", relativePath: ".kiro/specs/oauth-callback-loop", branch: "main", commitHash: "c3d4e5f60011" }),
-    retention_policy: null,
-    legal_hold_active: 0
+    retention_policy: null
   },
   {
     id: "snap-approval",
@@ -29536,8 +29641,7 @@ var sampleSnapshots = [
     content_digest: "d4e5f60011223344",
     metadata_projection: JSON.stringify({ title: "Agent tool approval audit", type: "feature", theme: "Governance", owner: "Maya Chen", tags: ["audit", "governance"] }),
     provenance: JSON.stringify({ repository: "crew-platform", relativePath: ".kiro/specs/agent-tool-approval-audit", branch: "main", commitHash: "d4e5f6001122" }),
-    retention_policy: JSON.stringify({ type: "active_plus_2_years" }),
-    legal_hold_active: 0
+    retention_policy: JSON.stringify({ type: "active_plus_2_years" })
   }
 ];
 var metadataOverlays = new Map;
@@ -29646,6 +29750,6 @@ var overrides = {
     }
   }
 };
-import_client.createRoot(document.getElementById("root")).render(/* @__PURE__ */ jsx_dev_runtime16.jsxDEV(App, {
+import_client.createRoot(document.getElementById("root")).render(/* @__PURE__ */ jsx_dev_runtime17.jsxDEV(App, {
   crewOverrides: overrides
 }, undefined, false, undefined, this));

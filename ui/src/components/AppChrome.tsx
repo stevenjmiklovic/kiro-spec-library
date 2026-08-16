@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { DatabaseBackup, Link, Moon, Sun } from 'lucide-react';
+import { DatabaseBackup, Link, Moon, Sun, UserCircle } from 'lucide-react';
 import type { ThemeMode, ViewMode } from '../hooks/useUrlState.js';
 import { BackupPanel } from './BackupPanel.js';
+import { AliasesPanel } from './AliasesPanel.js';
 
 interface Props {
   view: ViewMode;
@@ -23,6 +24,7 @@ export function AppChrome({
   const nextTheme: ThemeMode = themeMode === 'dark' ? 'light' : 'dark';
   const [copyLabel, setCopyLabel] = useState('Copy link');
   const [backupPanelOpen, setBackupPanelOpen] = useState(false);
+  const [aliasesPanelOpen, setAliasesPanelOpen] = useState(false);
 
   const handleCopyLink = (): void => {
     navigator.clipboard.writeText(window.location.href);
@@ -61,6 +63,17 @@ export function AppChrome({
         <button
           type="button"
           className="chrome-icon-btn"
+          onClick={() => setAliasesPanelOpen(true)}
+          aria-label="Set your aliases for the Mine filter"
+          title="Set your aliases for the Mine filter"
+        >
+          <UserCircle size={14} aria-hidden="true" />
+          Mine
+        </button>
+
+        <button
+          type="button"
+          className="chrome-icon-btn"
           onClick={() => setBackupPanelOpen(true)}
           aria-label="Backup and restore"
           title="Backup and restore"
@@ -93,6 +106,7 @@ export function AppChrome({
       </div>
 
       {backupPanelOpen && <BackupPanel onClose={() => setBackupPanelOpen(false)} />}
+      {aliasesPanelOpen && <AliasesPanel onClose={() => setAliasesPanelOpen(false)} />}
     </div>
   );
 }
