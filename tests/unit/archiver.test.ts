@@ -25,7 +25,7 @@ function makeCompletedSpec(key: string = "src1::my-spec"): NormalizedSpec {
     workflow: "requirements-first",
     title: "My Feature",
     owner: "alice",
-    stage: "completed",
+    stage: "done",
     progress: 100,
     provenance: {
       repository: "/repos/test",
