@@ -277,7 +277,18 @@ export interface ApplyTextExportResult {
 }
 
 export function applyTextExportZip(db: Database, zipBytes: Uint8Array): ApplyTextExportResult {
+  const MAX_UNCOMPRESSED_SIZE = 100 * 1024 * 1024; // 100 MB limit
+  let totalSize = 0;
+  
   const files = unzipSync(zipBytes);
+  
+  for (const bytes of Object.values(files)) {
+    totalSize += bytes.length;
+    if (totalSize > MAX_UNCOMPRESSED_SIZE) {
+      throw new Error("Uploaded archive exceeds maximum allowed size");
+    }
+  }
+  
   const decoder = new TextDecoder();
   const readJsonArray = (path: string): unknown[] => {
     const bytes = files[path];
