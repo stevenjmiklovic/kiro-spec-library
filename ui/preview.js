@@ -16336,6 +16336,7 @@ var SELECTED_PARAM = "selected";
 var REVISION_PARAM = "revision";
 var QUERY_PARAM = "q";
 var Y_AXIS_PARAM = "yAxis";
+var X_AXIS_PARAM = "xAxis";
 var FILTER_PARAMS = [
   "type",
   "stage",
@@ -16362,6 +16363,8 @@ function parseUrl() {
   const query = params.get(QUERY_PARAM) ?? undefined;
   const yAxisRaw = params.get(Y_AXIS_PARAM);
   const yAxis = yAxisRaw === "owner" || yAxisRaw === "repository" || yAxisRaw === "type" || yAxisRaw === "theme" ? yAxisRaw : "owner";
+  const xAxisRaw = params.get(X_AXIS_PARAM);
+  const xAxis = xAxisRaw === "chronological" ? "chronological" : "status";
   const filters = {};
   for (const key of FILTER_PARAMS) {
     const urlKey = key === "repository" ? REPO_URL_PARAM : key;
@@ -16370,7 +16373,7 @@ function parseUrl() {
       filters[key] = val;
     }
   }
-  return { view, themeMode, yAxis, selected, revision, query, filters };
+  return { view, themeMode, yAxis, xAxis, selected, revision, query, filters };
 }
 function serializeToUrl(state) {
   const params = new URLSearchParams;
@@ -16382,6 +16385,9 @@ function serializeToUrl(state) {
   }
   if (state.yAxis && state.yAxis !== "owner") {
     params.set(Y_AXIS_PARAM, state.yAxis);
+  }
+  if (state.xAxis && state.xAxis !== "status") {
+    params.set(X_AXIS_PARAM, state.xAxis);
   }
   if (state.selected)
     params.set(SELECTED_PARAM, state.selected);
@@ -16434,6 +16440,7 @@ function useUrlState() {
       view: patch.view ?? prev.view,
       themeMode: patch.themeMode ?? prev.themeMode,
       yAxis: patch.yAxis ?? prev.yAxis,
+      xAxis: patch.xAxis ?? prev.xAxis,
       selected: "selected" in patch ? patch.selected : prev.selected,
       revision: "revision" in patch ? patch.revision : prev.revision,
       query: "query" in patch ? patch.query : prev.query,
@@ -26091,14 +26098,30 @@ var __iconNode2 = [
   ["path", { d: "M12 17h.01", key: "p32p05" }]
 ];
 var TriangleAlert = createLucideIcon("triangle-alert", __iconNode2);
-// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/link.mjs
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/database-backup.mjs
 var __iconNode3 = [
+  ["ellipse", { cx: "12", cy: "5", rx: "9", ry: "3", key: "msslwz" }],
+  ["path", { d: "M3 12a9 3 0 0 0 5 2.69", key: "1ui2ym" }],
+  ["path", { d: "M21 9.3V5", key: "6k6cib" }],
+  ["path", { d: "M3 5v14a9 3 0 0 0 6.47 2.88", key: "i62tjy" }],
+  ["path", { d: "M12 12v4h4", key: "1bxaet" }],
+  [
+    "path",
+    {
+      d: "M13 20a5 5 0 0 0 9-3 4.5 4.5 0 0 0-4.5-4.5c-1.33 0-2.54.54-3.41 1.41L12 16",
+      key: "1f4ei9"
+    }
+  ]
+];
+var DatabaseBackup = createLucideIcon("database-backup", __iconNode3);
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/link.mjs
+var __iconNode4 = [
   ["path", { d: "M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71", key: "1cjeqo" }],
   ["path", { d: "M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71", key: "19qd67" }]
 ];
-var Link = createLucideIcon("link", __iconNode3);
+var Link = createLucideIcon("link", __iconNode4);
 // ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/moon.mjs
-var __iconNode4 = [
+var __iconNode5 = [
   [
     "path",
     {
@@ -26107,9 +26130,9 @@ var __iconNode4 = [
     }
   ]
 ];
-var Moon = createLucideIcon("moon", __iconNode4);
+var Moon = createLucideIcon("moon", __iconNode5);
 // ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/sun.mjs
-var __iconNode5 = [
+var __iconNode6 = [
   ["circle", { cx: "12", cy: "12", r: "4", key: "4exip2" }],
   ["path", { d: "M12 2v2", key: "tus03m" }],
   ["path", { d: "M12 20v2", key: "1lh1kg" }],
@@ -26120,16 +26143,22 @@ var __iconNode5 = [
   ["path", { d: "m6.34 17.66-1.41 1.41", key: "1m8zz5" }],
   ["path", { d: "m19.07 4.93-1.41 1.41", key: "1shlcs" }]
 ];
-var Sun = createLucideIcon("sun", __iconNode5);
+var Sun = createLucideIcon("sun", __iconNode6);
 // ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/target.mjs
-var __iconNode6 = [
+var __iconNode7 = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
   ["circle", { cx: "12", cy: "12", r: "6", key: "1vlfrh" }],
   ["circle", { cx: "12", cy: "12", r: "2", key: "1c9p78" }]
 ];
-var Target = createLucideIcon("target", __iconNode6);
+var Target = createLucideIcon("target", __iconNode7);
+// ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/x.mjs
+var __iconNode8 = [
+  ["path", { d: "M18 6 6 18", key: "1bl5f8" }],
+  ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
+];
+var X = createLucideIcon("x", __iconNode8);
 // ../node_modules/.bun/lucide-react@1.31.0+4bcfe187168658ad/node_modules/lucide-react/dist/esm/icons/zap.mjs
-var __iconNode7 = [
+var __iconNode9 = [
   [
     "path",
     {
@@ -26138,7 +26167,7 @@ var __iconNode7 = [
     }
   ]
 ];
-var Zap = createLucideIcon("zap", __iconNode7);
+var Zap = createLucideIcon("zap", __iconNode9);
 // src/components/NodeComponent.tsx
 var jsx_dev_runtime3 = __toESM(require_jsx_dev_runtime(), 1);
 var TYPE_GLYPHS = {
@@ -26320,6 +26349,10 @@ var Y_AXIS_OPTIONS = [
   { value: "type", label: "Type" },
   { value: "theme", label: "Theme" }
 ];
+var X_AXIS_OPTIONS = [
+  { value: "status", label: "Status" },
+  { value: "chronological", label: "Chronological" }
+];
 var STAGES2 = ["new", "scoped", "refined", "in-flight", "done"];
 var STAGE_LABELS = {
   new: "New",
@@ -26328,8 +26361,36 @@ var STAGE_LABELS = {
   "in-flight": "In-Flight",
   done: "Done"
 };
+var MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+var UNKNOWN_MONTH_BUCKET = "unknown";
+function monthBucket(isoDate) {
+  if (!isoDate)
+    return UNKNOWN_MONTH_BUCKET;
+  const date = new Date(isoDate);
+  if (Number.isNaN(date.getTime()))
+    return UNKNOWN_MONTH_BUCKET;
+  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
+}
+function monthBucketLabel(bucket) {
+  if (bucket === UNKNOWN_MONTH_BUCKET)
+    return "Unknown";
+  const [year, month] = bucket.split("-");
+  const label = MONTH_LABELS[Number(month) - 1];
+  return label ? `${label} ${year}` : bucket;
+}
+function getColumnValue(spec, field) {
+  return field === "status" ? spec.stage : monthBucket(spec.indexedAt);
+}
+function getColumnLabel(column, field) {
+  return field === "status" ? STAGE_LABELS[column] ?? column : monthBucketLabel(column);
+}
+function getColumns(specs, field) {
+  if (field === "status")
+    return STAGES2;
+  return [...new Set(specs.map((spec) => monthBucket(spec.indexedAt)))].sort();
+}
 var LEFT_GUTTER = 160;
-var STAGE_WIDTH = 270;
+var COLUMN_WIDTH = 270;
 var LANE_GAP = 220;
 var NODE_GAP = 138;
 var nodeTypes = { spec: SpecNode };
@@ -26346,18 +26407,19 @@ function getLaneValue(spec, field) {
       return spec.theme || "Unassigned";
   }
 }
-function placeGraphNodes(specs, yAxisField = "theme") {
+function placeGraphNodes(specs, yAxisField = "theme", xAxisField = "status") {
   const lanes = [...new Set(specs.map((spec) => getLaneValue(spec, yAxisField)))].sort();
+  const columns = getColumns(specs, xAxisField);
   const nodes = [];
   for (const lane of lanes) {
     const laneIndex = lanes.indexOf(lane);
-    for (const stage of STAGES2) {
-      const inCell = specs.filter((spec) => getLaneValue(spec, yAxisField) === lane && spec.stage === stage).sort((a, b) => a.title.localeCompare(b.title) || a.key.localeCompare(b.key));
+    for (const column of columns) {
+      const inCell = specs.filter((spec) => getLaneValue(spec, yAxisField) === lane && getColumnValue(spec, xAxisField) === column).sort((a, b) => a.title.localeCompare(b.title) || a.key.localeCompare(b.key));
       inCell.forEach((spec, rowIndex) => {
         nodes.push({
           id: spec.key,
           type: "spec",
-          position: { x: LEFT_GUTTER + STAGES2.indexOf(stage) * STAGE_WIDTH, y: laneIndex * LANE_GAP + rowIndex * NODE_GAP },
+          position: { x: LEFT_GUTTER + columns.indexOf(column) * COLUMN_WIDTH, y: laneIndex * LANE_GAP + rowIndex * NODE_GAP },
           draggable: false,
           connectable: false,
           data: {
@@ -26452,16 +26514,18 @@ function GraphLegend() {
     ]
   }, undefined, true, undefined, this);
 }
-function GraphOverlays({ specs, yAxisField }) {
+function GraphOverlays({ specs, yAxisField, xAxisField }) {
   const lanes = [...new Set(specs.map((spec) => getLaneValue(spec, yAxisField)))].sort();
+  const columns = getColumns(specs, xAxisField);
   return /* @__PURE__ */ jsx_dev_runtime5.jsxDEV(jsx_dev_runtime5.Fragment, {
     children: [
       /* @__PURE__ */ jsx_dev_runtime5.jsxDEV("div", {
         className: "graph-stage-header",
         "aria-hidden": "true",
-        children: STAGES2.map((stage) => /* @__PURE__ */ jsx_dev_runtime5.jsxDEV("span", {
-          children: STAGE_LABELS[stage] ?? stage
-        }, stage, false, undefined, this))
+        style: { gridTemplateColumns: `repeat(${columns.length}, 1fr)` },
+        children: columns.map((column) => /* @__PURE__ */ jsx_dev_runtime5.jsxDEV("span", {
+          children: getColumnLabel(column, xAxisField)
+        }, column, false, undefined, this))
       }, undefined, false, undefined, this),
       /* @__PURE__ */ jsx_dev_runtime5.jsxDEV("div", {
         className: "graph-lane-gutter",
@@ -26473,7 +26537,7 @@ function GraphOverlays({ specs, yAxisField }) {
     ]
   }, undefined, true, undefined, this);
 }
-function GraphCanvasInner({ specs, selectedKey, onSelect, colorMode = "dark", yAxisField = "theme" }) {
+function GraphCanvasInner({ specs, selectedKey, onSelect, colorMode = "dark", yAxisField = "theme", xAxisField = "status" }) {
   const supersededKeys = import_react13.useMemo(() => {
     const keys = new Set;
     for (const spec of specs) {
@@ -26484,7 +26548,7 @@ function GraphCanvasInner({ specs, selectedKey, onSelect, colorMode = "dark", yA
     }
     return keys;
   }, [specs]);
-  const nodes = import_react13.useMemo(() => placeGraphNodes(specs, yAxisField).map((node) => ({ ...node, data: { ...node.data, selected: node.id === selectedKey, superseded: supersededKeys.has(node.id), onSelect } })), [specs, selectedKey, onSelect, supersededKeys, yAxisField]);
+  const nodes = import_react13.useMemo(() => placeGraphNodes(specs, yAxisField, xAxisField).map((node) => ({ ...node, data: { ...node.data, selected: node.id === selectedKey, superseded: supersededKeys.has(node.id), onSelect } })), [specs, selectedKey, onSelect, supersededKeys, yAxisField, xAxisField]);
   const edges = import_react13.useMemo(() => buildGraphEdges(specs, selectedKey), [specs, selectedKey]);
   const handleNodeClick2 = import_react13.useCallback((_event, node) => onSelect?.(node.id), [onSelect]);
   const handleInit = import_react13.useCallback((instance) => {
@@ -26495,7 +26559,8 @@ function GraphCanvasInner({ specs, selectedKey, onSelect, colorMode = "dark", yA
     children: [
       /* @__PURE__ */ jsx_dev_runtime5.jsxDEV(GraphOverlays, {
         specs,
-        yAxisField
+        yAxisField,
+        xAxisField
       }, undefined, false, undefined, this),
       /* @__PURE__ */ jsx_dev_runtime5.jsxDEV("div", {
         className: "graph-viewport",
@@ -27663,6 +27728,7 @@ function normalizeSpec(record) {
     theme: str2("theme"),
     progress: num2("progress", 0),
     reviewed: !!(r["reviewed_at"] || r["reviewedAt"]),
+    indexedAt: str2("indexed_at") || str2("indexedAt") || undefined,
     relationships: parseRelArray("relationships"),
     suggestions: parseRelArray("suggestions")
   };
@@ -27941,24 +28007,43 @@ function RelationshipView() {
               children: [
                 /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("div", {
                   className: "graph-toolbar",
-                  children: /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("label", {
-                    className: "y-axis-selector",
-                    children: [
-                      /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("span", {
-                        children: "Y-axis:"
-                      }, undefined, false, undefined, this),
-                      /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("select", {
-                        value: urlState.yAxis,
-                        onChange: (e) => setUrlState({ yAxis: e.target.value }),
-                        "aria-label": "Y-axis grouping",
-                        children: Y_AXIS_OPTIONS.map((opt) => /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("option", {
-                          value: opt.value,
-                          children: opt.label
-                        }, opt.value, false, undefined, this))
-                      }, undefined, false, undefined, this)
-                    ]
-                  }, undefined, true, undefined, this)
-                }, undefined, false, undefined, this),
+                  children: [
+                    /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("label", {
+                      className: "x-axis-selector",
+                      children: [
+                        /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("span", {
+                          children: "X-axis:"
+                        }, undefined, false, undefined, this),
+                        /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("select", {
+                          value: urlState.xAxis,
+                          onChange: (e) => setUrlState({ xAxis: e.target.value }),
+                          "aria-label": "X-axis grouping",
+                          children: X_AXIS_OPTIONS.map((opt) => /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("option", {
+                            value: opt.value,
+                            children: opt.label
+                          }, opt.value, false, undefined, this))
+                        }, undefined, false, undefined, this)
+                      ]
+                    }, undefined, true, undefined, this),
+                    /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("label", {
+                      className: "y-axis-selector",
+                      children: [
+                        /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("span", {
+                          children: "Y-axis:"
+                        }, undefined, false, undefined, this),
+                        /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("select", {
+                          value: urlState.yAxis,
+                          onChange: (e) => setUrlState({ yAxis: e.target.value }),
+                          "aria-label": "Y-axis grouping",
+                          children: Y_AXIS_OPTIONS.map((opt) => /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("option", {
+                            value: opt.value,
+                            children: opt.label
+                          }, opt.value, false, undefined, this))
+                        }, undefined, false, undefined, this)
+                      ]
+                    }, undefined, true, undefined, this)
+                  ]
+                }, undefined, true, undefined, this),
                 /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("div", {
                   className: "graph-shell",
                   children: /* @__PURE__ */ jsx_dev_runtime10.jsxDEV(GraphCanvas, {
@@ -27966,7 +28051,8 @@ function RelationshipView() {
                     selectedKey,
                     onSelect: handleCanvasSelect,
                     colorMode: urlState.themeMode,
-                    yAxisField: urlState.yAxis
+                    yAxisField: urlState.yAxis,
+                    xAxisField: urlState.xAxis
                   }, undefined, false, undefined, this)
                 }, undefined, false, undefined, this),
                 hintVisible && /* @__PURE__ */ jsx_dev_runtime10.jsxDEV("p", {
@@ -28960,8 +29046,285 @@ function SnapshotDetail({
 }
 
 // src/components/AppChrome.tsx
+var import_react20 = __toESM(require_react(), 1);
+
+// src/components/BackupPanel.tsx
 var import_react19 = __toESM(require_react(), 1);
 var jsx_dev_runtime13 = __toESM(require_jsx_dev_runtime(), 1);
+var RESTORE_CONFIRMATION = "RESTORE";
+function triggerDownload(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function filenameFromContentDisposition(header, fallback) {
+  if (!header)
+    return fallback;
+  const match = /filename="?([^"]+)"?/.exec(header);
+  return match?.[1] ?? fallback;
+}
+function BackupPanel({ onClose }) {
+  const { api, notify } = useCrew();
+  const [downloadingBackup, setDownloadingBackup] = import_react19.useState(false);
+  const [downloadingExport, setDownloadingExport] = import_react19.useState(false);
+  const [restoring, setRestoring] = import_react19.useState(false);
+  const [applying, setApplying] = import_react19.useState(false);
+  const [restoreConfirmText, setRestoreConfirmText] = import_react19.useState("");
+  const [restoreResult, setRestoreResult] = import_react19.useState(null);
+  const [applyResult, setApplyResult] = import_react19.useState(null);
+  import_react19.useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === "Escape")
+        onClose();
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+  const handleDownloadBackup = async () => {
+    setDownloadingBackup(true);
+    try {
+      const res = await api.fetch("/backup");
+      if (!res.ok)
+        throw new Error(`Download failed: ${res.status}`);
+      const blob = await res.blob();
+      const filename = filenameFromContentDisposition(res.headers.get("content-disposition"), "spec-library-backup.db");
+      triggerDownload(blob, filename);
+      notify.success("Backup downloaded.");
+    } catch (err) {
+      notify.error(err instanceof Error ? err.message : "Backup download failed.");
+    } finally {
+      setDownloadingBackup(false);
+    }
+  };
+  const handleDownloadTextExport = async () => {
+    setDownloadingExport(true);
+    try {
+      const res = await api.fetch("/export/text");
+      if (!res.ok)
+        throw new Error(`Download failed: ${res.status}`);
+      const blob = await res.blob();
+      const filename = filenameFromContentDisposition(res.headers.get("content-disposition"), "spec-library-export.zip");
+      triggerDownload(blob, filename);
+      notify.success("Text export downloaded.");
+    } catch (err) {
+      notify.error(err instanceof Error ? err.message : "Text export download failed.");
+    } finally {
+      setDownloadingExport(false);
+    }
+  };
+  const handleRestore = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file)
+      return;
+    setRestoring(true);
+    setRestoreResult(null);
+    try {
+      const form = new FormData;
+      form.set("confirmation", restoreConfirmText);
+      form.set("file", file);
+      const res = await api.fetch("/backup/restore", { method: "POST", body: form });
+      const data = await res.json();
+      if (!res.ok)
+        throw new Error(data.message || `Restore failed: ${res.status}`);
+      setRestoreResult(data);
+      notify.success("Backup restored to disk — restart the backend to load it.");
+    } catch (err) {
+      notify.error(err instanceof Error ? err.message : "Restore failed.");
+    } finally {
+      setRestoring(false);
+    }
+  };
+  const handleApply = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file)
+      return;
+    setApplying(true);
+    setApplyResult(null);
+    try {
+      const form = new FormData;
+      form.set("file", file);
+      const res = await api.fetch("/export/text/apply", { method: "POST", body: form });
+      const data = await res.json();
+      if (!res.ok)
+        throw new Error(data.message || `Apply failed: ${res.status}`);
+      const applied = data;
+      setApplyResult(applied);
+      notify.success(`Applied export — ${applied.specsUpdated.length} spec(s) updated.`);
+    } catch (err) {
+      notify.error(err instanceof Error ? err.message : "Apply failed.");
+    } finally {
+      setApplying(false);
+    }
+  };
+  const restoreReady = restoreConfirmText === RESTORE_CONFIRMATION;
+  return /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("div", {
+    className: "modal-backdrop",
+    role: "presentation",
+    onMouseDown: onClose,
+    children: /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("div", {
+      className: "backup-panel",
+      role: "dialog",
+      "aria-modal": "true",
+      "aria-label": "Backup and restore",
+      onMouseDown: (e) => e.stopPropagation(),
+      children: [
+        /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("header", {
+          className: "backup-panel__header",
+          children: [
+            /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("h2", {
+              children: "Backup & restore"
+            }, undefined, false, undefined, this),
+            /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("button", {
+              type: "button",
+              className: "backup-panel__close",
+              onClick: onClose,
+              "aria-label": "Close",
+              children: /* @__PURE__ */ jsx_dev_runtime13.jsxDEV(X, {
+                size: 16
+              }, undefined, false, undefined, this)
+            }, undefined, false, undefined, this)
+          ]
+        }, undefined, true, undefined, this),
+        /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("section", {
+          className: "backup-panel__section",
+          children: [
+            /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("h3", {
+              children: "Full backup"
+            }, undefined, false, undefined, this),
+            /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("p", {
+              children: "One file with the entire library’s contents — specs, metadata, relationships, suggestions, proposals, and audit history. Restoring replaces everything and requires a backend restart to take effect."
+            }, undefined, false, undefined, this),
+            /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("button", {
+              type: "button",
+              className: "backup-panel__primary",
+              onClick: handleDownloadBackup,
+              disabled: downloadingBackup,
+              children: downloadingBackup ? "Downloading…" : "Download backup (.db)"
+            }, undefined, false, undefined, this),
+            /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("div", {
+              className: "backup-panel__restore",
+              children: [
+                /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("label", {
+                  className: "backup-panel__confirm-label",
+                  children: [
+                    /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("span", {
+                      children: [
+                        "Type ",
+                        /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("code", {
+                          children: RESTORE_CONFIRMATION
+                        }, undefined, false, undefined, this),
+                        " to enable restore:"
+                      ]
+                    }, undefined, true, undefined, this),
+                    /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("input", {
+                      type: "text",
+                      value: restoreConfirmText,
+                      onChange: (e) => setRestoreConfirmText(e.target.value),
+                      placeholder: RESTORE_CONFIRMATION,
+                      "aria-label": `Type ${RESTORE_CONFIRMATION} to confirm`
+                    }, undefined, false, undefined, this)
+                  ]
+                }, undefined, true, undefined, this),
+                /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("label", {
+                  className: `backup-panel__file-button${restoreReady ? "" : " is-disabled"}`,
+                  children: [
+                    restoring ? "Restoring…" : "Choose backup file…",
+                    /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("input", {
+                      type: "file",
+                      accept: ".db,application/octet-stream",
+                      disabled: !restoreReady || restoring,
+                      onChange: handleRestore,
+                      className: "visually-hidden"
+                    }, undefined, false, undefined, this)
+                  ]
+                }, undefined, true, undefined, this),
+                restoreResult && /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("p", {
+                  className: "backup-panel__result",
+                  role: "status",
+                  children: restoreResult.message
+                }, undefined, false, undefined, this)
+              ]
+            }, undefined, true, undefined, this)
+          ]
+        }, undefined, true, undefined, this),
+        /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("section", {
+          className: "backup-panel__section",
+          children: [
+            /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("h3", {
+              children: "Text export"
+            }, undefined, false, undefined, this),
+            /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("p", {
+              children: "Human-readable JSON files — one per spec, plus sources, suggestions, rejections, and proposals — meant for committing into its own version-control repo. Applying merges its contents into the current library; it doesn’t touch audit history or archived snapshot content (use the full backup for exact historical fidelity)."
+            }, undefined, false, undefined, this),
+            /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("button", {
+              type: "button",
+              className: "backup-panel__primary",
+              onClick: handleDownloadTextExport,
+              disabled: downloadingExport,
+              children: downloadingExport ? "Downloading…" : "Download text export (.zip)"
+            }, undefined, false, undefined, this),
+            /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("div", {
+              className: "backup-panel__restore",
+              children: [
+                /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("label", {
+                  className: "backup-panel__file-button",
+                  children: [
+                    applying ? "Applying…" : "Choose export file…",
+                    /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("input", {
+                      type: "file",
+                      accept: ".zip,application/zip",
+                      disabled: applying,
+                      onChange: handleApply,
+                      className: "visually-hidden"
+                    }, undefined, false, undefined, this)
+                  ]
+                }, undefined, true, undefined, this),
+                applyResult && /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("div", {
+                  className: "backup-panel__result",
+                  role: "status",
+                  children: [
+                    /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("p", {
+                      children: [
+                        applyResult.specsUpdated.length,
+                        " spec(s) updated",
+                        applyResult.specsSkipped.length > 0 ? `, ${applyResult.specsSkipped.length} skipped (not found)` : "",
+                        ". ",
+                        applyResult.relationshipsApplied,
+                        " relationship(s),",
+                        " ",
+                        applyResult.suggestionsAdded,
+                        " suggestion(s), ",
+                        applyResult.rejectionsAdded,
+                        " ",
+                        "rejection(s), ",
+                        applyResult.proposalsAdded,
+                        " proposal(s) applied."
+                      ]
+                    }, undefined, true, undefined, this),
+                    applyResult.errors.length > 0 && /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("ul", {
+                      className: "backup-panel__errors",
+                      children: applyResult.errors.map((err, i) => /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("li", {
+                        children: err
+                      }, i, false, undefined, this))
+                    }, undefined, false, undefined, this)
+                  ]
+                }, undefined, true, undefined, this)
+              ]
+            }, undefined, true, undefined, this)
+          ]
+        }, undefined, true, undefined, this)
+      ]
+    }, undefined, true, undefined, this)
+  }, undefined, false, undefined, this);
+}
+
+// src/components/AppChrome.tsx
+var jsx_dev_runtime14 = __toESM(require_jsx_dev_runtime(), 1);
 function AppChrome({
   view,
   themeMode,
@@ -28969,21 +29332,22 @@ function AppChrome({
   onThemeChange
 }) {
   const nextTheme = themeMode === "dark" ? "light" : "dark";
-  const [copyLabel, setCopyLabel] = import_react19.useState("Copy link");
+  const [copyLabel, setCopyLabel] = import_react20.useState("Copy link");
+  const [backupPanelOpen, setBackupPanelOpen] = import_react20.useState(false);
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
     setCopyLabel("Copied!");
     setTimeout(() => setCopyLabel("Copy link"), 1500);
   };
-  return /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("div", {
+  return /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("div", {
     className: "app-chrome",
     children: [
-      /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("div", {
+      /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("div", {
         className: "view-switcher",
         role: "tablist",
         "aria-label": "View",
         children: [
-          /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("button", {
+          /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("button", {
             type: "button",
             role: "tab",
             "aria-selected": view === "relationship",
@@ -28991,7 +29355,7 @@ function AppChrome({
             onClick: () => onViewChange("relationship"),
             children: "Relationships"
           }, undefined, false, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("button", {
+          /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("button", {
             type: "button",
             role: "tab",
             "aria-selected": view === "archive",
@@ -29001,34 +29365,48 @@ function AppChrome({
           }, undefined, false, undefined, this)
         ]
       }, undefined, true, undefined, this),
-      /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("div", {
+      /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("div", {
         className: "chrome-actions",
         children: [
-          /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("button", {
+          /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("button", {
+            type: "button",
+            className: "chrome-icon-btn",
+            onClick: () => setBackupPanelOpen(true),
+            "aria-label": "Backup and restore",
+            title: "Backup and restore",
+            children: [
+              /* @__PURE__ */ jsx_dev_runtime14.jsxDEV(DatabaseBackup, {
+                size: 14,
+                "aria-hidden": "true"
+              }, undefined, false, undefined, this),
+              "Backup"
+            ]
+          }, undefined, true, undefined, this),
+          /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("button", {
             type: "button",
             className: "copy-link-btn",
             onClick: handleCopyLink,
             "aria-label": "Copy current page link",
             title: "Copy current page link",
             children: [
-              /* @__PURE__ */ jsx_dev_runtime13.jsxDEV(Link, {
+              /* @__PURE__ */ jsx_dev_runtime14.jsxDEV(Link, {
                 size: 14,
                 "aria-hidden": "true"
               }, undefined, false, undefined, this),
               copyLabel
             ]
           }, undefined, true, undefined, this),
-          /* @__PURE__ */ jsx_dev_runtime13.jsxDEV("button", {
+          /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("button", {
             type: "button",
             className: "theme-switcher",
             onClick: () => onThemeChange(nextTheme),
             "aria-label": `Switch to ${nextTheme} theme`,
             title: `Switch to ${nextTheme} theme`,
             children: [
-              themeMode === "dark" ? /* @__PURE__ */ jsx_dev_runtime13.jsxDEV(Moon, {
+              themeMode === "dark" ? /* @__PURE__ */ jsx_dev_runtime14.jsxDEV(Moon, {
                 size: 14,
                 "aria-hidden": "true"
-              }, undefined, false, undefined, this) : /* @__PURE__ */ jsx_dev_runtime13.jsxDEV(Sun, {
+              }, undefined, false, undefined, this) : /* @__PURE__ */ jsx_dev_runtime14.jsxDEV(Sun, {
                 size: 14,
                 "aria-hidden": "true"
               }, undefined, false, undefined, this),
@@ -29036,13 +29414,16 @@ function AppChrome({
             ]
           }, undefined, true, undefined, this)
         ]
-      }, undefined, true, undefined, this)
+      }, undefined, true, undefined, this),
+      backupPanelOpen && /* @__PURE__ */ jsx_dev_runtime14.jsxDEV(BackupPanel, {
+        onClose: () => setBackupPanelOpen(false)
+      }, undefined, false, undefined, this)
     ]
   }, undefined, true, undefined, this);
 }
 
 // src/App.tsx
-var jsx_dev_runtime14 = __toESM(require_jsx_dev_runtime(), 1);
+var jsx_dev_runtime15 = __toESM(require_jsx_dev_runtime(), 1);
 var cssUrl = new URL("./index.css", import.meta.url).href;
 if (typeof document !== "undefined" && !document.querySelector(`link[href="${cssUrl}"]`)) {
   const link2 = document.createElement("link");
@@ -29054,7 +29435,7 @@ function AppProvider({
   children: children2,
   overrides
 }) {
-  return /* @__PURE__ */ jsx_dev_runtime14.jsxDEV(CrewProvider, {
+  return /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(CrewProvider, {
     overrides,
     children: children2
   }, undefined, false, undefined, this);
@@ -29063,58 +29444,58 @@ function AppContent() {
   const { ready, error } = useCrew();
   const [urlState, setUrlState] = useUrlState();
   if (error) {
-    return /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("div", {
+    return /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("div", {
       role: "alert",
       className: "crew-error",
       children: [
-        /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("h2", {
+        /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("h2", {
           children: "Integration Error"
         }, undefined, false, undefined, this),
-        /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("p", {
+        /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("p", {
           children: error
         }, undefined, false, undefined, this)
       ]
     }, undefined, true, undefined, this);
   }
   if (!ready) {
-    return /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("div", {
+    return /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("div", {
       className: "loading",
       "aria-busy": "true",
-      children: /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("p", {
+      children: /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("p", {
         children: "Initializing…"
       }, undefined, false, undefined, this)
     }, undefined, false, undefined, this);
   }
   const { view, themeMode } = urlState;
-  return /* @__PURE__ */ jsx_dev_runtime14.jsxDEV("div", {
+  return /* @__PURE__ */ jsx_dev_runtime15.jsxDEV("div", {
     "data-theme": themeMode,
     className: `app-root theme-${themeMode}`,
     children: [
-      /* @__PURE__ */ jsx_dev_runtime14.jsxDEV(AppChrome, {
+      /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(AppChrome, {
         view,
         themeMode,
         onViewChange: (v) => setUrlState({ view: v }),
         onThemeChange: (m) => setUrlState({ themeMode: m })
       }, undefined, false, undefined, this),
-      view === "relationship" ? /* @__PURE__ */ jsx_dev_runtime14.jsxDEV(RelationshipView, {}, undefined, false, undefined, this) : /* @__PURE__ */ jsx_dev_runtime14.jsxDEV(ArchiveView, {}, undefined, false, undefined, this)
+      view === "relationship" ? /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(RelationshipView, {}, undefined, false, undefined, this) : /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(ArchiveView, {}, undefined, false, undefined, this)
     ]
   }, undefined, true, undefined, this);
 }
 function App({ crewOverrides } = {}) {
-  return /* @__PURE__ */ jsx_dev_runtime14.jsxDEV(AppProvider, {
+  return /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(AppProvider, {
     overrides: crewOverrides,
-    children: /* @__PURE__ */ jsx_dev_runtime14.jsxDEV(AppContent, {}, undefined, false, undefined, this)
+    children: /* @__PURE__ */ jsx_dev_runtime15.jsxDEV(AppContent, {}, undefined, false, undefined, this)
   }, undefined, false, undefined, this);
 }
 
 // src/preview.tsx
-var jsx_dev_runtime15 = __toESM(require_jsx_dev_runtime(), 1);
+var jsx_dev_runtime16 = __toESM(require_jsx_dev_runtime(), 1);
 var sampleSpecs = [
-  { key: "agent-memory", title: "Agent Memory v2", type: "feature", stage: "scoped", progress: 66, owner: "Maya Chen", theme: "AI Foundations", repository: "crew-platform", relationships: [{ targetKey: "retention", type: "depends_on" }] },
-  { key: "retention", title: "Memory retention controls", type: "feature", stage: "in-flight", progress: 78, owner: "Maya Chen", theme: "AI Foundations", repository: "crew-platform", suggestions: [{ targetKey: "usage-alerts", type: "related" }] },
-  { key: "usage-alerts", title: "Usage anomaly alerts", type: "feature", stage: "new", progress: 33, owner: "Daniel Kim", theme: "Platform Reliability", repository: "crew-platform" },
-  { key: "observability", title: "Trace correlation", type: "quick", stage: "done", progress: 100, owner: "Ravi Patel", theme: "Platform Reliability", repository: "crew-platform" },
-  { key: "workspace-export", title: "Workspace export fixes", type: "bugfix", stage: "in-flight", progress: 68, owner: "Maya Chen", theme: "Developer Experience", repository: "crew-platform", relationships: [{ targetKey: "agent-memory", type: "blocks" }] }
+  { key: "agent-memory", title: "Agent Memory v2", type: "feature", stage: "scoped", progress: 66, owner: "Maya Chen", theme: "AI Foundations", repository: "crew-platform", indexed_at: "2026-06-02T10:00:00Z", relationships: [{ targetKey: "retention", type: "depends_on" }] },
+  { key: "retention", title: "Memory retention controls", type: "feature", stage: "in-flight", progress: 78, owner: "Maya Chen", theme: "AI Foundations", repository: "crew-platform", indexed_at: "2026-07-14T10:00:00Z", suggestions: [{ targetKey: "usage-alerts", type: "related" }] },
+  { key: "usage-alerts", title: "Usage anomaly alerts", type: "feature", stage: "new", progress: 33, owner: "Daniel Kim", theme: "Platform Reliability", repository: "crew-platform", indexed_at: "2026-08-05T10:00:00Z" },
+  { key: "observability", title: "Trace correlation", type: "quick", stage: "done", progress: 100, owner: "Ravi Patel", theme: "Platform Reliability", repository: "crew-platform", indexed_at: "2026-06-20T10:00:00Z" },
+  { key: "workspace-export", title: "Workspace export fixes", type: "bugfix", stage: "in-flight", progress: 68, owner: "Maya Chen", theme: "Developer Experience", repository: "crew-platform", indexed_at: "2026-08-10T10:00:00Z", relationships: [{ targetKey: "agent-memory", type: "blocks" }] }
 ];
 var sampleSnapshots = [
   {
@@ -29265,6 +29646,6 @@ var overrides = {
     }
   }
 };
-import_client.createRoot(document.getElementById("root")).render(/* @__PURE__ */ jsx_dev_runtime15.jsxDEV(App, {
+import_client.createRoot(document.getElementById("root")).render(/* @__PURE__ */ jsx_dev_runtime16.jsxDEV(App, {
   crewOverrides: overrides
 }, undefined, false, undefined, this));

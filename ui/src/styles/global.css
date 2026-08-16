@@ -333,7 +333,9 @@ select {
 }
 .graph-canvas-container .react-flow { width: 100%; height: 100%; }
 
-/* X-axis: pinned stage header across the top */
+/* X-axis: pinned column header across the top. grid-template-columns is set
+   inline per-render (column count varies by X-axis mode); this is just the
+   "Status" mode's fixed 5-column fallback. */
 .graph-stage-header {
   grid-column: 2;
   grid-row: 1;
@@ -899,6 +901,7 @@ button.archive-row:hover { background: #f5f3fb; }
   padding: 0.4rem 0.6rem;
   margin-bottom: 0.3rem;
 }
+.x-axis-selector,
 .y-axis-selector {
   display: inline-flex;
   align-items: center;
@@ -906,12 +909,14 @@ button.archive-row:hover { background: #f5f3fb; }
   font-size: 0.78rem;
   color: var(--canvas-text, #c1c2c5);
 }
+.x-axis-selector span,
 .y-axis-selector span {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   opacity: 0.7;
 }
+.x-axis-selector select,
 .y-axis-selector select {
   font-size: 0.78rem;
   padding: 0.2rem 0.5rem;
@@ -921,6 +926,7 @@ button.archive-row:hover { background: #f5f3fb; }
   color: var(--canvas-text, #c1c2c5);
   cursor: pointer;
 }
+.x-axis-selector select:focus-visible,
 .y-axis-selector select:focus-visible {
   outline: 2px solid var(--canvas-accent, #9c75ff);
   outline-offset: 1px;

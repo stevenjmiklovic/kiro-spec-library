@@ -1692,7 +1692,7 @@ button.archive-row:hover {
   gap: .5rem;
 }
 
-.copy-link-btn {
+.copy-link-btn, .chrome-icon-btn {
   display: inline-flex;
   border: 1px solid var(--canvas-border, #3a3843);
   background: var(--canvas-surface, #1d1d24);
@@ -1705,7 +1705,7 @@ button.archive-row:hover {
   padding: .4rem .85rem;
 }
 
-.copy-link-btn:hover {
+.copy-link-btn:hover, .chrome-icon-btn:hover {
   border-color: var(--canvas-accent, #9c75ff);
 }
 
@@ -1959,7 +1959,7 @@ button.archive-row:hover {
   padding: .4rem .6rem;
 }
 
-.y-axis-selector {
+.x-axis-selector, .y-axis-selector {
   display: inline-flex;
   color: var(--canvas-text, #c1c2c5);
   align-items:  center;
@@ -1967,14 +1967,14 @@ button.archive-row:hover {
   font-size: .78rem;
 }
 
-.y-axis-selector span {
+.x-axis-selector span, .y-axis-selector span {
   text-transform: uppercase;
   letter-spacing: .04em;
   opacity: .7;
   font-weight: 600;
 }
 
-.y-axis-selector select {
+.x-axis-selector select, .y-axis-selector select {
   border: 1px solid var(--canvas-border, #373a40);
   background: var(--canvas-surface, #25262b);
   color: var(--canvas-text, #c1c2c5);
@@ -1982,6 +1982,11 @@ button.archive-row:hover {
   border-radius: .35rem;
   padding: .2rem .5rem;
   font-size: .78rem;
+}
+
+.x-axis-selector select:focus-visible {
+  outline: 2px solid var(--canvas-accent, #9c75ff);
+  outline-offset: 1px;
 }
 
 .y-axis-selector select:focus-visible {
@@ -2730,4 +2735,241 @@ button.archive-row:hover {
 .meta-field__mark-reviewed:hover {
   color: #2b8a3e;
   border-color: #2b8a3e;
+}
+
+.modal-backdrop {
+  position: fixed;
+  z-index: 100;
+  display: grid;
+  background: #06060999;
+  place-items:  center;
+  padding: 1.25rem;
+  inset: 0;
+}
+
+[data-theme="light"] .modal-backdrop {
+  background: #1e1d2159;
+}
+
+.backup-panel {
+  overflow-y: auto;
+  border: 1px solid var(--canvas-border, #3a3843);
+  background: var(--canvas-surface, #1d1d24);
+  color: var(--canvas-text, #c1c2c5);
+  border-radius: .75rem;
+  width: min(34rem, 100%);
+  max-height: calc(100vh - 2.5rem);
+  padding: 1.25rem 1.4rem 1.5rem;
+  box-shadow: 0 24px 70px #00000073;
+}
+
+.backup-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items:  flex-start;
+  gap: .75rem;
+  margin-bottom: .5rem;
+}
+
+.backup-panel__header h2 {
+  color: var(--canvas-text, #e9ecef);
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.backup-panel__close {
+  display: grid;
+  border: 1px solid var(--canvas-border, #3a3843);
+  color: var(--canvas-text-muted, #909296);
+  cursor: pointer;
+  background: none;
+  border-radius: .4rem;
+  flex: none;
+  place-items:  center;
+  width: 1.9rem;
+  height: 1.9rem;
+}
+
+.backup-panel__close:hover {
+  color: var(--canvas-text, #e9ecef);
+}
+
+.backup-panel__section {
+  border-top: 1px solid var(--canvas-border, #3a3843);
+  padding: 1rem 0;
+}
+
+.backup-panel__section:first-of-type {
+  border-top: 0;
+  padding-top: .25rem;
+}
+
+.backup-panel__section h3 {
+  margin: 0 0 .4rem;
+  font-size: .95rem;
+  font-weight: 600;
+}
+
+.backup-panel__section p {
+  color: var(--canvas-text-muted, #909296);
+  margin: 0 0 .85rem;
+  font-size: .82rem;
+  line-height: 1.5;
+}
+
+.backup-panel__primary {
+  background: var(--canvas-accent, #9c75ff);
+  color: #fff;
+  cursor: pointer;
+  border: 0;
+  border-radius: .5rem;
+  padding: .55rem .9rem;
+  font-size: .85rem;
+  font-weight: 600;
+}
+
+.backup-panel__primary:hover:not(:disabled) {
+  background: var(--canvas-accent-hover, #8a63f2);
+}
+
+.backup-panel__primary:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.backup-panel__restore {
+  display: flex;
+  border-top: 1px dashed var(--canvas-border, #3a3843);
+  flex-direction: column;
+  gap: .6rem;
+  margin-top: .9rem;
+  padding-top: .9rem;
+}
+
+.backup-panel__confirm-label {
+  display: flex;
+  color: var(--canvas-text-muted, #909296);
+  flex-direction: column;
+  gap: .35rem;
+  font-size: .78rem;
+}
+
+.backup-panel__confirm-label code {
+  background: var(--canvas-bg, #111115);
+  color: var(--canvas-text, #e9ecef);
+  font-family: var(--font-mono);
+  border-radius: .3rem;
+  padding: .05rem .4rem;
+}
+
+.backup-panel__confirm-label input {
+  border: 1px solid var(--canvas-border, #3a3843);
+  background: var(--canvas-bg, #111115);
+  color: var(--canvas-text, #e9ecef);
+  font: inherit;
+  border-radius: .4rem;
+  padding: .4rem .6rem;
+}
+
+.backup-panel__file-button {
+  display: inline-flex;
+  border: 1px solid var(--canvas-border, #3a3843);
+  color: var(--canvas-text, #c1c2c5);
+  cursor: pointer;
+  background: none;
+  border-radius: .45rem;
+  justify-content: center;
+  align-items:  center;
+  width: -moz-fit-content;
+  width: fit-content;
+  padding: .5rem .85rem;
+  font-size: .82rem;
+}
+
+.backup-panel__file-button:hover {
+  border-color: var(--canvas-accent, #9c75ff);
+}
+
+.backup-panel__file-button.is-disabled {
+  opacity: .5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.backup-panel__result {
+  border: 1px solid var(--canvas-border, #3a3843);
+  background: var(--canvas-bg, #111115);
+  color: var(--canvas-text, #c1c2c5);
+  border-radius: .45rem;
+  margin: 0;
+  padding: .6rem .75rem;
+  font-size: .8rem;
+  line-height: 1.5;
+}
+
+.backup-panel__errors {
+  color: #ffa94d;
+  margin: .5rem 0 0;
+  padding-left: 1.1rem;
+  font-size: .76rem;
+  line-height: 1.5;
+}
+
+[data-theme="light"] .backup-panel {
+  color: #343a40;
+  background: #fff;
+  border-color: #dee2e6;
+  box-shadow: 0 24px 70px #0000002e;
+}
+
+[data-theme="light"] .backup-panel__header h2 {
+  color: #16181c;
+}
+
+[data-theme="light"] .backup-panel__close {
+  color: #868e96;
+  border-color: #dee2e6;
+}
+
+[data-theme="light"] .backup-panel__close:hover {
+  color: #16181c;
+}
+
+[data-theme="light"] .backup-panel__section {
+  border-top-color: #dee2e6;
+}
+
+[data-theme="light"] .backup-panel__section p {
+  color: #868e96;
+}
+
+[data-theme="light"] .backup-panel__restore {
+  border-top-color: #dee2e6;
+}
+
+[data-theme="light"] .backup-panel__confirm-label {
+  color: #868e96;
+}
+
+[data-theme="light"] .backup-panel__confirm-label code {
+  color: #343a40;
+  background: #f1f3f5;
+}
+
+[data-theme="light"] .backup-panel__confirm-label input {
+  color: #343a40;
+  background: #fff;
+  border-color: #dee2e6;
+}
+
+[data-theme="light"] .backup-panel__file-button {
+  color: #343a40;
+  border-color: #dee2e6;
+}
+
+[data-theme="light"] .backup-panel__result {
+  color: #343a40;
+  background: #f8f9fa;
+  border-color: #dee2e6;
 }
