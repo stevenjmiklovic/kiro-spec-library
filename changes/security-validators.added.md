@@ -1,1 +1,0 @@
-Added path validator (traversal rejection, symlink escape detection, credential path blocking, file size limits) and git argument validator (shell metacharacter rejection, forbidden option filtering, safe command builders).

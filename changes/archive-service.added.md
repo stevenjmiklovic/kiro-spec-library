@@ -1,1 +1,0 @@
-Added immutable archive service with SHA-256 hash-verified snapshot creation and retrieval, retention policy enforcement (permanent, project_lifetime, active_plus_2_years, custom_date), legal hold gates, exact confirmation purge, and partial failure cleanup.

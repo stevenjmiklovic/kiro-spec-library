@@ -1,6 +1,6 @@
 {
   "name": "kiro-spec-library",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "displayName": "Spec Library",
   "description": "Index, browse, and curate Kiro Specs across repositories with relationship mapping and AI-assisted metadata.",
   "author": "Johns Hopkins University Sheridan Libraries",
