@@ -37,8 +37,8 @@ console.log("[startup] Running migrations...");
 runMigrations(db);
 
 // 5. Initialize services
-const scanner = new ScannerService(db, dataDir);
 const archiver = new ArchiverService(db, { archiveDir });
+const scanner = new ScannerService(db, dataDir, archiver);
 
 // 6. Readiness flag
 let isReady = false;

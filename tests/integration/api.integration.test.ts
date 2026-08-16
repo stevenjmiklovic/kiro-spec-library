@@ -77,8 +77,8 @@ beforeAll(async () => {
   db = createDatabase(tmpDir);
   await runMigrations(db);
 
-  const scanner = new ScannerService(db, tmpDir);
   const archiver = new ArchiverService(db, { archiveDir });
+  const scanner = new ScannerService(db, tmpDir, archiver);
 
   // Build the full app: router (health/bootstrap) + sub-routes
   const router = createRouter({
