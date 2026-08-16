@@ -82,7 +82,7 @@ function putJson(files: Record<string, Uint8Array>, path: string, value: unknown
 // ─── Build (export) ──────────────────────────────────────────────────────────
 
 export function buildTextExportZip(db: Database): Uint8Array {
-  const specs = listSpecs(db, { limit: 10_000, offset: 0 });
+  const specs = listSpecs(db, { limit: Number.MAX_SAFE_INTEGER, offset: 0 });
   const index = buildSpecIndex(specs);
   const files: Record<string, Uint8Array> = {};
 
