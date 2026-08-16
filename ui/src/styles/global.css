@@ -257,6 +257,12 @@ select {
   letter-spacing: -0.02em;
 }
 
+
+.title-tral {
+  color: #8b47fa;
+  font-style: italic;
+}
+
 .eyebrow {
   margin: 0 0 0.25rem;
   color: var(--canvas-accent, #9c75ff);

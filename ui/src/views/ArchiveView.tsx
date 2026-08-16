@@ -8,6 +8,7 @@ import React, {
 
 import { useArchiveData } from '../hooks/useSpecData.js';
 import { useUrlState } from '../hooks/useUrlState.js';
+import { GhostIcon } from '../components/GhostIcon.js';
 import {
   ArchiveFilterBar,
   type ArchiveFilters,
@@ -392,7 +393,7 @@ export function ArchiveView(): React.ReactElement {
       <div className="archive-view" role="alert">
         <header className="archive-header">
           <div>
-            <h1>Spec Library</h1>
+            <h1><GhostIcon size={28} /> Spec<span className="title-tral">tral</span> Library</h1>
             <p>Browse, retrieve, and curate completed Kiro Specs.</p>
           </div>
         </header>
@@ -411,7 +412,7 @@ export function ArchiveView(): React.ReactElement {
     >
       <header className="archive-header">
         <div>
-          <h1>Spec Library</h1>
+          <h1><GhostIcon size={28} /> Spec<span className="title-tral">tral</span> Library</h1>
           <p>Browse, retrieve, and curate completed Kiro Specs.</p>
         </div>
         <span aria-live="polite">

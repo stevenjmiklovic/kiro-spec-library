@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useSpecData } from '../hooks/useSpecData.js';
 import { useUrlState } from '../hooks/useUrlState.js';
+import { GhostIcon } from '../components/GhostIcon.js';
 import {
   FilterBar,
   type FilterOptions,
@@ -350,7 +351,7 @@ export function RelationshipView(): React.ReactElement {
       >
         <header className="relationship-header">
           <p className="eyebrow">Relationship observatory</p>
-          <h1>Spec Library</h1>
+          <h1><GhostIcon size={28} /> Spec<span className="title-tral">tral</span> Library</h1>
         </header>
         <div className="graph-shell">
           <p>Failed to load specifications: {error}</p>
@@ -372,7 +373,7 @@ export function RelationshipView(): React.ReactElement {
       {/* Header */}
       <header className="relationship-header">
         <p className="eyebrow">Relationship observatory</p>
-        <h1>Spec Library</h1>
+        <h1><GhostIcon size={28} /> Spec<span className="title-tral">tral</span> Library</h1>
       </header>
 
       {/* FilterBar */}
