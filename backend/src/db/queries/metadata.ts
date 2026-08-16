@@ -13,6 +13,8 @@ export interface MetadataRow {
   retention_policy: string | null;
   legal_hold: string | null;
   reviewed_at: string | null;
+  approvers: string | null;
+  implementation_ref: string | null;
   revision: number;
   updated_at: string;
 }

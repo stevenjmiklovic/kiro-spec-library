@@ -21,7 +21,7 @@ afterAll(() => {
 
 describe("Migration integration tests", () => {
   describe("runMigrations applies all migrations", () => {
-    test("applies all 7 migrations successfully", async () => {
+    test("applies all 9 migrations successfully", async () => {
       await runMigrations(db);
 
       const rows = db
@@ -30,7 +30,7 @@ describe("Migration integration tests", () => {
         )
         .all();
 
-      expect(rows).toHaveLength(7);
+      expect(rows).toHaveLength(9);
       expect(rows[0]!.number).toBe(1);
       expect(rows[0]!.name).toBe("core-tables");
       expect(rows[1]!.number).toBe(2);
@@ -45,6 +45,10 @@ describe("Migration integration tests", () => {
       expect(rows[5]!.name).toBe("proposals-rationale-source");
       expect(rows[6]!.number).toBe(7);
       expect(rows[6]!.name).toBe("lifecycle-stage-rename");
+      expect(rows[7]!.number).toBe(8);
+      expect(rows[7]!.name).toBe("metadata-reviewed-at");
+      expect(rows[8]!.number).toBe(9);
+      expect(rows[8]!.name).toBe("metadata-schema-completion");
     });
 
     test("_migrations rows have applied_at timestamps", () => {
@@ -162,6 +166,17 @@ describe("Migration integration tests", () => {
     });
   });
 
+  describe("schema verification: metadata schema completion (migration 009)", () => {
+    test("metadata_overlays has approvers and implementation_ref columns", () => {
+      const columns = db
+        .query<{ name: string }, []>("PRAGMA table_info(metadata_overlays)")
+        .all()
+        .map((c) => c.name);
+      expect(columns).toContain("approvers");
+      expect(columns).toContain("implementation_ref");
+    });
+  });
+
   describe("idempotency", () => {
     test("running runMigrations a second time applies nothing new and does not error", async () => {
       // Get state before second run
@@ -211,8 +226,8 @@ describe("Migration integration tests", () => {
         )
         .all();
 
-      expect(migrations).toHaveLength(7);
-      expect(migrations.map((m) => m.number)).toEqual([1, 2, 3, 4, 5, 6, 7]);
+      expect(migrations).toHaveLength(9);
+      expect(migrations.map((m) => m.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
       // Verify schema is internally consistent — tables created by migration 1
       // are prerequisites for indexes in migration 3. If 1 had partially applied
