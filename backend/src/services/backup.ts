@@ -108,7 +108,9 @@ export async function restoreFromBackup(
     await runMigrations(tempDb);
     migratedBytes = tempDb.serialize();
   } finally {
-    tempDb.close();
+    if (tempDb) {
+      tempDb.close();
+    }
   }
 
   // Safety copy of the CURRENT live database, taken via the same consistent
