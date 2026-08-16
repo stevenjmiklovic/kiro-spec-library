@@ -58,6 +58,10 @@ export const AUDIT_OPERATIONS: readonly AuditOperation[] = [
   "suggestion_rejected",
   "snapshot_created",
   "snapshot_purged",
+  "backup_created",
+  "backup_restored",
+  "text_export_created",
+  "text_export_applied",
 ] as const;
 
 export const SUGGESTION_REASONS: readonly SuggestionReason[] = [

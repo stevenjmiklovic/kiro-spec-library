@@ -5,9 +5,10 @@
  * Uses a temp SQLite database per suite; no network server is started.
  */
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { mkdtempSync, rmSync, mkdirSync } from "node:fs";
+import { mkdtempSync, rmSync, mkdirSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { unzipSync } from "fflate";
 import type { Database } from "bun:sqlite";
 import { createDatabase } from "../../backend/src/db/connection.js";
 import { runMigrations } from "../../backend/src/db/migrator.js";
@@ -20,7 +21,6 @@ import { ArchiverService } from "../../backend/src/services/archiver.js";
 import { upsertSpec } from "../../backend/src/db/queries/specs.js";
 import { putSource } from "../../backend/src/db/queries/sources.js";
 import { createSuggestion } from "../../backend/src/db/queries/suggestions.js";
-import { API_PREFIX } from "../../shared/src/constants.js";
 import type { NormalizedSpec } from "../../shared/src/types.js";
 
 // ─── Test Setup ──────────────────────────────────────────────────────────────
@@ -30,8 +30,12 @@ let archiveDir: string;
 let db: Database;
 let app: { handle: (req: Request) => Promise<Response> };
 
+// The Elysia app itself mounts at "/api" (see router.ts); API_PREFIX from
+// shared/src/constants.ts is the *host platform's* routing prefix, rewritten
+// down to "/api" before reaching this app in real deployments. Tests exercise
+// the Elysia app directly (no host in front of it), so they must target "/api".
 function buildUrl(path: string): string {
-  return `http://localhost${API_PREFIX}${path}`;
+  return `http://localhost/api${path}`;
 }
 
 function makeSpec(overrides: Partial<NormalizedSpec> = {}): NormalizedSpec {
@@ -82,6 +86,7 @@ beforeAll(async () => {
     scanner,
     archiver,
     ready: () => true,
+    dataDir: tmpDir,
   });
 
   // Mount sub-routes onto the same API_PREFIX'd app
@@ -432,6 +437,119 @@ describe("REST API integration tests", () => {
       const data = await res.json() as { snapshots: unknown[]; nextCursor: unknown };
       expect(data.snapshots).toBeInstanceOf(Array);
       expect(data.nextCursor).toBeNull();
+    });
+  });
+
+  // ─── Backup: whole-database serialize/restore ──────────────────────────
+  describe("GET /backup", () => {
+    test("returns a SQLite file", async () => {
+      const res = await handleRequest("GET", "/backup");
+      expect(res.status).toBe(200);
+      expect(res.headers.get("content-type")).toBe("application/octet-stream");
+      expect(res.headers.get("content-disposition")).toContain("attachment");
+
+      const bytes = new Uint8Array(await res.arrayBuffer());
+      const header = new TextDecoder().decode(bytes.slice(0, 16));
+      expect(header.startsWith("SQLite format 3")).toBe(true);
+    });
+  });
+
+  describe("POST /backup/restore", () => {
+    test("rejects without the confirmation phrase", async () => {
+      const form = new FormData();
+      form.set("file", new Blob(["not a database"]), "backup.db");
+      const res = await app.handle(
+        new Request(buildUrl("/backup/restore"), { method: "POST", body: form }),
+      );
+      expect(res.status).toBe(400);
+      const data = (await res.json()) as { code: string };
+      expect(data.code).toBe("CONFIRMATION_REQUIRED");
+    });
+
+    test("rejects a file that isn't a SQLite database", async () => {
+      const form = new FormData();
+      form.set("confirmation", "RESTORE");
+      form.set("file", new Blob(["not a database"]), "backup.db");
+      const res = await app.handle(
+        new Request(buildUrl("/backup/restore"), { method: "POST", body: form }),
+      );
+      expect(res.status).toBe(400);
+      const data = (await res.json()) as { code: string };
+      expect(data.code).toBe("INVALID_BACKUP");
+    });
+
+    test("round-trips a real backup and writes a safety copy of the live db", async () => {
+      const exportRes = await handleRequest("GET", "/backup");
+      const backupBytes = new Uint8Array(await exportRes.arrayBuffer());
+
+      const form = new FormData();
+      form.set("confirmation", "RESTORE");
+      form.set("file", new Blob([backupBytes]), "backup.db");
+      const res = await app.handle(
+        new Request(buildUrl("/backup/restore"), { method: "POST", body: form }),
+      );
+      expect(res.status).toBe(200);
+
+      const data = (await res.json()) as {
+        restored: boolean;
+        requiresRestart: boolean;
+        safetyBackupPath: string;
+      };
+      expect(data.restored).toBe(true);
+      expect(data.requiresRestart).toBe(true);
+      expect(existsSync(data.safetyBackupPath)).toBe(true);
+      expect(existsSync(join(tmpDir, "spec-library.db"))).toBe(true);
+    });
+  });
+
+  // ─── Textual/git export: zip build + apply round-trip ──────────────────
+  describe("GET /export/text", () => {
+    test("returns a zip with the expected top-level files", async () => {
+      const res = await handleRequest("GET", "/export/text");
+      expect(res.status).toBe(200);
+      expect(res.headers.get("content-type")).toBe("application/zip");
+
+      const bytes = new Uint8Array(await res.arrayBuffer());
+      const files = unzipSync(bytes);
+      expect(files["manifest.json"]).toBeDefined();
+      expect(files["sources.json"]).toBeDefined();
+      expect(files["suggestions.json"]).toBeDefined();
+      expect(files["rejections.json"]).toBeDefined();
+
+      const manifest = JSON.parse(new TextDecoder().decode(files["manifest.json"]!)) as {
+        schemaVersion: number;
+        counts: { specs: number };
+      };
+      expect(manifest.schemaVersion).toBe(1);
+      expect(manifest.counts.specs).toBeGreaterThanOrEqual(2);
+
+      const specFile = Object.keys(files).find(
+        (p) => p.startsWith("specs/") && p.includes("target-spec"),
+      );
+      expect(specFile).toBeDefined();
+    });
+  });
+
+  describe("POST /export/text/apply", () => {
+    test("re-applies its own export without error", async () => {
+      const exportRes = await handleRequest("GET", "/export/text");
+      const zipBytes = new Uint8Array(await exportRes.arrayBuffer());
+
+      const form = new FormData();
+      form.set("file", new Blob([zipBytes]), "export.zip");
+      const res = await app.handle(
+        new Request(buildUrl("/export/text/apply"), { method: "POST", body: form }),
+      );
+      expect(res.status).toBe(200);
+
+      const data = (await res.json()) as {
+        specsUpdated: string[];
+        specsSkipped: string[];
+        errors: string[];
+      };
+      expect(data.errors).toEqual([]);
+      expect(data.specsSkipped).toEqual([]);
+      expect(data.specsUpdated).toContain("test-spec");
     });
   });
 });

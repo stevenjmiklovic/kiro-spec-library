@@ -99,6 +99,12 @@ export function listSnapshots(
   return stmt.all({ $limit: filters.limit }) as SnapshotRow[];
 }
 
+/** Every snapshot record (including purged), for full-library export. */
+export function listAllSnapshots(db: Database): SnapshotRow[] {
+  const stmt = db.prepare("SELECT * FROM snapshots ORDER BY created_at ASC");
+  return stmt.all() as SnapshotRow[];
+}
+
 export interface SnapshotArtifactRow {
   id: number;
   snapshot_id: string;

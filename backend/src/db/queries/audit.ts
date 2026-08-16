@@ -47,6 +47,12 @@ export function insertAuditEvent(
   });
 }
 
+/** Every audit event ever recorded, oldest first, for full-library export. */
+export function listAllAuditEvents(db: Database): AuditRow[] {
+  const stmt = db.prepare("SELECT * FROM audit_events ORDER BY timestamp ASC");
+  return stmt.all() as AuditRow[];
+}
+
 export function queryAuditEvents(
   db: Database,
   filters: AuditFilters,
