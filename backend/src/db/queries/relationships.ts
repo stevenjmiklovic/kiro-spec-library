@@ -66,6 +66,39 @@ export function listBySourceKeys(db: Database, specKeys: string[]): Relationship
   return stmt.all(params) as RelationshipRow[];
 }
 
+export interface SupersessionRow {
+  target_spec_key: string;
+  successor_spec_key: string;
+  successor_title: string;
+}
+
+/**
+ * For each of the given spec keys, find the spec (if any) that supersedes
+ * it — i.e. a `supersedes` relationship whose target is that key. Used to
+ * derive the Archive view's "Disposition" (Active vs. Superseded) per
+ * ADR-005, which replaced the legal-hold columns with this relationship.
+ */
+export function listSupersessionsByTargetKeys(
+  db: Database,
+  specKeys: string[],
+): SupersessionRow[] {
+  if (specKeys.length === 0) return [];
+  const placeholders = specKeys.map((_, i) => `$k${i}`).join(", ");
+  const params: Record<string, string> = {};
+  specKeys.forEach((key, i) => {
+    params[`$k${i}`] = key;
+  });
+  const stmt = db.prepare(`
+    SELECT r.target_spec_key AS target_spec_key,
+           r.source_spec_key AS successor_spec_key,
+           s.title AS successor_title
+    FROM relationships r
+    JOIN specs s ON s.key = r.source_spec_key
+    WHERE r.type = 'supersedes' AND r.target_spec_key IN (${placeholders})
+  `);
+  return stmt.all(params) as SupersessionRow[];
+}
+
 /**
  * Replace every outgoing relationship for `sourceSpecKey` with exactly the
  * given set (delete then re-insert, in one transaction). Used by the

@@ -21,7 +21,6 @@ const sampleSnapshots = [
     metadata_projection: JSON.stringify({ title: "Workspace semantic index", type: "quick", theme: "AI Foundations", owner: "Priya Shah", tags: ["search", "index"] }),
     provenance: JSON.stringify({ repository: "crew-platform", relativePath: ".kiro/specs/workspace-index", branch: "main", commitHash: "a1b2c3d4e5f6" }),
     retention_policy: JSON.stringify({ type: "active_plus_2_years" }),
-    legal_hold_active: 0,
   },
   {
     id: "snap-billing",
@@ -31,8 +30,7 @@ const sampleSnapshots = [
     metadata_projection: JSON.stringify({ title: "Billing export v3", type: "feature", theme: "Commerce", owner: "Lena Ortiz", tags: ["billing", "export"] }),
     provenance: JSON.stringify({ repository: "web-console", relativePath: ".kiro/specs/billing-export-v3", branch: "main", commitHash: "b2c3d4e5f600" }),
     retention_policy: JSON.stringify({ type: "permanent" }),
-    legal_hold_active: 1,
-    legal_hold_reason: "Under audit",
+    supersededBy: { specKey: "billing-export-v4", title: "Billing export v4" },
   },
   {
     id: "snap-oauth",
@@ -42,7 +40,6 @@ const sampleSnapshots = [
     metadata_projection: JSON.stringify({ title: "OAuth callback loop", type: "bugfix", theme: "Security", owner: "Theo Grant", tags: [] }),
     provenance: JSON.stringify({ repository: "identity-service", relativePath: ".kiro/specs/oauth-callback-loop", branch: "main", commitHash: "c3d4e5f60011" }),
     retention_policy: null,
-    legal_hold_active: 0,
   },
   {
     id: "snap-approval",
@@ -52,7 +49,6 @@ const sampleSnapshots = [
     metadata_projection: JSON.stringify({ title: "Agent tool approval audit", type: "feature", theme: "Governance", owner: "Maya Chen", tags: ["audit", "governance"] }),
     provenance: JSON.stringify({ repository: "crew-platform", relativePath: ".kiro/specs/agent-tool-approval-audit", branch: "main", commitHash: "d4e5f6001122" }),
     retention_policy: JSON.stringify({ type: "active_plus_2_years" }),
-    legal_hold_active: 0,
   },
 ];
 

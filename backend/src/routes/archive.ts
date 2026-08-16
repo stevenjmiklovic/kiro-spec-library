@@ -1,7 +1,24 @@
 import { Elysia, t } from "elysia";
 import type { Database } from "bun:sqlite";
 import type { ArchiverService } from "../services/archiver.js";
-import { listSnapshots } from "../db/queries/snapshots.js";
+import { listSnapshots, type SnapshotRow } from "../db/queries/snapshots.js";
+import { listSupersessionsByTargetKeys } from "../db/queries/relationships.js";
+
+/** Attach `supersededBy` (successor spec key/title) per ADR-005's replacement for legal-hold. */
+function attachSupersessionData(db: Database, snapshots: SnapshotRow[]) {
+  const specKeys = snapshots.map((s) => s.spec_key);
+  const supersessions = listSupersessionsByTargetKeys(db, specKeys);
+  const byTarget = new Map(
+    supersessions.map((s) => [
+      s.target_spec_key,
+      { specKey: s.successor_spec_key, title: s.successor_title },
+    ]),
+  );
+  return snapshots.map((s) => ({
+    ...s,
+    supersededBy: byTarget.get(s.spec_key) ?? null,
+  }));
+}
 
 export interface ArchiveDeps {
   db: Database;
@@ -24,7 +41,7 @@ export function archiveRoutes(deps: ArchiveDeps) {
         const page = hasMore ? snapshots.slice(0, limit) : snapshots;
         const nextCursor = hasMore ? page[page.length - 1]!.created_at : null;
 
-        return { snapshots: page, nextCursor };
+        return { snapshots: attachSupersessionData(db, page), nextCursor };
       },
       {
         query: t.Object({

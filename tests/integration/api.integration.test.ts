@@ -417,14 +417,31 @@ describe("REST API integration tests", () => {
       expect(data.status).toBe("ok");
     });
 
-    test("GET /bootstrap returns 500 — BUG: router.ts references 'metadata' table instead of 'metadata_overlays'", async () => {
+    test("GET /bootstrap returns 200 with spec/archive counts and facets", async () => {
       const res = await handleRequest("GET", "/bootstrap");
-      // BUG: backend/src/router.ts line ~119 queries "SELECT DISTINCT theme FROM metadata"
-      // but the actual table is "metadata_overlays". This causes a SQL error.
-      expect(res.status).toBe(500);
+      expect(res.status).toBe(200);
 
-      const data = await res.json() as { code: string };
-      expect(data.code).toBe("INTERNAL_ERROR");
+      const data = await res.json() as {
+        specCount: number;
+        archiveCount: number;
+        lastSyncAt: string | null;
+        syncStatus: string;
+        facets: {
+          types: string[];
+          stages: string[];
+          themes: string[];
+          owners: string[];
+          repositories: string[];
+        };
+      };
+      expect(typeof data.specCount).toBe("number");
+      expect(typeof data.archiveCount).toBe("number");
+      expect(typeof data.syncStatus).toBe("string");
+      expect(Array.isArray(data.facets.types)).toBe(true);
+      expect(Array.isArray(data.facets.stages)).toBe(true);
+      expect(Array.isArray(data.facets.themes)).toBe(true);
+      expect(Array.isArray(data.facets.owners)).toBe(true);
+      expect(Array.isArray(data.facets.repositories)).toBe(true);
     });
   });
 

@@ -12,6 +12,29 @@ import { RevisionConflictError } from "../db/queries/metadata.js";
 import { applyPatch, resolveMetadata, evaluateCompleteness } from "../services/metadata.js";
 import { listBySourceKeys } from "../db/queries/relationships.js";
 import { listPendingBySourceKeys } from "../db/queries/suggestions.js";
+import { recordEvent } from "../services/audit.js";
+import type { MetadataOverlay } from "@kiro-spec-library/shared";
+import type { MetadataRow } from "../db/queries/metadata.js";
+
+function overlayToResolvedInput(overlay: MetadataRow): MetadataOverlay {
+  return {
+    specKey: overlay.spec_key,
+    title: overlay.title ?? undefined,
+    summary: overlay.summary ?? undefined,
+    owner: overlay.owner ?? undefined,
+    theme: overlay.theme ?? undefined,
+    tags: overlay.tags ? JSON.parse(overlay.tags) : undefined,
+    targetRelease: overlay.target_release ?? undefined,
+    retentionPolicy: overlay.retention_policy
+      ? JSON.parse(overlay.retention_policy)
+      : undefined,
+    approvers: overlay.approvers ? JSON.parse(overlay.approvers) : undefined,
+    implementationRef: overlay.implementation_ref ?? undefined,
+    reviewedAt: overlay.reviewed_at ?? undefined,
+    revision: overlay.revision,
+    updatedAt: overlay.updated_at,
+  };
+}
 
 /** Attach each spec's outgoing accepted relationships and pending suggestions (for the graph view). */
 function attachRelationshipData(db: Database, specs: SpecRow[]) {
@@ -77,23 +100,7 @@ export function specRoutes(deps: { db: Database }) {
             const overlay = getOverlay(db, spec.key);
             const resolved = resolveMetadata(
               { title: spec.title, owner: spec.owner } as any,
-              overlay
-                ? {
-                    specKey: overlay.spec_key,
-                    title: overlay.title ?? undefined,
-                    summary: overlay.summary ?? undefined,
-                    owner: overlay.owner ?? undefined,
-                    theme: overlay.theme ?? undefined,
-                    tags: overlay.tags ? JSON.parse(overlay.tags) : undefined,
-                    targetRelease: overlay.target_release ?? undefined,
-                    retentionPolicy: overlay.retention_policy
-                      ? JSON.parse(overlay.retention_policy)
-                      : undefined,
-                    reviewedAt: overlay.reviewed_at ?? undefined,
-                    revision: overlay.revision,
-                    updatedAt: overlay.updated_at,
-                  }
-                : null,
+              overlay ? overlayToResolvedInput(overlay) : null,
               null,
             );
             const completeness = evaluateCompleteness(resolved, spec.stage as any);
@@ -135,23 +142,7 @@ export function specRoutes(deps: { db: Database }) {
         const overlay = getOverlay(db, spec.key);
         const metadata = resolveMetadata(
           { title: spec.title, owner: spec.owner } as any,
-          overlay
-            ? {
-                specKey: overlay.spec_key,
-                title: overlay.title ?? undefined,
-                summary: overlay.summary ?? undefined,
-                owner: overlay.owner ?? undefined,
-                theme: overlay.theme ?? undefined,
-                tags: overlay.tags ? JSON.parse(overlay.tags) : undefined,
-                targetRelease: overlay.target_release ?? undefined,
-                retentionPolicy: overlay.retention_policy
-                  ? JSON.parse(overlay.retention_policy)
-                  : undefined,
-                reviewedAt: overlay.reviewed_at ?? undefined,
-                    revision: overlay.revision,
-                updatedAt: overlay.updated_at,
-              }
-            : null,
+          overlay ? overlayToResolvedInput(overlay) : null,
           null,
         );
 
@@ -174,6 +165,7 @@ export function specRoutes(deps: { db: Database }) {
 
         try {
           const result = applyPatch(db, spec.key, patch, expectedRevision);
+          recordEvent(db, "metadata_updated", { specKey: spec.key });
           return { revision: result.revision, updatedAt: result.updatedAt };
         } catch (err) {
           if (err instanceof RevisionConflictError) {
@@ -205,6 +197,9 @@ export function specRoutes(deps: { db: Database }) {
                 customDate: t.Optional(t.String()),
               }),
             ),
+            approvers: t.Optional(t.Array(t.String({ maxLength: 100 }), { maxItems: 20 })),
+            implementationRef: t.Optional(t.String({ maxLength: 500 })),
+            reviewedAt: t.Optional(t.String()),
           }),
         }),
       },

@@ -9,7 +9,6 @@ export interface ArchiveFilters {
   fromDate?: string; // ISO date (YYYY-MM-DD)
   toDate?: string; // ISO date (YYYY-MM-DD)
   retention?: string;
-  legalHold?: 'active' | 'none';
   metadataComplete?: boolean;
 }
 

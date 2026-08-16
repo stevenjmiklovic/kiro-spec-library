@@ -36,8 +36,8 @@ export interface ArchiveSnapshot {
   /** e.g. "Aug 7, 2026" */
   dateLabel: string;
   retentionLabel: string;
-  legalHoldActive: boolean;
-  legalHoldReason?: string;
+  /** Per ADR-005: derived from the `supersedes` relationship graph, not legal-hold columns. */
+  supersededBy?: { specKey: string; title: string };
   metadataComplete: boolean;
   contentDigest: string;
   provenance: {
@@ -128,8 +128,11 @@ function normalizeSnapshot(record: unknown): ArchiveSnapshot {
       str(metadata['theme']) !== '' &&
       tags.length > 0);
 
-  const legalHoldActive =
-    r['legal_hold_active'] === 1 || r['legal_hold_active'] === true;
+  const supersededByRaw = r['supersededBy'] as Record<string, unknown> | null | undefined;
+  const supersededBy =
+    supersededByRaw && typeof supersededByRaw === 'object'
+      ? { specKey: str(supersededByRaw['specKey']), title: str(supersededByRaw['title']) }
+      : undefined;
 
   return {
     id: str(r['id']) || str(r['spec_key']) || crypto.randomUUID(),
@@ -147,8 +150,7 @@ function normalizeSnapshot(record: unknown): ArchiveSnapshot {
       r['retention_policy'] ?? metadata['retentionPolicy'],
       metadataComplete,
     ),
-    legalHoldActive,
-    legalHoldReason: str(r['legal_hold_reason']) || undefined,
+    supersededBy,
     metadataComplete,
     contentDigest: str(r['content_digest'] ?? r['contentDigest']),
     provenance: {
@@ -178,8 +180,6 @@ function applyFilters(
     if (filters.theme && s.theme !== filters.theme) return false;
     if (filters.repository && s.repository !== filters.repository) return false;
     if (filters.owner && s.owner !== filters.owner) return false;
-    if (filters.legalHold === 'active' && s.legalHoldActive) return false;
-    if (filters.legalHold === 'none' && !s.legalHoldActive) return false;
     if (filters.metadataComplete === true && !s.metadataComplete) return false;
     if (filters.metadataComplete === false && s.metadataComplete) return false;
     if (filters.fromDate && s.createdAt < filters.fromDate) return false;
@@ -639,12 +639,12 @@ function SnapshotDetail({
           <h3>Disposition</h3>
           <div className="archive-fact">
             <span>Status</span>
-            <strong>{snapshot.legalHoldActive ? 'Superseded' : 'Active'}</strong>
+            <strong>{snapshot.supersededBy ? 'Superseded' : 'Active'}</strong>
           </div>
-          {snapshot.legalHoldActive && snapshot.legalHoldReason && (
+          {snapshot.supersededBy && (
             <div className="archive-fact">
               <span>Successor</span>
-              <strong>{snapshot.legalHoldReason}</strong>
+              <strong>{snapshot.supersededBy.title || snapshot.supersededBy.specKey}</strong>
             </div>
           )}
         </section>

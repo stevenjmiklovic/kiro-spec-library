@@ -155,7 +155,7 @@ export function createRouter(deps: RouterDeps) {
 
       const themes = db
         .query<{ theme: string }, []>(
-          "SELECT DISTINCT theme FROM metadata WHERE theme IS NOT NULL AND theme != ''",
+          "SELECT DISTINCT theme FROM metadata_overlays WHERE theme IS NOT NULL AND theme != ''",
         )
         .all()
         .map((r) => r.theme);
