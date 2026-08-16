@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img alt="Version" src="https://img.shields.io/badge/version-0.1.0-blue" />
+  <img alt="Version" src="https://img.shields.io/badge/version-0.2.0-blue" />
   <img alt="License" src="https://img.shields.io/badge/license-Apache--2.0-green" />
   <img alt="Crew" src="https://img.shields.io/badge/Kiro_Crew-%E2%89%A50.2.0-purple" />
   <img alt="Runtime" src="https://img.shields.io/badge/runtime-Bun-f9f1e1?logo=bun" />
