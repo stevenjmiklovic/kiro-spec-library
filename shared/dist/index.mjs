@@ -40,7 +40,11 @@ var AUDIT_OPERATIONS = [
   "suggestion_accepted",
   "suggestion_rejected",
   "snapshot_created",
-  "snapshot_purged"
+  "snapshot_purged",
+  "backup_created",
+  "backup_restored",
+  "text_export_created",
+  "text_export_applied"
 ];
 var SUGGESTION_REASONS = [
   "markdown_link",
@@ -3983,6 +3987,73 @@ var SpecLibrarySidecarV1Schema = z.object({
   metadata: SidecarMetadataSchema,
   relationships: z.array(SidecarRelationshipSchema).max(50).optional()
 });
+var TextExportManifestSchema = z.object({
+  schemaVersion: z.literal(1),
+  exportedAt: z.string().datetime(),
+  counts: z.object({
+    sources: z.number().int().min(0),
+    specs: z.number().int().min(0),
+    suggestions: z.number().int().min(0),
+    rejections: z.number().int().min(0),
+    proposals: z.number().int().min(0),
+    snapshots: z.number().int().min(0),
+    auditEvents: z.number().int().min(0)
+  })
+});
+var TextExportSourceSchema = z.object({
+  id: z.string().min(1),
+  type: z.enum(["local", "remote"]),
+  path: z.string().optional(),
+  url: z.string().optional(),
+  branch: z.string().optional(),
+  webUrlTemplate: z.string().optional(),
+  addedAt: z.string().datetime()
+});
+var SpecRefSchema = z.object({
+  specId: z.string().min(1),
+  repository: z.string().min(1)
+});
+var TextExportSuggestionSchema = z.object({
+  source: SpecRefSchema,
+  target: SpecRefSchema,
+  type: z.enum(RELATIONSHIP_TYPES),
+  confidence: z.number().min(0).max(1),
+  reason: z.string().min(1),
+  evidence: z.string(),
+  status: z.enum(["pending", "accepted", "rejected"]),
+  createdAt: z.string().datetime(),
+  resolvedAt: z.string().datetime().optional(),
+  dataHash: z.string().min(1)
+});
+var TextExportRejectionSchema = z.object({
+  source: SpecRefSchema,
+  target: SpecRefSchema,
+  type: z.enum(RELATIONSHIP_TYPES),
+  dataHash: z.string().min(1),
+  rejectedAt: z.string().datetime()
+});
+var TextExportProposalSchema = z.object({
+  id: z.string().min(1),
+  spec: SpecRefSchema,
+  patch: z.record(z.string(), z.unknown()),
+  status: z.enum(["pending", "accepted", "rejected"]),
+  submittedAt: z.string().datetime(),
+  submittedBy: z.string().optional(),
+  resolvedAt: z.string().datetime().optional(),
+  resolvedBy: z.string().optional(),
+  rationale: z.string().optional(),
+  source: z.string().optional()
+});
+var TextExportSnapshotSchema = z.object({
+  id: z.string().min(1),
+  spec: SpecRefSchema,
+  createdAt: z.string().datetime(),
+  contentDigest: z.string().min(1),
+  retentionPolicy: z.string().optional(),
+  purged: z.boolean(),
+  purgedAt: z.string().datetime().optional(),
+  artifactNames: z.array(z.string())
+});
 var MetadataPatchSchema = z.object({
   title: z.string().max(200).optional(),
   summary: z.string().max(2000).optional(),
@@ -4071,6 +4142,12 @@ export {
   redact,
   containsCredentials,
   WORKFLOW_TYPES,
+  TextExportSuggestionSchema,
+  TextExportSourceSchema,
+  TextExportSnapshotSchema,
+  TextExportRejectionSchema,
+  TextExportProposalSchema,
+  TextExportManifestSchema,
   SpecLibrarySidecarV1Schema,
   SpecFilterSchema,
   SourceConfigSchema,

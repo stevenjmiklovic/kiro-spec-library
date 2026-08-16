@@ -295,7 +295,7 @@ describe('auto-metadata', () => {
 
   describe('extractCompletedAt', () => {
     test('returns date when stage is completed', async () => {
-      const date = await extractCompletedAt('completed', repoPath, specRelPath);
+      const date = await extractCompletedAt('done', repoPath, specRelPath);
       expect(date).toBeDefined();
       expect(date).toMatch(/^\d{4}-\d{2}-\d{2}T/);
     });

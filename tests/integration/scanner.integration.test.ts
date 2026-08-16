@@ -93,7 +93,7 @@ describe('Scanner integration', () => {
     const agentMem = stored.find((s) => s.key === 'local-1::.kiro/specs/agent-memory');
     expect(agentMem).toBeDefined();
     expect(agentMem!.type).toBe('feature');
-    expect(agentMem!.stage).toBe('tasks'); // has tasks.md, not all complete
+    expect(agentMem!.stage).toBe('in-flight'); // has tasks.md, some completed
     expect(agentMem!.total_tasks).toBe(3);
     expect(agentMem!.completed_tasks).toBe(2);
     expect(agentMem!.progress).toBeGreaterThan(0);
