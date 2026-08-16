@@ -82,7 +82,7 @@ export async function searchSpecs(
   const effectiveLimit = Math.min(limit ?? 50, 100);
 
   const searchParams = new URLSearchParams();
-  searchParams.set("query", query);
+  searchParams.set("q", query);
   searchParams.set("limit", String(effectiveLimit));
 
   if (filters) {

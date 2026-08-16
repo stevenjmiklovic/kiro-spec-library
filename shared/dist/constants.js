@@ -12,11 +12,11 @@ export const WORKFLOW_TYPES = [
     "unknown",
 ];
 export const LIFECYCLE_STAGES = [
-    "requirements",
-    "bug_analysis",
-    "design",
-    "tasks",
-    "completed",
+    "new",
+    "scoped",
+    "refined",
+    "in-flight",
+    "done",
 ];
 export const RELATIONSHIP_TYPES = [
     "depends_on",
@@ -41,6 +41,10 @@ export const AUDIT_OPERATIONS = [
     "suggestion_rejected",
     "snapshot_created",
     "snapshot_purged",
+    "backup_created",
+    "backup_restored",
+    "text_export_created",
+    "text_export_applied",
 ];
 export const SUGGESTION_REASONS = [
     "markdown_link",

@@ -37,6 +37,81 @@ export const SpecLibrarySidecarV1Schema = z.object({
     metadata: SidecarMetadataSchema,
     relationships: z.array(SidecarRelationshipSchema).max(50).optional(),
 });
+// ─── Textual/git-committable library export ──────────────────────────────────
+// A whole-library export as a zip of human-readable, diffable JSON files —
+// suitable for committing into a dedicated version-control repo. Every spec
+// reference uses (specId, repository) rather than the internal DB `key`,
+// since that's the only addressing scheme that survives outside this DB.
+export const TextExportManifestSchema = z.object({
+    schemaVersion: z.literal(1),
+    exportedAt: z.string().datetime(),
+    counts: z.object({
+        sources: z.number().int().min(0),
+        specs: z.number().int().min(0),
+        suggestions: z.number().int().min(0),
+        rejections: z.number().int().min(0),
+        proposals: z.number().int().min(0),
+        snapshots: z.number().int().min(0),
+        auditEvents: z.number().int().min(0),
+    }),
+});
+export const TextExportSourceSchema = z.object({
+    id: z.string().min(1),
+    type: z.enum(["local", "remote"]),
+    path: z.string().optional(),
+    url: z.string().optional(),
+    branch: z.string().optional(),
+    webUrlTemplate: z.string().optional(),
+    addedAt: z.string().datetime(),
+});
+const SpecRefSchema = z.object({
+    specId: z.string().min(1),
+    repository: z.string().min(1),
+});
+export const TextExportSuggestionSchema = z.object({
+    source: SpecRefSchema,
+    target: SpecRefSchema,
+    type: z.enum(RELATIONSHIP_TYPES),
+    confidence: z.number().min(0).max(1),
+    reason: z.string().min(1),
+    evidence: z.string(),
+    status: z.enum(["pending", "accepted", "rejected"]),
+    createdAt: z.string().datetime(),
+    resolvedAt: z.string().datetime().optional(),
+    dataHash: z.string().min(1),
+});
+export const TextExportRejectionSchema = z.object({
+    source: SpecRefSchema,
+    target: SpecRefSchema,
+    type: z.enum(RELATIONSHIP_TYPES),
+    dataHash: z.string().min(1),
+    rejectedAt: z.string().datetime(),
+});
+export const TextExportProposalSchema = z.object({
+    id: z.string().min(1),
+    spec: SpecRefSchema,
+    patch: z.record(z.string(), z.unknown()),
+    status: z.enum(["pending", "accepted", "rejected"]),
+    submittedAt: z.string().datetime(),
+    submittedBy: z.string().optional(),
+    resolvedAt: z.string().datetime().optional(),
+    resolvedBy: z.string().optional(),
+    rationale: z.string().optional(),
+    source: z.string().optional(),
+});
+// Snapshot records are export-only (read-only in the textual format): the
+// archived artifact bytes live on disk, not in this export, so there is
+// nothing meaningful to "apply" back from this file alone.
+export const TextExportSnapshotSchema = z.object({
+    id: z.string().min(1),
+    spec: SpecRefSchema,
+    createdAt: z.string().datetime(),
+    contentDigest: z.string().min(1),
+    retentionPolicy: z.string().optional(),
+    purged: z.boolean(),
+    purgedAt: z.string().datetime().optional(),
+    artifactNames: z.array(z.string()),
+});
 // ─── Metadata Patch (API request body) ───────────────────────────────────────
 export const MetadataPatchSchema = z.object({
     title: z.string().max(200).optional(),

@@ -18,7 +18,7 @@ import { relationshipRoutes } from "../../backend/src/routes/relationships.js";
 import { archiveRoutes } from "../../backend/src/routes/archive.js";
 import { ScannerService } from "../../backend/src/services/scanner.js";
 import { ArchiverService } from "../../backend/src/services/archiver.js";
-import { upsertSpec } from "../../backend/src/db/queries/specs.js";
+import { upsertSpec, syncSpecFts } from "../../backend/src/db/queries/specs.js";
 import { putSource } from "../../backend/src/db/queries/sources.js";
 import { createSuggestion } from "../../backend/src/db/queries/suggestions.js";
 import type { NormalizedSpec } from "../../shared/src/types.js";
@@ -104,14 +104,30 @@ beforeAll(async () => {
   });
 
   // Seed primary spec
-  upsertSpec(db, makeSpec());
+  const primaryRowid = upsertSpec(db, makeSpec());
+  syncSpecFts(db, primaryRowid, {
+    title: "Test Spec Title",
+    content: "Persistent memory retention window for agent context.",
+    owner: "tester",
+    theme: "",
+    tags: "",
+    repository: "test-repo",
+  });
 
   // Seed a second spec for relationship tests
-  upsertSpec(db, makeSpec({
+  const targetRowid = upsertSpec(db, makeSpec({
     key: "test-source::target-spec",
     specId: "target-spec",
     title: "Target Spec",
   }));
+  syncSpecFts(db, targetRowid, {
+    title: "Target Spec",
+    content: "Usage anomaly alerts for the platform dashboard.",
+    owner: "tester",
+    theme: "",
+    tags: "",
+    repository: "test-repo",
+  });
 
   // Seed a suggestion for accept/reject tests
   createSuggestion(db, {
@@ -210,6 +226,21 @@ describe("REST API integration tests", () => {
 
       const data = await res.json() as { specs: unknown[]; total: number };
       expect(data.total).toBeGreaterThanOrEqual(1);
+    });
+
+    test("supports q full-text search, matching only the relevant spec", async () => {
+      const res = await handleRequest("GET", "/specs?q=Persistent%20memory");
+      expect(res.status).toBe(200);
+
+      const data = await res.json() as { specs: Array<{ key: string }>; total: number };
+      const keys = data.specs.map((s) => s.key);
+      expect(keys).toContain("test-source::test-spec");
+      expect(keys).not.toContain("test-source::target-spec");
+    });
+
+    test("q search with FTS5-special characters does not 500", async () => {
+      const res = await handleRequest("GET", `/specs?q=${encodeURIComponent("foo-bar:\"baz")}`);
+      expect(res.status).toBe(200);
     });
   });
 

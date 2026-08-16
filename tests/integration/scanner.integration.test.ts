@@ -97,6 +97,15 @@ describe('Scanner integration', () => {
     expect(quick!.type).toBe('quick');
   });
 
+  test('scan syncs specs_fts so a search term matches the scanned content', () => {
+    // Relies on the scan above having indexed agent-memory's requirements.md
+    // ("Persistent memory.") into specs_fts.
+    const results = listSpecs(db, { query: 'Persistent', limit: 10, offset: 0 });
+    const keys = results.map((s) => s.key);
+    expect(keys).toContain('local-1::.kiro/specs/agent-memory');
+    expect(keys).not.toContain('local-1::.kiro/specs/quick-fix');
+  });
+
   test('error isolation: one failing source does not abort the scan', async () => {
     const good: Source = {
       id: 'good-src',

@@ -58,7 +58,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
             type: "object",
             properties: {
               type: { type: "string", enum: ["feature", "bugfix", "quick", "unknown"] },
-              stage: { type: "string", enum: ["requirements", "bug_analysis", "design", "tasks", "completed"] },
+              stage: { type: "string", enum: ["new", "scoped", "refined", "in-flight", "done"] },
               theme: { type: "string" },
               owner: { type: "string" },
               repository: { type: "string" },

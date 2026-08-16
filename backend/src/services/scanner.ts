@@ -5,10 +5,11 @@ import { validatePath } from '../security/path-validator.js';
 import { validateArgs, buildFetchCommand, buildCloneCommand } from '../security/git-validator.js';
 import { normalize, type RawSpecArtifacts } from './normalizer.js';
 import { autoPopulate } from './auto-metadata.js';
-import { getOverlay, upsertOverlay } from '../db/queries/metadata.js';
+import { getOverlay, upsertOverlay, overlayRowToMetadataOverlay } from '../db/queries/metadata.js';
+import { resolveMetadata } from './metadata.js';
 import { ConfigKiroSchema } from '@kiro-spec-library/shared';
 import { insertScan, updateScan } from '../db/queries/scan-history.js';
-import { upsertSpec } from '../db/queries/specs.js';
+import { upsertSpec, syncSpecFts } from '../db/queries/specs.js';
 import { join, relative } from 'node:path';
 import { readdirSync, existsSync } from 'node:fs';
 
@@ -57,10 +58,6 @@ export class ScannerService {
       try {
         const specs = await this.scanSource(source);
         specsDiscovered += specs.length;
-
-        for (const spec of specs) {
-          upsertSpec(this.db, spec);
-        }
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : String(err);
         const category = this.categorizeError(err);
@@ -115,6 +112,12 @@ export class ScannerService {
         const raw = await this.readArtifacts(specDir, source);
         const normalized = normalize(raw, source);
 
+        // Persist the spec first — metadata_overlays.spec_key has a foreign
+        // key to specs.key, so auto-populate's upsertOverlay() below would
+        // fail on every spec's first scan (before its specs row exists)
+        // if this ran after it instead.
+        const rowid = upsertSpec(this.db, normalized);
+
         // Auto-populate metadata for specs without an existing overlay
         try {
           const existingOverlay = getOverlay(this.db, normalized.key);
@@ -155,6 +158,29 @@ export class ScannerService {
           console.warn(
             `[scanner] Auto-populate failed for ${specDir.slug}:`,
             autoErr instanceof Error ? autoErr.message : autoErr,
+          );
+        }
+
+        try {
+          const overlay = getOverlay(this.db, normalized.key);
+          const resolved = resolveMetadata(
+            normalized,
+            overlay ? overlayRowToMetadataOverlay(overlay) : null,
+            null,
+          );
+          syncSpecFts(this.db, rowid, {
+            title: normalized.title,
+            content: Object.values(raw.contents).join('\n'),
+            owner: normalized.owner,
+            theme: resolved.theme ?? '',
+            tags: resolved.tags.join(' '),
+            repository: normalized.provenance.repository,
+          });
+        } catch (ftsErr: unknown) {
+          // Search indexing is non-critical; log and continue
+          console.warn(
+            `[scanner] FTS sync failed for ${specDir.slug}:`,
+            ftsErr instanceof Error ? ftsErr.message : ftsErr,
           );
         }
 

@@ -7,34 +7,12 @@ import {
   type SpecFilters,
   type SpecRow,
 } from "../db/queries/specs.js";
-import { getOverlay } from "../db/queries/metadata.js";
+import { getOverlay, overlayRowToMetadataOverlay } from "../db/queries/metadata.js";
 import { RevisionConflictError } from "../db/queries/metadata.js";
 import { applyPatch, resolveMetadata, evaluateCompleteness } from "../services/metadata.js";
 import { listBySourceKeys } from "../db/queries/relationships.js";
 import { listPendingBySourceKeys } from "../db/queries/suggestions.js";
 import { recordEvent } from "../services/audit.js";
-import type { MetadataOverlay } from "@kiro-spec-library/shared";
-import type { MetadataRow } from "../db/queries/metadata.js";
-
-function overlayToResolvedInput(overlay: MetadataRow): MetadataOverlay {
-  return {
-    specKey: overlay.spec_key,
-    title: overlay.title ?? undefined,
-    summary: overlay.summary ?? undefined,
-    owner: overlay.owner ?? undefined,
-    theme: overlay.theme ?? undefined,
-    tags: overlay.tags ? JSON.parse(overlay.tags) : undefined,
-    targetRelease: overlay.target_release ?? undefined,
-    retentionPolicy: overlay.retention_policy
-      ? JSON.parse(overlay.retention_policy)
-      : undefined,
-    approvers: overlay.approvers ? JSON.parse(overlay.approvers) : undefined,
-    implementationRef: overlay.implementation_ref ?? undefined,
-    reviewedAt: overlay.reviewed_at ?? undefined,
-    revision: overlay.revision,
-    updatedAt: overlay.updated_at,
-  };
-}
 
 /** Attach each spec's outgoing accepted relationships and pending suggestions (for the graph view). */
 function attachRelationshipData(db: Database, specs: SpecRow[]) {
@@ -79,6 +57,7 @@ export function specRoutes(deps: { db: Database }) {
           owner: query.owner || undefined,
           theme: query.theme || undefined,
           repository: query.repository || undefined,
+          query: query.q || undefined,
           limit,
           offset,
         };
@@ -100,7 +79,7 @@ export function specRoutes(deps: { db: Database }) {
             const overlay = getOverlay(db, spec.key);
             const resolved = resolveMetadata(
               { title: spec.title, owner: spec.owner } as any,
-              overlay ? overlayToResolvedInput(overlay) : null,
+              overlay ? overlayRowToMetadataOverlay(overlay) : null,
               null,
             );
             const completeness = evaluateCompleteness(resolved, spec.stage as any);
@@ -111,8 +90,8 @@ export function specRoutes(deps: { db: Database }) {
           specs = filtered.slice(offset, offset + limit);
         } else {
           specs = listSpecs(db, filters);
-          const { type, stage, owner, theme, repository } = filters;
-          total = countSpecs(db, { type, stage, owner, theme, repository });
+          const { type, stage, owner, theme, repository, query: q } = filters;
+          total = countSpecs(db, { type, stage, owner, theme, repository, query: q });
         }
 
         return { specs: attachRelationshipData(db, specs), total, limit, offset };
@@ -125,6 +104,7 @@ export function specRoutes(deps: { db: Database }) {
           theme: t.Optional(t.String()),
           repository: t.Optional(t.String()),
           metadataComplete: t.Optional(t.String()),
+          q: t.Optional(t.String()),
           limit: t.Optional(t.String()),
           offset: t.Optional(t.String()),
         }),
@@ -142,7 +122,7 @@ export function specRoutes(deps: { db: Database }) {
         const overlay = getOverlay(db, spec.key);
         const metadata = resolveMetadata(
           { title: spec.title, owner: spec.owner } as any,
-          overlay ? overlayToResolvedInput(overlay) : null,
+          overlay ? overlayRowToMetadataOverlay(overlay) : null,
           null,
         );
 
