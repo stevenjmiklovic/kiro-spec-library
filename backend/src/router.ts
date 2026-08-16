@@ -17,6 +17,11 @@ import { proposalRoutes } from "./routes/proposals.js";
 import { auditRoutes } from "./routes/audit.js";
 import { backupRoutes } from "./routes/backup.js";
 import { textExportRoutes } from "./routes/text-export.js";
+import { findByKey } from "./db/queries/specs.js";
+import { getOverlay, overlayRowToMetadataOverlay } from "./db/queries/metadata.js";
+import { resolveMetadata } from "./services/metadata.js";
+import { listPending as listPendingSuggestions } from "./db/queries/suggestions.js";
+import { listPendingProposals } from "./db/queries/proposals.js";
 
 // ─── Dependency interface ────────────────────────────────────────────────────
 
@@ -212,6 +217,33 @@ export function createRouter(deps: RouterDeps) {
           repositories,
         },
       };
+    })
+    // ─── Spec lookup by key (query param) ──────────────────────────────────
+    // These endpoints use query params instead of path params because spec keys
+    // can contain slashes (e.g. "counter-table::.kiro/specs/foo") which break
+    // URL path routing when the gateway proxy decodes %2F back to /.
+    .get("/spec-detail", ({ query, set }) => {
+      const key = (query as any).key as string | undefined;
+      if (!key) { set.status = 400; return { code: "BAD_REQUEST", message: "key required" }; }
+      const spec = findByKey(db, key);
+      if (!spec) { set.status = 404; return { code: "NOT_FOUND", message: `Spec '${key}' not found` }; }
+      const overlay = getOverlay(db, spec.key);
+      const metadata = resolveMetadata(
+        { title: spec.title, owner: spec.owner } as any,
+        overlay ? overlayRowToMetadataOverlay(overlay) : null,
+        null,
+      );
+      return { spec, metadata, revision: overlay?.revision ?? 0 };
+    })
+    .get("/spec-suggestions", ({ query }) => {
+      const key = (query as any).key as string ?? "";
+      return { suggestions: listPendingSuggestions(db, key) };
+    })
+    .get("/spec-proposals", ({ query, set }) => {
+      const key = (query as any).key as string ?? "";
+      const spec = findByKey(db, key);
+      if (!spec) { set.status = 404; return { code: "NOT_FOUND", message: "Spec not found" }; }
+      return { proposals: listPendingProposals(db, spec.key) };
     })
     // ─── Sub-routes ──────────────────────────────────────────────────────────
     .use(specRoutes({ db }))

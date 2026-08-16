@@ -41,8 +41,8 @@
   },
   "permissions": {
     "api": [
-      "/api/apps/kiro-spec-library",
-      "/api/apps/kiro-spec-library/*"
+      "/apps/kiro-spec-library/api",
+      "/apps/kiro-spec-library/api/*"
     ],
     "storage": true,
     "network": true
@@ -54,6 +54,6 @@
     "os": ["macos", "linux"]
   },
   "setup": {
-    "onInstall": "bun install && cd ui && bun run build"
+    "onInstall": "export PATH=\"$HOME/.bun/bin:$PATH\" && bun install && bun build shared/src/index.ts --target=bun --outfile=shared/dist/index.mjs && bun build backend/src/index.ts --target=bun --outfile=backend/dist/index.mjs && cd ui && bun run build"
   }
 }

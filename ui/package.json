@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "rm -rf dist && bun build src/index.tsx --target=browser --outdir=dist --naming='[name].[ext]' --external react --external react-dom --external lucide-react --external @kirocrew/app-sdk && mv dist/index.js dist/index.mjs",
+    "build": "rm -rf dist && bun build src/app.tsx --outdir dist --target browser --production --external react --external react/jsx-runtime --external react-dom --external lucide-react --external @kirocrew/app-sdk && mv dist/app.js dist/app.mjs && mv dist/App.css dist/index.css",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

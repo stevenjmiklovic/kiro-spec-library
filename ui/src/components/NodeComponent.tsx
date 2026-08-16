@@ -1,6 +1,6 @@
 import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
 import { useCallback, type KeyboardEvent } from 'react';
-import { Target, AlertTriangle, Zap, HelpCircle, type LucideIcon } from 'lucide-react';
+import { Sparkles, AlertTriangle, Zap, Search, type LucideIcon } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
 // Data shape
@@ -31,10 +31,10 @@ export type SpecNodeType = Node<SpecNodeData>;
 // ---------------------------------------------------------------------------
 
 const TYPE_GLYPHS: Record<SpecType, LucideIcon> = {
-  feature: Target,
+  feature: Sparkles,
   bugfix: AlertTriangle,
   quick: Zap,
-  unknown: HelpCircle,
+  unknown: Search,
 };
 
 const TYPE_LABELS: Record<SpecType, string> = {

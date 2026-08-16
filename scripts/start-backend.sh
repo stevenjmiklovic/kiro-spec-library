@@ -12,6 +12,9 @@ set -euo pipefail
 APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$APP_DIR"
 
+# Ensure bun is on PATH (gateway process may have minimal PATH)
+export PATH="${HOME}/.bun/bin:${PATH}"
+
 BUN="${HOME}/.bun/bin/bun"
 PORT="${PORT:-${SPEC_LIBRARY_PORT:-3100}}"
 DIST="backend/dist/index.mjs"
@@ -28,6 +31,11 @@ needs_build() {
 
 if needs_build; then
   echo "[start-backend] Building..."
+  # Ensure deps are available for bundling
+  if [[ ! -d "node_modules" ]]; then
+    echo "[start-backend] Installing dependencies..."
+    "$BUN" install
+  fi
   "$BUN" build shared/src/index.ts --target=bun --outfile=shared/dist/index.mjs
   "$BUN" build backend/src/index.ts --target=bun --outfile=backend/dist/index.mjs
 fi

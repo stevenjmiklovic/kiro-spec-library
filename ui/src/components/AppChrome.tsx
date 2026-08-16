@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DatabaseBackup, History, Link, Moon, RefreshCw, Sun, UserCircle } from 'lucide-react';
+import { Download, Clock, ExternalLink, Moon, RefreshCw, Sun, Users } from 'lucide-react';
 import type { ThemeMode, ViewMode } from '../hooks/useUrlState.js';
 import { useCrew } from '../hooks/useCrewIntegration.js';
 import { BackupPanel } from './BackupPanel.js';
@@ -93,7 +93,7 @@ export function AppChrome({
           aria-label="Set your aliases for the Mine filter"
           title="Set your aliases for the Mine filter"
         >
-          <UserCircle size={14} aria-hidden="true" />
+          <Users size={14} aria-hidden="true" />
           Mine
         </button>
 
@@ -104,7 +104,7 @@ export function AppChrome({
           aria-label="Backup and restore"
           title="Backup and restore"
         >
-          <DatabaseBackup size={14} aria-hidden="true" />
+          <Download size={14} aria-hidden="true" />
           Backup
         </button>
 
@@ -115,7 +115,7 @@ export function AppChrome({
           aria-label="View audit log"
           title="View audit log"
         >
-          <History size={14} aria-hidden="true" />
+          <Clock size={14} aria-hidden="true" />
           Audit
         </button>
 
@@ -138,7 +138,7 @@ export function AppChrome({
           aria-label="Copy current page link"
           title="Copy current page link"
         >
-          <Link size={14} aria-hidden="true" />
+          <ExternalLink size={14} aria-hidden="true" />
           {copyLabel}
         </button>
 

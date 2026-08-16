@@ -177,16 +177,12 @@ export function listAllRejections(db: Database): RejectionRow[] {
 /** Bulk-fetch pending suggestions whose source is one of the given spec keys (for graph edge building). */
 export function listPendingBySourceKeys(db: Database, specKeys: string[]): SuggestionRow[] {
   if (specKeys.length === 0) return [];
-  const placeholders = specKeys.map((_, i) => `$k${i}`).join(", ");
-  const params: Record<string, string> = {};
-  specKeys.forEach((key, i) => {
-    params[`$k${i}`] = key;
-  });
+  const placeholders = specKeys.map(() => "?").join(", ");
   const stmt = db.prepare(`
     SELECT * FROM suggestions
     WHERE status = 'pending' AND source_spec_key IN (${placeholders})
   `);
-  return stmt.all(params) as SuggestionRow[];
+  return stmt.all(...specKeys) as SuggestionRow[];
 }
 
 export function isRejected(

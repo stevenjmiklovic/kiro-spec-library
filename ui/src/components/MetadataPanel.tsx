@@ -409,14 +409,34 @@ export function MetadataPanel({
           </p>
         ) : (
           <ul className="suggestion-list">
-            {suggestions.map((s) => (
+            {suggestions.map((s) => {
+              // Determine which spec is the "other" one (not the current spec)
+              const isSource = s.sourceSpecKey === detail.key;
+              const otherKey = isSource ? s.targetSpecKey : s.sourceSpecKey;
+              // Extract readable name from key: "repo::.kiro/specs/slug" → "Slug"
+              const otherName = otherKey
+                .replace(/^[^:]+::/, '')         // strip repo prefix
+                .replace(/^\.kiro\/specs\//, '') // strip .kiro/specs/
+                .replace(/-/g, ' ')             // hyphens to spaces
+                .replace(/\b\w/g, (c) => c.toUpperCase()); // title case
+              const directionLabel = isSource ? '→' : '←';
+              const directionTitle = isSource
+                ? `This spec relates to "${otherName}"`
+                : `"${otherName}" relates to this spec`;
+
+              return (
               <li key={s.id} className="suggestion">
                 <div className="suggestion__body">
                   <span className="suggestion__type">{s.type}</span>
-                  <strong className="suggestion__target">{s.targetSpecKey}</strong>
+                  <span className="suggestion__direction" title={directionTitle}>
+                    {directionLabel}
+                  </span>
+                  <strong className="suggestion__target" title={otherKey}>
+                    {otherName}
+                  </strong>
                   <span className="suggestion__evidence">{s.evidence}</span>
                   <span className="suggestion__confidence">
-                    {Math.round(s.confidence * 100)}% confidence
+                    {Math.round(s.confidence * 100)}%
                   </span>
                 </div>
                 <div className="suggestion__actions">
@@ -426,7 +446,7 @@ export function MetadataPanel({
                     onClick={() => {
                       chatLauncher.open({
                         specId: detail.key,
-                        prompt: `Explain this suggested relationship:\n- Source: ${metadata.title} (${detail.key})\n- Target: ${s.targetSpecKey}\n- Type: ${s.type}\n- Confidence: ${Math.round(s.confidence * 100)}%\n- Evidence: ${s.evidence}\n\nShow me the relevant content from both specs that supports or contradicts this suggestion.`,
+                        prompt: `Explain this suggested relationship:\n\nSource: ${s.sourceSpecKey}\nTarget: ${s.targetSpecKey}\nType: ${s.type}\nConfidence: ${Math.round(s.confidence * 100)}%\nEvidence: ${s.evidence}\n\nI'm currently viewing "${metadata.title}" (${detail.key}). Show me the relevant content from both specs that supports or contradicts this suggestion.`,
                       });
                     }}
                     title="Open Crew chat to explain this suggestion"
@@ -449,7 +469,8 @@ export function MetadataPanel({
                   </button>
                 </div>
               </li>
-            ))}
+              );
+            })}
           </ul>
         )}
       </div>

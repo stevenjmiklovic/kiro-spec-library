@@ -5341,8 +5341,8 @@ var require_dist = __commonJS((exports) => {
 });
 
 // backend/src/index.ts
-import { mkdirSync } from "fs";
-import { join as join4 } from "path";
+import { mkdirSync as mkdirSync2, writeFileSync as writeFileSync2, chmodSync } from "fs";
+import { join as join5 } from "path";
 
 // backend/src/db/connection.ts
 import { Database } from "bun:sqlite";
@@ -5633,13 +5633,133 @@ var migration5 = {
   }
 };
 
+// backend/src/db/migrations/006-proposals-rationale-source.ts
+var migration6 = {
+  number: 6,
+  name: "proposals-rationale-source",
+  up(db) {
+    db.exec(`
+      ALTER TABLE proposals ADD COLUMN rationale TEXT;
+      ALTER TABLE proposals ADD COLUMN source TEXT DEFAULT 'human';
+    `);
+  }
+};
+
+// backend/src/db/migrations/007-lifecycle-stage-rename.ts
+var migration7 = {
+  number: 7,
+  name: "lifecycle-stage-rename",
+  up(db) {
+    db.exec(`
+      CREATE TABLE specs_new (
+        key TEXT PRIMARY KEY,
+        source_id TEXT NOT NULL,
+        spec_id TEXT NOT NULL,
+        type TEXT NOT NULL CHECK (type IN ('feature', 'bugfix', 'quick', 'unknown')),
+        workflow TEXT NOT NULL DEFAULT 'requirements-first' CHECK (workflow IN ('requirements-first', 'design-first', 'unknown')),
+        title TEXT NOT NULL DEFAULT '',
+        owner TEXT NOT NULL DEFAULT 'unowned',
+        stage TEXT NOT NULL CHECK (stage IN ('new', 'scoped', 'refined', 'in-flight', 'done')),
+        progress INTEGER NOT NULL DEFAULT 0,
+        repository TEXT,
+        relative_path TEXT,
+        branch TEXT,
+        commit_hash TEXT,
+        is_dirty INTEGER NOT NULL DEFAULT 0,
+        remote_url TEXT,
+        total_tasks INTEGER NOT NULL DEFAULT 0,
+        completed_tasks INTEGER NOT NULL DEFAULT 0,
+        content_digest TEXT NOT NULL,
+        indexed_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+
+      INSERT INTO specs_new SELECT
+        key, source_id, spec_id, type, workflow, title, owner,
+        CASE stage
+          WHEN 'requirements' THEN 'new'
+          WHEN 'bug_analysis' THEN 'scoped'
+          WHEN 'design' THEN 'scoped'
+          WHEN 'tasks' THEN CASE WHEN completed_tasks > 0 THEN 'in-flight' ELSE 'refined' END
+          WHEN 'completed' THEN 'done'
+          ELSE 'new'
+        END,
+        progress, repository, relative_path, branch, commit_hash,
+        is_dirty, remote_url, total_tasks, completed_tasks,
+        content_digest, indexed_at, updated_at
+      FROM specs;
+
+      DROP TABLE specs;
+      ALTER TABLE specs_new RENAME TO specs;
+
+      CREATE INDEX idx_specs_source ON specs(source_id);
+      CREATE INDEX idx_specs_stage ON specs(stage);
+      CREATE INDEX idx_specs_type ON specs(type);
+      CREATE INDEX idx_specs_owner ON specs(owner);
+    `);
+  }
+};
+
+// backend/src/db/migrations/008-metadata-reviewed-at.ts
+var migration8 = {
+  number: 8,
+  name: "metadata-reviewed-at",
+  up(db) {
+    db.exec(`
+      ALTER TABLE metadata_overlays ADD COLUMN reviewed_at TEXT;
+    `);
+  }
+};
+
+// backend/src/db/migrations/009-metadata-schema-completion.ts
+var migration9 = {
+  number: 9,
+  name: "metadata-schema-completion",
+  up(db) {
+    db.exec(`
+      ALTER TABLE metadata_overlays ADD COLUMN approvers TEXT;
+      ALTER TABLE metadata_overlays ADD COLUMN implementation_ref TEXT;
+    `);
+  }
+};
+
+// backend/src/db/migrations/010-drop-dead-columns.ts
+var migration10 = {
+  number: 10,
+  name: "drop-dead-columns",
+  up(db) {
+    db.exec(`
+      ALTER TABLE sources DROP COLUMN last_scan_at;
+      ALTER TABLE sources DROP COLUMN last_error;
+      ALTER TABLE sources DROP COLUMN last_error_at;
+
+      ALTER TABLE metadata_overlays DROP COLUMN legal_hold;
+
+      ALTER TABLE snapshots DROP COLUMN legal_hold_active;
+      ALTER TABLE snapshots DROP COLUMN legal_hold_reason;
+      ALTER TABLE snapshots DROP COLUMN spec_title_at_snapshot;
+
+      ALTER TABLE proposals DROP COLUMN submitted_by;
+
+      ALTER TABLE specs DROP COLUMN updated_at;
+
+      DROP TABLE owner_aliases;
+    `);
+  }
+};
+
 // backend/src/db/migrator.ts
 var migrations = [
   migration,
   migration2,
   migration3,
   migration4,
-  migration5
+  migration5,
+  migration6,
+  migration7,
+  migration8,
+  migration9,
+  migration10
 ].sort((a, b) => a.number - b.number);
 async function runMigrations(db) {
   db.run(`
@@ -5650,19 +5770,19 @@ async function runMigrations(db) {
     )
   `);
   const applied = new Set(db.query("SELECT number FROM _migrations").all().map((row) => row.number));
-  for (const migration6 of migrations) {
-    if (applied.has(migration6.number)) {
+  for (const migration11 of migrations) {
+    if (applied.has(migration11.number)) {
       continue;
     }
     try {
       db.run("BEGIN");
-      migration6.up(db);
-      db.run("INSERT INTO _migrations (number, name, applied_at) VALUES (?, ?, ?)", [migration6.number, migration6.name, new Date().toISOString()]);
+      migration11.up(db);
+      db.run("INSERT INTO _migrations (number, name, applied_at) VALUES (?, ?, ?)", [migration11.number, migration11.name, new Date().toISOString()]);
       db.run("COMMIT");
-      console.log(`[migrator] Applied migration ${migration6.number}: ${migration6.name}`);
+      console.log(`[migrator] Applied migration ${migration11.number}: ${migration11.name}`);
     } catch (error) {
       db.run("ROLLBACK");
-      console.error(`[migrator] Failed migration ${migration6.number}: ${migration6.name}`, error);
+      console.error(`[migrator] Failed migration ${migration11.number}: ${migration11.name}`, error);
       throw error;
     }
   }
@@ -20203,11 +20323,11 @@ var WORKFLOW_TYPES = [
   "unknown"
 ];
 var LIFECYCLE_STAGES = [
-  "requirements",
-  "bug_analysis",
-  "design",
-  "tasks",
-  "completed"
+  "new",
+  "scoped",
+  "refined",
+  "in-flight",
+  "done"
 ];
 var RELATIONSHIP_TYPES = [
   "depends_on",
@@ -20231,12 +20351,25 @@ var AUDIT_OPERATIONS = [
   "suggestion_accepted",
   "suggestion_rejected",
   "snapshot_created",
-  "snapshot_purged"
+  "snapshot_purged",
+  "backup_created",
+  "backup_restored",
+  "text_export_created",
+  "text_export_applied"
 ];
 var DEFAULT_SCAN_INTERVAL_MS = 900000;
 var MAX_ARTIFACT_BYTES = 1048576;
+var MAX_SUGGESTIONS_PER_SPEC = 5;
+var SUGGESTION_THRESHOLD = 0.3;
 var REMOTE_TIMEOUT_SECONDS = 120;
 var MAX_ERROR_MESSAGE_LENGTH = 500;
+var CONFIDENCE_WEIGHTS = {
+  markdown_link: 0.9,
+  shared_tags_base: 0.5,
+  shared_tags_increment: 0.1,
+  shared_theme: 0.4,
+  repository_proximity: 0.35
+};
 var SPEC_ARTIFACTS = {
   REQUIREMENTS: "requirements.md",
   BUGFIX: "bugfix.md",
@@ -24154,6 +24287,73 @@ var SpecLibrarySidecarV1Schema = z.object({
   metadata: SidecarMetadataSchema,
   relationships: z.array(SidecarRelationshipSchema).max(50).optional()
 });
+var TextExportManifestSchema = z.object({
+  schemaVersion: z.literal(1),
+  exportedAt: z.string().datetime(),
+  counts: z.object({
+    sources: z.number().int().min(0),
+    specs: z.number().int().min(0),
+    suggestions: z.number().int().min(0),
+    rejections: z.number().int().min(0),
+    proposals: z.number().int().min(0),
+    snapshots: z.number().int().min(0),
+    auditEvents: z.number().int().min(0)
+  })
+});
+var TextExportSourceSchema = z.object({
+  id: z.string().min(1),
+  type: z.enum(["local", "remote"]),
+  path: z.string().optional(),
+  url: z.string().optional(),
+  branch: z.string().optional(),
+  webUrlTemplate: z.string().optional(),
+  addedAt: z.string().datetime()
+});
+var SpecRefSchema = z.object({
+  specId: z.string().min(1),
+  repository: z.string().min(1)
+});
+var TextExportSuggestionSchema = z.object({
+  source: SpecRefSchema,
+  target: SpecRefSchema,
+  type: z.enum(RELATIONSHIP_TYPES),
+  confidence: z.number().min(0).max(1),
+  reason: z.string().min(1),
+  evidence: z.string(),
+  status: z.enum(["pending", "accepted", "rejected"]),
+  createdAt: z.string().datetime(),
+  resolvedAt: z.string().datetime().optional(),
+  dataHash: z.string().min(1)
+});
+var TextExportRejectionSchema = z.object({
+  source: SpecRefSchema,
+  target: SpecRefSchema,
+  type: z.enum(RELATIONSHIP_TYPES),
+  dataHash: z.string().min(1),
+  rejectedAt: z.string().datetime()
+});
+var TextExportProposalSchema = z.object({
+  id: z.string().min(1),
+  spec: SpecRefSchema,
+  patch: z.record(z.string(), z.unknown()),
+  status: z.enum(["pending", "accepted", "rejected"]),
+  submittedAt: z.string().datetime(),
+  submittedBy: z.string().optional(),
+  resolvedAt: z.string().datetime().optional(),
+  resolvedBy: z.string().optional(),
+  rationale: z.string().optional(),
+  source: z.string().optional()
+});
+var TextExportSnapshotSchema = z.object({
+  id: z.string().min(1),
+  spec: SpecRefSchema,
+  createdAt: z.string().datetime(),
+  contentDigest: z.string().min(1),
+  retentionPolicy: z.string().optional(),
+  purged: z.boolean(),
+  purgedAt: z.string().datetime().optional(),
+  artifactNames: z.array(z.string())
+});
 var MetadataPatchSchema = z.object({
   title: z.string().max(200).optional(),
   summary: z.string().max(2000).optional(),
@@ -24209,17 +24409,39 @@ var ArchiveFilterSchema = z.object({
   limit: z.number().int().min(1).max(100).default(50)
 });
 // backend/src/db/queries/specs.ts
+function sanitizeFtsQuery(query) {
+  return query.trim().split(/\s+/).filter(Boolean).map((word) => `"${word.replace(/"/g, '""')}"`).join(" ");
+}
 function upsertSpec(db, spec) {
   const stmt = db.prepare(`
-    INSERT OR REPLACE INTO specs (
+    INSERT INTO specs (
       key, source_id, spec_id, type, workflow, title, owner, stage, progress,
       repository, relative_path, branch, commit_hash, is_dirty, remote_url,
-      total_tasks, completed_tasks, content_digest, indexed_at, updated_at
+      total_tasks, completed_tasks, content_digest, indexed_at
     ) VALUES (
       $key, $source_id, $spec_id, $type, $workflow, $title, $owner, $stage, $progress,
       $repository, $relative_path, $branch, $commit_hash, $is_dirty, $remote_url,
-      $total_tasks, $completed_tasks, $content_digest, $indexed_at, $updated_at
+      $total_tasks, $completed_tasks, $content_digest, $indexed_at
     )
+    ON CONFLICT(key) DO UPDATE SET
+      source_id = excluded.source_id,
+      spec_id = excluded.spec_id,
+      type = excluded.type,
+      workflow = excluded.workflow,
+      title = excluded.title,
+      owner = excluded.owner,
+      stage = excluded.stage,
+      progress = excluded.progress,
+      repository = excluded.repository,
+      relative_path = excluded.relative_path,
+      branch = excluded.branch,
+      commit_hash = excluded.commit_hash,
+      is_dirty = excluded.is_dirty,
+      remote_url = excluded.remote_url,
+      total_tasks = excluded.total_tasks,
+      completed_tasks = excluded.completed_tasks,
+      content_digest = excluded.content_digest,
+      indexed_at = excluded.indexed_at
   `);
   stmt.run({
     $key: spec.key,
@@ -24240,8 +24462,24 @@ function upsertSpec(db, spec) {
     $total_tasks: spec.taskCounts.total,
     $completed_tasks: spec.taskCounts.completed,
     $content_digest: spec.contentDigest,
-    $indexed_at: spec.indexedAt,
-    $updated_at: spec.indexedAt
+    $indexed_at: spec.indexedAt
+  });
+  const row = db.prepare("SELECT rowid FROM specs WHERE key = $key").get({ $key: spec.key });
+  return row.rowid;
+}
+function syncSpecFts(db, rowid, fields) {
+  db.prepare("DELETE FROM specs_fts WHERE rowid = $rowid").run({ $rowid: rowid });
+  db.prepare(`
+    INSERT INTO specs_fts (rowid, title, content, owner, theme, tags, repository)
+    VALUES ($rowid, $title, $content, $owner, $theme, $tags, $repository)
+  `).run({
+    $rowid: rowid,
+    $title: fields.title,
+    $content: fields.content,
+    $owner: fields.owner,
+    $theme: fields.theme,
+    $tags: fields.tags,
+    $repository: fields.repository
   });
 }
 function findByKey(db, key) {
@@ -24271,12 +24509,16 @@ function listSpecs(db, filters) {
     conditions.push("m.theme = $theme");
     params.$theme = filters.theme;
   }
-  const needsJoin = !!filters.theme;
-  const from = needsJoin ? "specs s LEFT JOIN metadata_overlays m ON s.key = m.spec_key" : "specs s";
+  const ftsQuery = filters.query ? sanitizeFtsQuery(filters.query) : "";
+  if (ftsQuery) {
+    conditions.push("s.key IN (SELECT specs.key FROM specs JOIN specs_fts ON specs_fts.rowid = specs.rowid WHERE specs_fts MATCH $query)");
+    params.$query = ftsQuery;
+  }
+  const from = "specs s LEFT JOIN metadata_overlays m ON s.key = m.spec_key";
   const where = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
   params.$limit = filters.limit;
   params.$offset = filters.offset;
-  const sql = `SELECT s.* FROM ${from} ${where} ORDER BY s.indexed_at DESC LIMIT $limit OFFSET $offset`;
+  const sql = `SELECT s.*, m.reviewed_at FROM ${from} ${where} ORDER BY s.indexed_at DESC LIMIT $limit OFFSET $offset`;
   const stmt = db.prepare(sql);
   return stmt.all(params);
 }
@@ -24302,6 +24544,11 @@ function countSpecs(db, filters) {
   if (filters.theme) {
     conditions.push("m.theme = $theme");
     params.$theme = filters.theme;
+  }
+  const ftsQuery = filters.query ? sanitizeFtsQuery(filters.query) : "";
+  if (ftsQuery) {
+    conditions.push("s.key IN (SELECT specs.key FROM specs JOIN specs_fts ON specs_fts.rowid = specs.rowid WHERE specs_fts MATCH $query)");
+    params.$query = ftsQuery;
   }
   const needsJoin = !!filters.theme;
   const from = needsJoin ? "specs s LEFT JOIN metadata_overlays m ON s.key = m.spec_key" : "specs s";
@@ -24371,6 +24618,23 @@ function upsertOverlay(db, specKey, patch, expectedRevision) {
   })();
   return result;
 }
+function overlayRowToMetadataOverlay(overlay) {
+  return {
+    specKey: overlay.spec_key,
+    title: overlay.title ?? undefined,
+    summary: overlay.summary ?? undefined,
+    owner: overlay.owner ?? undefined,
+    theme: overlay.theme ?? undefined,
+    tags: overlay.tags ? JSON.parse(overlay.tags) : undefined,
+    targetRelease: overlay.target_release ?? undefined,
+    retentionPolicy: overlay.retention_policy ? JSON.parse(overlay.retention_policy) : undefined,
+    approvers: overlay.approvers ? JSON.parse(overlay.approvers) : undefined,
+    implementationRef: overlay.implementation_ref ?? undefined,
+    reviewedAt: overlay.reviewed_at ?? undefined,
+    revision: overlay.revision,
+    updatedAt: overlay.updated_at
+  };
+}
 
 // backend/src/services/metadata.ts
 function resolveMetadata(spec, overlay, sidecar) {
@@ -24384,7 +24648,8 @@ function resolveMetadata(spec, overlay, sidecar) {
     targetRelease: overlay?.targetRelease ?? sm?.targetRelease,
     retentionPolicy: overlay?.retentionPolicy ?? sm?.retentionPolicy,
     approvers: overlay?.approvers ?? [],
-    implementationRef: overlay?.implementationRef
+    implementationRef: overlay?.implementationRef,
+    reviewedAt: overlay?.reviewedAt
   };
 }
 function evaluateCompleteness(resolved, _stage) {
@@ -24404,7 +24669,301 @@ function applyPatch(db, specKey, patch, expectedRevision) {
   return { revision: result.revision, updatedAt: result.updated_at };
 }
 
+// backend/src/db/queries/relationships.ts
+function createRelationship(db, rel) {
+  const stmt = db.prepare(`
+    INSERT INTO relationships (id, source_spec_key, target_spec_key, type, created_at)
+    VALUES ($id, $source_spec_key, $target_spec_key, $type, $created_at)
+  `);
+  stmt.run({
+    $id: rel.id,
+    $source_spec_key: rel.sourceSpecKey,
+    $target_spec_key: rel.targetSpecKey,
+    $type: rel.type,
+    $created_at: new Date().toISOString()
+  });
+}
+function deleteRelationship(db, id) {
+  const stmt = db.prepare("DELETE FROM relationships WHERE id = $id");
+  stmt.run({ $id: id });
+}
+function listAllRelationships(db) {
+  const stmt = db.prepare("SELECT * FROM relationships ORDER BY created_at ASC");
+  return stmt.all();
+}
+function listBySourceKeys(db, specKeys) {
+  if (specKeys.length === 0)
+    return [];
+  const placeholders = specKeys.map(() => "?").join(", ");
+  const stmt = db.prepare(`
+    SELECT * FROM relationships
+    WHERE source_spec_key IN (${placeholders})
+  `);
+  return stmt.all(...specKeys);
+}
+function listSupersessionsByTargetKeys(db, specKeys) {
+  if (specKeys.length === 0)
+    return [];
+  const placeholders = specKeys.map((_2, i) => `$k${i}`).join(", ");
+  const params = {};
+  specKeys.forEach((key, i) => {
+    params[`$k${i}`] = key;
+  });
+  const stmt = db.prepare(`
+    SELECT r.target_spec_key AS target_spec_key,
+           r.source_spec_key AS successor_spec_key,
+           s.title AS successor_title
+    FROM relationships r
+    JOIN specs s ON s.key = r.source_spec_key
+    WHERE r.type = 'supersedes' AND r.target_spec_key IN (${placeholders})
+  `);
+  return stmt.all(params);
+}
+function replaceOutgoingRelationships(db, sourceSpecKey, relationships) {
+  db.transaction(() => {
+    db.prepare("DELETE FROM relationships WHERE source_spec_key = $source").run({
+      $source: sourceSpecKey
+    });
+    const insert = db.prepare(`
+      INSERT INTO relationships (id, source_spec_key, target_spec_key, type, created_at)
+      VALUES ($id, $source_spec_key, $target_spec_key, $type, $created_at)
+    `);
+    for (const rel of relationships) {
+      insert.run({
+        $id: crypto.randomUUID(),
+        $source_spec_key: sourceSpecKey,
+        $target_spec_key: rel.targetSpecKey,
+        $type: rel.type,
+        $created_at: new Date().toISOString()
+      });
+    }
+  })();
+}
+function checkDuplicate(db, sourceSpecKey, targetSpecKey, type) {
+  const stmt = db.prepare(`
+    SELECT 1 FROM relationships
+    WHERE source_spec_key = $source AND target_spec_key = $target AND type = $type
+    LIMIT 1
+  `);
+  return stmt.get({ $source: sourceSpecKey, $target: targetSpecKey, $type: type }) !== null;
+}
+
+// backend/src/db/queries/suggestions.ts
+function createSuggestion(db, suggestion) {
+  const stmt = db.prepare(`
+    INSERT INTO suggestions (
+      id, source_spec_key, target_spec_key, type, confidence,
+      reason, evidence, status, created_at, data_hash
+    ) VALUES (
+      $id, $source_spec_key, $target_spec_key, $type, $confidence,
+      $reason, $evidence, 'pending', $created_at, $data_hash
+    )
+  `);
+  stmt.run({
+    $id: suggestion.id,
+    $source_spec_key: suggestion.sourceSpecKey,
+    $target_spec_key: suggestion.targetSpecKey,
+    $type: suggestion.type,
+    $confidence: suggestion.confidence,
+    $reason: suggestion.reason,
+    $evidence: suggestion.evidence,
+    $created_at: new Date().toISOString(),
+    $data_hash: suggestion.dataHash
+  });
+}
+function acceptSuggestion(db, id) {
+  const stmt = db.prepare(`
+    UPDATE suggestions
+    SET status = 'accepted', resolved_at = $resolved_at
+    WHERE id = $id
+  `);
+  stmt.run({ $id: id, $resolved_at: new Date().toISOString() });
+}
+function rejectSuggestion(db, id, dataHash) {
+  db.transaction(() => {
+    const suggestion = db.prepare("SELECT * FROM suggestions WHERE id = $id").get({ $id: id });
+    if (!suggestion)
+      return;
+    const now = new Date().toISOString();
+    db.prepare(`
+      UPDATE suggestions
+      SET status = 'rejected', resolved_at = $resolved_at
+      WHERE id = $id
+    `).run({ $id: id, $resolved_at: now });
+    db.prepare(`
+      INSERT INTO rejections (id, source_spec_key, target_spec_key, type, data_hash, rejected_at)
+      VALUES ($id, $source, $target, $type, $data_hash, $rejected_at)
+    `).run({
+      $id: crypto.randomUUID(),
+      $source: suggestion.source_spec_key,
+      $target: suggestion.target_spec_key,
+      $type: suggestion.type,
+      $data_hash: dataHash,
+      $rejected_at: now
+    });
+  })();
+}
+function suggestionExists(db, sourceSpecKey, targetSpecKey, type) {
+  const stmt = db.prepare(`
+    SELECT 1 FROM suggestions
+    WHERE source_spec_key = $source AND target_spec_key = $target AND type = $type
+    LIMIT 1
+  `);
+  return stmt.get({ $source: sourceSpecKey, $target: targetSpecKey, $type: type }) !== null;
+}
+function createRejection(db, rejection) {
+  db.prepare(`
+    INSERT INTO rejections (id, source_spec_key, target_spec_key, type, data_hash, rejected_at)
+    VALUES ($id, $source, $target, $type, $data_hash, $rejected_at)
+  `).run({
+    $id: crypto.randomUUID(),
+    $source: rejection.sourceSpecKey,
+    $target: rejection.targetSpecKey,
+    $type: rejection.type,
+    $data_hash: rejection.dataHash,
+    $rejected_at: rejection.rejectedAt
+  });
+}
+function listPending(db, specKey) {
+  if (specKey) {
+    const stmt2 = db.prepare(`
+      SELECT * FROM suggestions
+      WHERE status = 'pending' AND (source_spec_key = $spec_key OR target_spec_key = $spec_key)
+      ORDER BY confidence DESC, created_at DESC
+    `);
+    return stmt2.all({ $spec_key: specKey });
+  }
+  const stmt = db.prepare(`
+    SELECT * FROM suggestions
+    WHERE status = 'pending'
+    ORDER BY confidence DESC, created_at DESC
+  `);
+  return stmt.all();
+}
+function listAllSuggestions(db) {
+  const stmt = db.prepare("SELECT * FROM suggestions ORDER BY created_at ASC");
+  return stmt.all();
+}
+function listAllRejections(db) {
+  const stmt = db.prepare("SELECT * FROM rejections ORDER BY rejected_at ASC");
+  return stmt.all();
+}
+function listPendingBySourceKeys(db, specKeys) {
+  if (specKeys.length === 0)
+    return [];
+  const placeholders = specKeys.map(() => "?").join(", ");
+  const stmt = db.prepare(`
+    SELECT * FROM suggestions
+    WHERE status = 'pending' AND source_spec_key IN (${placeholders})
+  `);
+  return stmt.all(...specKeys);
+}
+function isRejected(db, sourceKey, targetKey, type, dataHash) {
+  const stmt = db.prepare(`
+    SELECT 1 FROM rejections
+    WHERE source_spec_key = $source AND target_spec_key = $target
+      AND type = $type AND data_hash = $data_hash
+    LIMIT 1
+  `);
+  return stmt.get({
+    $source: sourceKey,
+    $target: targetKey,
+    $type: type,
+    $data_hash: dataHash
+  }) !== null;
+}
+
+// backend/src/db/queries/audit.ts
+function insertAuditEvent(db, event) {
+  const stmt = db.prepare(`
+    INSERT INTO audit_events (id, operation, spec_key, snapshot_id, actor, timestamp)
+    VALUES ($id, $operation, $spec_key, $snapshot_id, $actor, $timestamp)
+  `);
+  stmt.run({
+    $id: event.id,
+    $operation: event.operation,
+    $spec_key: event.specKey ?? null,
+    $snapshot_id: event.snapshotId ?? null,
+    $actor: event.actor,
+    $timestamp: event.timestamp
+  });
+}
+function listAllAuditEvents(db) {
+  const stmt = db.prepare("SELECT * FROM audit_events ORDER BY timestamp ASC");
+  return stmt.all();
+}
+function queryAuditEvents(db, filters) {
+  const conditions = [];
+  const params = {};
+  if (filters.specKey) {
+    conditions.push("spec_key = $spec_key");
+    params.$spec_key = filters.specKey;
+  }
+  if (filters.operation) {
+    conditions.push("operation = $operation");
+    params.$operation = filters.operation;
+  }
+  if (filters.actor) {
+    conditions.push("actor = $actor");
+    params.$actor = filters.actor;
+  }
+  if (filters.after) {
+    conditions.push("timestamp > $after");
+    params.$after = filters.after;
+  }
+  if (filters.before) {
+    conditions.push("timestamp < $before");
+    params.$before = filters.before;
+  }
+  const where = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+  params.$limit = filters.limit;
+  const sql = `SELECT * FROM audit_events ${where} ORDER BY timestamp DESC LIMIT $limit`;
+  const stmt = db.prepare(sql);
+  return stmt.all(params);
+}
+
+// backend/src/services/audit.ts
+function recordEvent(db, operation, options) {
+  try {
+    const id = crypto.randomUUID();
+    const timestamp = new Date().toISOString();
+    const actor = options?.actor ?? "system";
+    insertAuditEvent(db, {
+      id,
+      timestamp,
+      operation,
+      actor,
+      specKey: options?.specKey,
+      snapshotId: options?.snapshotId
+    });
+  } catch (err) {
+    console.error("[audit] Failed to record event:", err);
+  }
+}
+
 // backend/src/routes/specs.ts
+function attachRelationshipData(db, specs) {
+  const keys = specs.map((spec) => spec.key);
+  const relationships = listBySourceKeys(db, keys);
+  const suggestions = listPendingBySourceKeys(db, keys);
+  const relsByKey = new Map;
+  for (const rel of relationships) {
+    const list = relsByKey.get(rel.source_spec_key) ?? [];
+    list.push({ targetKey: rel.target_spec_key, type: rel.type });
+    relsByKey.set(rel.source_spec_key, list);
+  }
+  const sugsByKey = new Map;
+  for (const sug of suggestions) {
+    const list = sugsByKey.get(sug.source_spec_key) ?? [];
+    list.push({ targetKey: sug.target_spec_key, type: sug.type });
+    sugsByKey.set(sug.source_spec_key, list);
+  }
+  return specs.map((spec) => ({
+    ...spec,
+    relationships: relsByKey.get(spec.key) ?? [],
+    suggestions: sugsByKey.get(spec.key) ?? []
+  }));
+}
 function specRoutes(deps) {
   const { db } = deps;
   return new Elysia({ prefix: "/specs" }).get("/", ({ query }) => {
@@ -24416,6 +24975,7 @@ function specRoutes(deps) {
       owner: query.owner || undefined,
       theme: query.theme || undefined,
       repository: query.repository || undefined,
+      query: query.q || undefined,
       limit,
       offset
     };
@@ -24428,18 +24988,7 @@ function specRoutes(deps) {
       const allSpecs = listSpecs(db, allFilters);
       const filtered = allSpecs.filter((spec) => {
         const overlay = getOverlay(db, spec.key);
-        const resolved = resolveMetadata({ title: spec.title, owner: spec.owner }, overlay ? {
-          specKey: overlay.spec_key,
-          title: overlay.title ?? undefined,
-          summary: overlay.summary ?? undefined,
-          owner: overlay.owner ?? undefined,
-          theme: overlay.theme ?? undefined,
-          tags: overlay.tags ? JSON.parse(overlay.tags) : undefined,
-          targetRelease: overlay.target_release ?? undefined,
-          retentionPolicy: overlay.retention_policy ? JSON.parse(overlay.retention_policy) : undefined,
-          revision: overlay.revision,
-          updatedAt: overlay.updated_at
-        } : null, null);
+        const resolved = resolveMetadata({ title: spec.title, owner: spec.owner }, overlay ? overlayRowToMetadataOverlay(overlay) : null, null);
         const completeness = evaluateCompleteness(resolved, spec.stage);
         return completeness.complete === wantComplete;
       });
@@ -24447,10 +24996,10 @@ function specRoutes(deps) {
       specs = filtered.slice(offset, offset + limit);
     } else {
       specs = listSpecs(db, filters);
-      const { type, stage, owner, theme, repository } = filters;
-      total = countSpecs(db, { type, stage, owner, theme, repository });
+      const { type, stage, owner, theme, repository, query: q } = filters;
+      total = countSpecs(db, { type, stage, owner, theme, repository, query: q });
     }
-    return { specs, total, limit, offset };
+    return { specs: attachRelationshipData(db, specs), total, limit, offset };
   }, {
     query: t.Object({
       type: t.Optional(t.String()),
@@ -24459,9 +25008,26 @@ function specRoutes(deps) {
       theme: t.Optional(t.String()),
       repository: t.Optional(t.String()),
       metadataComplete: t.Optional(t.String()),
+      q: t.Optional(t.String()),
       limit: t.Optional(t.String()),
       offset: t.Optional(t.String())
     })
+  }).get("/by-key", ({ query, set }) => {
+    const key = query.key;
+    if (!key) {
+      set.status = 400;
+      return { code: "BAD_REQUEST", message: "key query parameter required" };
+    }
+    const spec = findByKey(db, key);
+    if (!spec) {
+      set.status = 404;
+      return { code: "NOT_FOUND", message: `Spec '${key}' not found` };
+    }
+    const overlay = getOverlay(db, spec.key);
+    const metadata = resolveMetadata({ title: spec.title, owner: spec.owner }, overlay ? overlayRowToMetadataOverlay(overlay) : null, null);
+    return { spec, metadata, revision: overlay?.revision ?? 0 };
+  }, {
+    query: t.Object({ key: t.String() })
   }).get("/:id", ({ params, set }) => {
     const spec = findByKey(db, params.id);
     if (!spec) {
@@ -24469,18 +25035,7 @@ function specRoutes(deps) {
       return { code: "NOT_FOUND", message: `Spec '${params.id}' not found` };
     }
     const overlay = getOverlay(db, spec.key);
-    const metadata = resolveMetadata({ title: spec.title, owner: spec.owner }, overlay ? {
-      specKey: overlay.spec_key,
-      title: overlay.title ?? undefined,
-      summary: overlay.summary ?? undefined,
-      owner: overlay.owner ?? undefined,
-      theme: overlay.theme ?? undefined,
-      tags: overlay.tags ? JSON.parse(overlay.tags) : undefined,
-      targetRelease: overlay.target_release ?? undefined,
-      retentionPolicy: overlay.retention_policy ? JSON.parse(overlay.retention_policy) : undefined,
-      revision: overlay.revision,
-      updatedAt: overlay.updated_at
-    } : null, null);
+    const metadata = resolveMetadata({ title: spec.title, owner: spec.owner }, overlay ? overlayRowToMetadataOverlay(overlay) : null, null);
     return { spec, metadata, revision: overlay?.revision ?? 0 };
   }, {
     params: t.Object({ id: t.String() })
@@ -24493,6 +25048,7 @@ function specRoutes(deps) {
     const { expectedRevision, patch } = body;
     try {
       const result = applyPatch(db, spec.key, patch, expectedRevision);
+      recordEvent(db, "metadata_updated", { specKey: spec.key });
       return { revision: result.revision, updatedAt: result.updatedAt };
     } catch (err) {
       if (err instanceof RevisionConflictError) {
@@ -24520,7 +25076,10 @@ function specRoutes(deps) {
         retentionPolicy: t.Optional(t.Object({
           type: t.String(),
           customDate: t.Optional(t.String())
-        }))
+        })),
+        approvers: t.Optional(t.Array(t.String({ maxLength: 100 }), { maxItems: 20 })),
+        implementationRef: t.Optional(t.String({ maxLength: 500 })),
+        reviewedAt: t.Optional(t.String())
       })
     })
   });
@@ -24724,6 +25283,10 @@ function listSnapshots(db, filters) {
   `);
   return stmt.all({ $limit: filters.limit });
 }
+function listAllSnapshots(db) {
+  const stmt = db.prepare("SELECT * FROM snapshots ORDER BY created_at ASC");
+  return stmt.all();
+}
 function insertSnapshotArtifact(db, artifact) {
   const stmt = db.prepare(`
     INSERT INTO snapshot_artifacts (snapshot_id, name, content_hash, size_bytes, storage_path)
@@ -24743,6 +25306,18 @@ function getSnapshotArtifacts(db, snapshotId) {
 }
 
 // backend/src/routes/archive.ts
+function attachSupersessionData(db, snapshots) {
+  const specKeys = snapshots.map((s) => s.spec_key);
+  const supersessions = listSupersessionsByTargetKeys(db, specKeys);
+  const byTarget = new Map(supersessions.map((s) => [
+    s.target_spec_key,
+    { specKey: s.successor_spec_key, title: s.successor_title }
+  ]));
+  return snapshots.map((s) => ({
+    ...s,
+    supersededBy: byTarget.get(s.spec_key) ?? null
+  }));
+}
 function archiveRoutes(deps) {
   const { db, archiver } = deps;
   return new Elysia({ prefix: "/archive" }).get("/", ({ query }) => {
@@ -24752,7 +25327,7 @@ function archiveRoutes(deps) {
     const hasMore = snapshots.length > limit;
     const page = hasMore ? snapshots.slice(0, limit) : snapshots;
     const nextCursor = hasMore ? page[page.length - 1].created_at : null;
-    return { snapshots: page, nextCursor };
+    return { snapshots: attachSupersessionData(db, page), nextCursor };
   }, {
     query: t.Object({
       cursor: t.Optional(t.String()),
@@ -24806,147 +25381,6 @@ function archiveRoutes(deps) {
   });
 }
 
-// backend/src/db/queries/relationships.ts
-function createRelationship(db, rel) {
-  const stmt = db.prepare(`
-    INSERT INTO relationships (id, source_spec_key, target_spec_key, type, created_at)
-    VALUES ($id, $source_spec_key, $target_spec_key, $type, $created_at)
-  `);
-  stmt.run({
-    $id: rel.id,
-    $source_spec_key: rel.sourceSpecKey,
-    $target_spec_key: rel.targetSpecKey,
-    $type: rel.type,
-    $created_at: new Date().toISOString()
-  });
-}
-function deleteRelationship(db, id) {
-  const stmt = db.prepare("DELETE FROM relationships WHERE id = $id");
-  stmt.run({ $id: id });
-}
-function checkDuplicate(db, sourceSpecKey, targetSpecKey, type) {
-  const stmt = db.prepare(`
-    SELECT 1 FROM relationships
-    WHERE source_spec_key = $source AND target_spec_key = $target AND type = $type
-    LIMIT 1
-  `);
-  return stmt.get({ $source: sourceSpecKey, $target: targetSpecKey, $type: type }) !== null;
-}
-
-// backend/src/db/queries/suggestions.ts
-function acceptSuggestion(db, id) {
-  const stmt = db.prepare(`
-    UPDATE suggestions
-    SET status = 'accepted', resolved_at = $resolved_at
-    WHERE id = $id
-  `);
-  stmt.run({ $id: id, $resolved_at: new Date().toISOString() });
-}
-function rejectSuggestion(db, id, dataHash) {
-  db.transaction(() => {
-    const suggestion = db.prepare("SELECT * FROM suggestions WHERE id = $id").get({ $id: id });
-    if (!suggestion)
-      return;
-    const now = new Date().toISOString();
-    db.prepare(`
-      UPDATE suggestions
-      SET status = 'rejected', resolved_at = $resolved_at
-      WHERE id = $id
-    `).run({ $id: id, $resolved_at: now });
-    db.prepare(`
-      INSERT INTO rejections (id, source_spec_key, target_spec_key, type, data_hash, rejected_at)
-      VALUES ($id, $source, $target, $type, $data_hash, $rejected_at)
-    `).run({
-      $id: crypto.randomUUID(),
-      $source: suggestion.source_spec_key,
-      $target: suggestion.target_spec_key,
-      $type: suggestion.type,
-      $data_hash: dataHash,
-      $rejected_at: now
-    });
-  })();
-}
-function listPending(db, specKey) {
-  if (specKey) {
-    const stmt2 = db.prepare(`
-      SELECT * FROM suggestions
-      WHERE status = 'pending' AND (source_spec_key = $spec_key OR target_spec_key = $spec_key)
-      ORDER BY confidence DESC, created_at DESC
-    `);
-    return stmt2.all({ $spec_key: specKey });
-  }
-  const stmt = db.prepare(`
-    SELECT * FROM suggestions
-    WHERE status = 'pending'
-    ORDER BY confidence DESC, created_at DESC
-  `);
-  return stmt.all();
-}
-
-// backend/src/db/queries/audit.ts
-function insertAuditEvent(db, event) {
-  const stmt = db.prepare(`
-    INSERT INTO audit_events (id, operation, spec_key, snapshot_id, actor, timestamp)
-    VALUES ($id, $operation, $spec_key, $snapshot_id, $actor, $timestamp)
-  `);
-  stmt.run({
-    $id: event.id,
-    $operation: event.operation,
-    $spec_key: event.specKey ?? null,
-    $snapshot_id: event.snapshotId ?? null,
-    $actor: event.actor,
-    $timestamp: event.timestamp
-  });
-}
-function queryAuditEvents(db, filters) {
-  const conditions = [];
-  const params = {};
-  if (filters.specKey) {
-    conditions.push("spec_key = $spec_key");
-    params.$spec_key = filters.specKey;
-  }
-  if (filters.operation) {
-    conditions.push("operation = $operation");
-    params.$operation = filters.operation;
-  }
-  if (filters.actor) {
-    conditions.push("actor = $actor");
-    params.$actor = filters.actor;
-  }
-  if (filters.after) {
-    conditions.push("timestamp > $after");
-    params.$after = filters.after;
-  }
-  if (filters.before) {
-    conditions.push("timestamp < $before");
-    params.$before = filters.before;
-  }
-  const where = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
-  params.$limit = filters.limit;
-  const sql = `SELECT * FROM audit_events ${where} ORDER BY timestamp DESC LIMIT $limit`;
-  const stmt = db.prepare(sql);
-  return stmt.all(params);
-}
-
-// backend/src/services/audit.ts
-function recordEvent(db, operation, options) {
-  try {
-    const id = crypto.randomUUID();
-    const timestamp = new Date().toISOString();
-    const actor = options?.actor ?? "system";
-    insertAuditEvent(db, {
-      id,
-      timestamp,
-      operation,
-      actor,
-      specKey: options?.specKey,
-      snapshotId: options?.snapshotId
-    });
-  } catch (err) {
-    console.error("[audit] Failed to record event:", err);
-  }
-}
-
 // backend/src/routes/relationships.ts
 var RelationshipTypeValues = [
   "depends_on",
@@ -24996,6 +25430,11 @@ function relationshipRoutes(deps) {
     return { suggestions };
   }, {
     params: t.Object({ id: t.String() })
+  }).get("/specs/suggestions-by-key", ({ query }) => {
+    const suggestions = listPending(db, query.key);
+    return { suggestions };
+  }, {
+    query: t.Object({ key: t.String() })
   }).post("/suggestions/:id/accept", ({ params }) => {
     const suggestionId = params.id;
     const stmt = db.prepare("SELECT * FROM suggestions WHERE id = $id");
@@ -25037,16 +25476,21 @@ function relationshipRoutes(deps) {
 // backend/src/db/queries/proposals.ts
 function createProposal(db, params) {
   const stmt = db.prepare(`
-    INSERT INTO proposals (id, spec_key, patch, status, submitted_at)
-    VALUES ($id, $spec_key, $patch, 'pending', $submitted_at)
+    INSERT INTO proposals (id, spec_key, patch, status, submitted_at, rationale, source)
+    VALUES ($id, $spec_key, $patch, 'pending', $submitted_at, $rationale, $source)
   `);
   stmt.run({
     $id: params.id,
     $spec_key: params.specKey,
     $patch: JSON.stringify(params.patch),
-    $submitted_at: params.submittedAt
+    $submitted_at: params.submittedAt,
+    $rationale: params.rationale ?? null,
+    $source: params.source ?? "human"
   });
   return db.query("SELECT * FROM proposals WHERE id = ?").get(params.id);
+}
+function listAllProposals(db) {
+  return db.query("SELECT * FROM proposals ORDER BY submitted_at ASC").all();
 }
 function listPendingProposals(db, specKey) {
   return db.query("SELECT * FROM proposals WHERE spec_key = ? AND status = 'pending' ORDER BY submitted_at DESC").all(specKey);
@@ -25086,6 +25530,16 @@ function proposalRoutes(deps) {
     return { proposals };
   }, {
     params: t.Object({ id: t.String() })
+  }).get("/specs/proposals-by-key", ({ query, set }) => {
+    const spec = findByKey(db, query.key);
+    if (!spec) {
+      set.status = 404;
+      return { code: "NOT_FOUND", message: `Spec '${query.key}' not found` };
+    }
+    const proposals = listPendingProposals(db, spec.key);
+    return { proposals };
+  }, {
+    query: t.Object({ key: t.String() })
   }).post("/specs/:id/proposals", ({ params, body, set }) => {
     const spec = findByKey(db, params.id);
     if (!spec) {
@@ -25097,7 +25551,9 @@ function proposalRoutes(deps) {
       id,
       specKey: spec.key,
       patch: body.patch,
-      submittedAt: new Date().toISOString()
+      submittedAt: new Date().toISOString(),
+      rationale: body.rationale,
+      source: body.source
     });
     set.status = 201;
     return { id: proposal.id, status: proposal.status };
@@ -25208,89 +25664,1297 @@ function auditRoutes(deps) {
   });
 }
 
-// backend/src/routes/import-export.ts
-function buildExportPayload(db) {
-  const specs = listSpecs(db, { limit: 1e4, offset: 0 });
-  const exported = [];
+// backend/src/services/backup.ts
+import { Database as Database2 } from "bun:sqlite";
+import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "fs";
+import { join as join2 } from "path";
+var DB_FILENAME = "spec-library.db";
+var SAFETY_BACKUP_PREFIX = "pre-restore-";
+var MAX_SAFETY_BACKUPS = 5;
+
+class InvalidBackupError extends Error {
+  code = "INVALID_BACKUP";
+}
+function serializeForPortability(db) {
+  const mode = db.query("PRAGMA journal_mode").get()?.journal_mode;
+  if (mode?.toLowerCase() !== "wal") {
+    return db.serialize();
+  }
+  db.exec("PRAGMA journal_mode = DELETE");
+  try {
+    return db.serialize();
+  } finally {
+    db.exec("PRAGMA journal_mode = WAL");
+  }
+}
+function createBackupBuffer(db) {
+  return serializeForPortability(db);
+}
+async function restoreFromBackup(db, dataDir, uploaded) {
+  const header = new TextDecoder().decode(uploaded.slice(0, 16));
+  if (!header.startsWith("SQLite format 3")) {
+    throw new InvalidBackupError("Uploaded file is not a SQLite database.");
+  }
+  let tempDb;
+  try {
+    tempDb = Database2.deserialize(uploaded);
+  } catch {
+    throw new InvalidBackupError("Uploaded file could not be read as a SQLite database.");
+  }
+  let migratedBytes;
+  try {
+    let tables;
+    try {
+      tables = new Set(tempDb.query("SELECT name FROM sqlite_master WHERE type = 'table'").all().map((row) => row.name));
+    } catch (err) {
+      if (err instanceof Error && "code" in err && err.code === "SQLITE_CANTOPEN") {
+        throw new InvalidBackupError(`Uploaded file looks like a raw copy of a database taken while it was open (WAL journal mode), which can't be read directly. Use the app's "Download backup" feature to produce a restorable file instead of copying the database file directly.`);
+      }
+      throw err;
+    }
+    if (!tables.has("specs") || !tables.has("metadata_overlays")) {
+      throw new InvalidBackupError("Uploaded file doesn't look like a Spec Library backup (missing expected tables).");
+    }
+    await runMigrations(tempDb);
+    migratedBytes = tempDb.serialize();
+  } finally {
+    if (tempDb) {
+      tempDb.close();
+    }
+  }
+  const safetyDir = join2(dataDir, "backups");
+  mkdirSync(safetyDir, { recursive: true });
+  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const safetyBackupPath = join2(safetyDir, `${SAFETY_BACKUP_PREFIX}${timestamp}.db`);
+  writeFileSync(safetyBackupPath, serializeForPortability(db));
+  pruneOldSafetyBackups(safetyDir);
+  const dbPath = join2(dataDir, DB_FILENAME);
+  for (const suffix of ["-wal", "-shm"]) {
+    const sidecar = `${dbPath}${suffix}`;
+    if (existsSync(sidecar))
+      rmSync(sidecar, { force: true });
+  }
+  writeFileSync(dbPath, migratedBytes);
+  return { safetyBackupPath };
+}
+function pruneOldSafetyBackups(safetyDir) {
+  const files = readdirSync(safetyDir).filter((f) => f.startsWith(SAFETY_BACKUP_PREFIX) && f.endsWith(".db")).sort();
+  const excess = files.length - MAX_SAFETY_BACKUPS;
+  for (let i = 0;i < excess; i++) {
+    rmSync(join2(safetyDir, files[i]), { force: true });
+  }
+}
+
+// backend/src/routes/backup.ts
+var RESTORE_CONFIRMATION = "RESTORE";
+function backupRoutes(deps) {
+  const { db, dataDir } = deps;
+  return new Elysia({ prefix: "" }).get("/backup", () => {
+    const bytes = createBackupBuffer(db);
+    recordEvent(db, "backup_created");
+    const filename = `spec-library-backup-${new Date().toISOString().replace(/[:.]/g, "-")}.db`;
+    return new Response(bytes, {
+      status: 200,
+      headers: {
+        "Content-Type": "application/octet-stream",
+        "Content-Disposition": `attachment; filename="${filename}"`
+      }
+    });
+  }).post("/backup/restore", async ({ request, set }) => {
+    let formData;
+    try {
+      formData = await request.formData();
+    } catch {
+      set.status = 400;
+      return { code: "INVALID_REQUEST", message: "Expected multipart/form-data body." };
+    }
+    const confirmation = formData.get("confirmation");
+    if (confirmation !== RESTORE_CONFIRMATION) {
+      set.status = 400;
+      return {
+        code: "CONFIRMATION_REQUIRED",
+        message: `Restoring a backup replaces the entire library. Set "confirmation" to exactly "${RESTORE_CONFIRMATION}" to proceed.`
+      };
+    }
+    const file2 = formData.get("file");
+    if (!(file2 instanceof File)) {
+      set.status = 400;
+      return { code: "FILE_REQUIRED", message: "No backup file was uploaded." };
+    }
+    const uploaded = new Uint8Array(await file2.arrayBuffer());
+    try {
+      const { safetyBackupPath } = await restoreFromBackup(db, dataDir, uploaded);
+      recordEvent(db, "backup_restored");
+      return {
+        restored: true,
+        requiresRestart: true,
+        message: "Backup restored to disk. Restart the Spec Library backend for the restored data to take effect.",
+        safetyBackupPath
+      };
+    } catch (err) {
+      if (err instanceof InvalidBackupError) {
+        set.status = 400;
+        return { code: err.code, message: err.message };
+      }
+      throw err;
+    }
+  });
+}
+
+// node_modules/.bun/fflate@0.8.3/node_modules/fflate/esm/index.mjs
+import { createRequire } from "module";
+var require2 = createRequire("/");
+var _a2;
+var Worker;
+var isMarkedAsUntransferable;
+try {
+  _a2 = require2("worker_threads"), Worker = _a2.Worker, isMarkedAsUntransferable = _a2.isMarkedAsUntransferable;
+} catch (e) {}
+var u8 = Uint8Array;
+var u16 = Uint16Array;
+var i32 = Int32Array;
+var fleb = new u8([0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0, 0, 0, 0]);
+var fdeb = new u8([0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 0, 0]);
+var clim = new u8([16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15]);
+var freb = function(eb, start) {
+  var b = new u16(31);
+  for (var i = 0;i < 31; ++i) {
+    b[i] = start += 1 << eb[i - 1];
+  }
+  var r = new i32(b[30]);
+  for (var i = 1;i < 30; ++i) {
+    for (var j = b[i];j < b[i + 1]; ++j) {
+      r[j] = j - b[i] << 5 | i;
+    }
+  }
+  return { b, r };
+};
+var _a2 = freb(fleb, 2);
+var fl = _a2.b;
+var revfl = _a2.r;
+fl[28] = 258, revfl[258] = 28;
+var _b = freb(fdeb, 0);
+var fd = _b.b;
+var revfd = _b.r;
+var rev = new u16(32768);
+for (i = 0;i < 32768; ++i) {
+  x = (i & 43690) >> 1 | (i & 21845) << 1;
+  x = (x & 52428) >> 2 | (x & 13107) << 2;
+  x = (x & 61680) >> 4 | (x & 3855) << 4;
+  rev[i] = ((x & 65280) >> 8 | (x & 255) << 8) >> 1;
+}
+var x;
+var i;
+var hMap = function(cd, mb, r) {
+  var s = cd.length;
+  var i2 = 0;
+  var l = new u16(mb);
+  for (;i2 < s; ++i2) {
+    if (cd[i2])
+      ++l[cd[i2] - 1];
+  }
+  var le = new u16(mb);
+  for (i2 = 1;i2 < mb; ++i2) {
+    le[i2] = le[i2 - 1] + l[i2 - 1] << 1;
+  }
+  var co;
+  if (r) {
+    co = new u16(1 << mb);
+    var rvb = 15 - mb;
+    for (i2 = 0;i2 < s; ++i2) {
+      if (cd[i2]) {
+        var sv = i2 << 4 | cd[i2];
+        var r_1 = mb - cd[i2];
+        var v = le[cd[i2] - 1]++ << r_1;
+        for (var m = v | (1 << r_1) - 1;v <= m; ++v) {
+          co[rev[v] >> rvb] = sv;
+        }
+      }
+    }
+  } else {
+    co = new u16(s);
+    for (i2 = 0;i2 < s; ++i2) {
+      if (cd[i2]) {
+        co[i2] = rev[le[cd[i2] - 1]++] >> 15 - cd[i2];
+      }
+    }
+  }
+  return co;
+};
+var flt = new u8(288);
+for (i = 0;i < 144; ++i)
+  flt[i] = 8;
+var i;
+for (i = 144;i < 256; ++i)
+  flt[i] = 9;
+var i;
+for (i = 256;i < 280; ++i)
+  flt[i] = 7;
+var i;
+for (i = 280;i < 288; ++i)
+  flt[i] = 8;
+var i;
+var fdt = new u8(32);
+for (i = 0;i < 32; ++i)
+  fdt[i] = 5;
+var i;
+var flm = /* @__PURE__ */ hMap(flt, 9, 0);
+var flrm = /* @__PURE__ */ hMap(flt, 9, 1);
+var fdm = /* @__PURE__ */ hMap(fdt, 5, 0);
+var fdrm = /* @__PURE__ */ hMap(fdt, 5, 1);
+var max = function(a) {
+  var m = a[0];
+  for (var i2 = 1;i2 < a.length; ++i2) {
+    if (a[i2] > m)
+      m = a[i2];
+  }
+  return m;
+};
+var bits = function(d, p, m) {
+  var o = p / 8 | 0;
+  return (d[o] | d[o + 1] << 8) >> (p & 7) & m;
+};
+var bits16 = function(d, p) {
+  var o = p / 8 | 0;
+  return (d[o] | d[o + 1] << 8 | d[o + 2] << 16) >> (p & 7);
+};
+var shft = function(p) {
+  return (p + 7) / 8 | 0;
+};
+var slc = function(v, s, e) {
+  if (s == null || s < 0)
+    s = 0;
+  if (e == null || e > v.length)
+    e = v.length;
+  return new u8(v.subarray(s, e));
+};
+var ec = [
+  "unexpected EOF",
+  "invalid block type",
+  "invalid length/literal",
+  "invalid distance",
+  "stream finished",
+  "no stream handler",
+  ,
+  "no callback",
+  "invalid UTF-8 data",
+  "extra field too long",
+  "date not in range 1980-2099",
+  "filename too long",
+  "stream finishing",
+  "invalid zip data"
+];
+var err = function(ind, msg, nt) {
+  var e = new Error(msg || ec[ind]);
+  e.code = ind;
+  if (Error.captureStackTrace)
+    Error.captureStackTrace(e, err);
+  if (!nt)
+    throw e;
+  return e;
+};
+var inflt = function(dat, st, buf, dict) {
+  var sl = dat.length, dl = dict ? dict.length : 0;
+  if (!sl || st.f && !st.l)
+    return buf || new u8(0);
+  var noBuf = !buf;
+  var resize = noBuf || st.i != 2;
+  var noSt = st.i;
+  if (noBuf)
+    buf = new u8(sl * 3);
+  var cbuf = function(l2) {
+    var bl = buf.length;
+    if (l2 > bl) {
+      var nbuf = new u8(Math.max(bl * 2, l2));
+      nbuf.set(buf);
+      buf = nbuf;
+    }
+  };
+  var final = st.f || 0, pos = st.p || 0, bt = st.b || 0, lm = st.l, dm = st.d, lbt = st.m, dbt = st.n;
+  var tbts = sl * 8;
+  do {
+    if (!lm) {
+      final = bits(dat, pos, 1);
+      var type = bits(dat, pos + 1, 3);
+      pos += 3;
+      if (!type) {
+        var s = shft(pos) + 4, l = dat[s - 4] | dat[s - 3] << 8, t2 = s + l;
+        if (t2 > sl) {
+          if (noSt)
+            err(0);
+          break;
+        }
+        if (resize)
+          cbuf(bt + l);
+        buf.set(dat.subarray(s, t2), bt);
+        st.b = bt += l, st.p = pos = t2 * 8, st.f = final;
+        continue;
+      } else if (type == 1)
+        lm = flrm, dm = fdrm, lbt = 9, dbt = 5;
+      else if (type == 2) {
+        var hLit = bits(dat, pos, 31) + 257, hcLen = bits(dat, pos + 10, 15) + 4;
+        var tl = hLit + bits(dat, pos + 5, 31) + 1;
+        pos += 14;
+        var ldt = new u8(tl);
+        var clt = new u8(19);
+        for (var i2 = 0;i2 < hcLen; ++i2) {
+          clt[clim[i2]] = bits(dat, pos + i2 * 3, 7);
+        }
+        pos += hcLen * 3;
+        var clb = max(clt), clbmsk = (1 << clb) - 1;
+        var clm = hMap(clt, clb, 1);
+        for (var i2 = 0;i2 < tl; ) {
+          var r = clm[bits(dat, pos, clbmsk)];
+          pos += r & 15;
+          var s = r >> 4;
+          if (s < 16) {
+            ldt[i2++] = s;
+          } else {
+            var c = 0, n = 0;
+            if (s == 16)
+              n = 3 + bits(dat, pos, 3), pos += 2, c = ldt[i2 - 1];
+            else if (s == 17)
+              n = 3 + bits(dat, pos, 7), pos += 3;
+            else if (s == 18)
+              n = 11 + bits(dat, pos, 127), pos += 7;
+            while (n--)
+              ldt[i2++] = c;
+          }
+        }
+        var lt = ldt.subarray(0, hLit), dt = ldt.subarray(hLit);
+        lbt = max(lt);
+        dbt = max(dt);
+        lm = hMap(lt, lbt, 1);
+        dm = hMap(dt, dbt, 1);
+      } else
+        err(1);
+      if (pos > tbts) {
+        if (noSt)
+          err(0);
+        break;
+      }
+    }
+    if (resize)
+      cbuf(bt + 131072);
+    var lms = (1 << lbt) - 1, dms = (1 << dbt) - 1;
+    var lpos = pos;
+    for (;; lpos = pos) {
+      var c = lm[bits16(dat, pos) & lms], sym = c >> 4;
+      pos += c & 15;
+      if (pos > tbts) {
+        if (noSt)
+          err(0);
+        break;
+      }
+      if (!c)
+        err(2);
+      if (sym < 256)
+        buf[bt++] = sym;
+      else if (sym == 256) {
+        lpos = pos, lm = null;
+        break;
+      } else {
+        var add = sym - 254;
+        if (sym > 264) {
+          var i2 = sym - 257, b = fleb[i2];
+          add = bits(dat, pos, (1 << b) - 1) + fl[i2];
+          pos += b;
+        }
+        var d = dm[bits16(dat, pos) & dms], dsym = d >> 4;
+        if (!d)
+          err(3);
+        pos += d & 15;
+        var dt = fd[dsym];
+        if (dsym > 3) {
+          var b = fdeb[dsym];
+          dt += bits16(dat, pos) & (1 << b) - 1, pos += b;
+        }
+        if (pos > tbts) {
+          if (noSt)
+            err(0);
+          break;
+        }
+        if (resize)
+          cbuf(bt + 131072);
+        var end = bt + add;
+        if (bt < dt) {
+          var shift = dl - dt, dend = Math.min(dt, end);
+          if (shift + bt < 0)
+            err(3);
+          for (;bt < dend; ++bt)
+            buf[bt] = dict[shift + bt];
+        }
+        for (;bt < end; ++bt)
+          buf[bt] = buf[bt - dt];
+      }
+    }
+    st.l = lm, st.p = lpos, st.b = bt, st.f = final;
+    if (lm)
+      final = 1, st.m = lbt, st.d = dm, st.n = dbt;
+  } while (!final);
+  return bt != buf.length && noBuf ? slc(buf, 0, bt) : buf.subarray(0, bt);
+};
+var wbits = function(d, p, v) {
+  v <<= p & 7;
+  var o = p / 8 | 0;
+  d[o] |= v;
+  d[o + 1] |= v >> 8;
+};
+var wbits16 = function(d, p, v) {
+  v <<= p & 7;
+  var o = p / 8 | 0;
+  d[o] |= v;
+  d[o + 1] |= v >> 8;
+  d[o + 2] |= v >> 16;
+};
+var hTree = function(d, mb) {
+  var t2 = [];
+  for (var i2 = 0;i2 < d.length; ++i2) {
+    if (d[i2])
+      t2.push({ s: i2, f: d[i2] });
+  }
+  var s = t2.length;
+  var t22 = t2.slice();
+  if (!s)
+    return { t: et, l: 0 };
+  if (s == 1) {
+    var v = new u8(t2[0].s + 1);
+    v[t2[0].s] = 1;
+    return { t: v, l: 1 };
+  }
+  t2.sort(function(a, b) {
+    return a.f - b.f;
+  });
+  t2.push({ s: -1, f: 25001 });
+  var l = t2[0], r = t2[1], i0 = 0, i1 = 1, i22 = 2;
+  t2[0] = { s: -1, f: l.f + r.f, l, r };
+  while (i1 != s - 1) {
+    l = t2[t2[i0].f < t2[i22].f ? i0++ : i22++];
+    r = t2[i0 != i1 && t2[i0].f < t2[i22].f ? i0++ : i22++];
+    t2[i1++] = { s: -1, f: l.f + r.f, l, r };
+  }
+  var maxSym = t22[0].s;
+  for (var i2 = 1;i2 < s; ++i2) {
+    if (t22[i2].s > maxSym)
+      maxSym = t22[i2].s;
+  }
+  var tr = new u16(maxSym + 1);
+  var mbt = ln(t2[i1 - 1], tr, 0);
+  if (mbt > mb) {
+    var i2 = 0, dt = 0;
+    var lft = mbt - mb, cst = 1 << lft;
+    t22.sort(function(a, b) {
+      return tr[b.s] - tr[a.s] || a.f - b.f;
+    });
+    for (;i2 < s; ++i2) {
+      var i2_1 = t22[i2].s;
+      if (tr[i2_1] > mb) {
+        dt += cst - (1 << mbt - tr[i2_1]);
+        tr[i2_1] = mb;
+      } else
+        break;
+    }
+    dt >>= lft;
+    while (dt > 0) {
+      var i2_2 = t22[i2].s;
+      if (tr[i2_2] < mb)
+        dt -= 1 << mb - tr[i2_2]++ - 1;
+      else
+        ++i2;
+    }
+    for (;i2 >= 0 && dt; --i2) {
+      var i2_3 = t22[i2].s;
+      if (tr[i2_3] == mb) {
+        --tr[i2_3];
+        ++dt;
+      }
+    }
+    mbt = mb;
+  }
+  return { t: new u8(tr), l: mbt };
+};
+var ln = function(n, l, d) {
+  return n.s == -1 ? Math.max(ln(n.l, l, d + 1), ln(n.r, l, d + 1)) : l[n.s] = d;
+};
+var lc = function(c) {
+  var s = c.length;
+  while (s && !c[--s])
+    ;
+  var cl = new u16(++s);
+  var cli = 0, cln = c[0], cls = 1;
+  var w = function(v) {
+    cl[cli++] = v;
+  };
+  for (var i2 = 1;i2 <= s; ++i2) {
+    if (c[i2] == cln && i2 != s)
+      ++cls;
+    else {
+      if (!cln && cls > 2) {
+        for (;cls > 138; cls -= 138)
+          w(32754);
+        if (cls > 2) {
+          w(cls > 10 ? cls - 11 << 5 | 28690 : cls - 3 << 5 | 12305);
+          cls = 0;
+        }
+      } else if (cls > 3) {
+        w(cln), --cls;
+        for (;cls > 6; cls -= 6)
+          w(8304);
+        if (cls > 2)
+          w(cls - 3 << 5 | 8208), cls = 0;
+      }
+      while (cls--)
+        w(cln);
+      cls = 1;
+      cln = c[i2];
+    }
+  }
+  return { c: cl.subarray(0, cli), n: s };
+};
+var clen = function(cf, cl) {
+  var l = 0;
+  for (var i2 = 0;i2 < cl.length; ++i2)
+    l += cf[i2] * cl[i2];
+  return l;
+};
+var wfblk = function(out, pos, dat) {
+  var s = dat.length;
+  var o = shft(pos + 2);
+  out[o] = s & 255;
+  out[o + 1] = s >> 8;
+  out[o + 2] = out[o] ^ 255;
+  out[o + 3] = out[o + 1] ^ 255;
+  for (var i2 = 0;i2 < s; ++i2)
+    out[o + i2 + 4] = dat[i2];
+  return (o + 4 + s) * 8;
+};
+var wblk = function(dat, out, final, syms, lf, df, eb, li, bs, bl, p) {
+  wbits(out, p++, final);
+  ++lf[256];
+  var _a3 = hTree(lf, 15), dlt = _a3.t, mlb = _a3.l;
+  var _b2 = hTree(df, 15), ddt = _b2.t, mdb = _b2.l;
+  var _c = lc(dlt), lclt = _c.c, nlc = _c.n;
+  var _d = lc(ddt), lcdt = _d.c, ndc = _d.n;
+  var lcfreq = new u16(19);
+  for (var i2 = 0;i2 < lclt.length; ++i2)
+    ++lcfreq[lclt[i2] & 31];
+  for (var i2 = 0;i2 < lcdt.length; ++i2)
+    ++lcfreq[lcdt[i2] & 31];
+  var _e = hTree(lcfreq, 7), lct = _e.t, mlcb = _e.l;
+  var nlcc = 19;
+  for (;nlcc > 4 && !lct[clim[nlcc - 1]]; --nlcc)
+    ;
+  var flen = bl + 5 << 3;
+  var ftlen = clen(lf, flt) + clen(df, fdt) + eb;
+  var dtlen = clen(lf, dlt) + clen(df, ddt) + eb + 14 + 3 * nlcc + clen(lcfreq, lct) + 2 * lcfreq[16] + 3 * lcfreq[17] + 7 * lcfreq[18];
+  if (bs >= 0 && flen <= ftlen && flen <= dtlen)
+    return wfblk(out, p, dat.subarray(bs, bs + bl));
+  var lm, ll, dm, dl;
+  wbits(out, p, 1 + (dtlen < ftlen)), p += 2;
+  if (dtlen < ftlen) {
+    lm = hMap(dlt, mlb, 0), ll = dlt, dm = hMap(ddt, mdb, 0), dl = ddt;
+    var llm = hMap(lct, mlcb, 0);
+    wbits(out, p, nlc - 257);
+    wbits(out, p + 5, ndc - 1);
+    wbits(out, p + 10, nlcc - 4);
+    p += 14;
+    for (var i2 = 0;i2 < nlcc; ++i2)
+      wbits(out, p + 3 * i2, lct[clim[i2]]);
+    p += 3 * nlcc;
+    var lcts = [lclt, lcdt];
+    for (var it = 0;it < 2; ++it) {
+      var clct = lcts[it];
+      for (var i2 = 0;i2 < clct.length; ++i2) {
+        var len = clct[i2] & 31;
+        wbits(out, p, llm[len]), p += lct[len];
+        if (len > 15)
+          wbits(out, p, clct[i2] >> 5 & 127), p += clct[i2] >> 12;
+      }
+    }
+  } else {
+    lm = flm, ll = flt, dm = fdm, dl = fdt;
+  }
+  for (var i2 = 0;i2 < li; ++i2) {
+    var sym = syms[i2];
+    if (sym > 255) {
+      var len = sym >> 18 & 31;
+      wbits16(out, p, lm[len + 257]), p += ll[len + 257];
+      if (len > 7)
+        wbits(out, p, sym >> 23 & 31), p += fleb[len];
+      var dst = sym & 31;
+      wbits16(out, p, dm[dst]), p += dl[dst];
+      if (dst > 3)
+        wbits16(out, p, sym >> 5 & 8191), p += fdeb[dst];
+    } else {
+      wbits16(out, p, lm[sym]), p += ll[sym];
+    }
+  }
+  wbits16(out, p, lm[256]);
+  return p + ll[256];
+};
+var deo = /* @__PURE__ */ new i32([65540, 131080, 131088, 131104, 262176, 1048704, 1048832, 2114560, 2117632]);
+var et = /* @__PURE__ */ new u8(0);
+var dflt = function(dat, lvl, plvl, pre, post, st) {
+  var s = st.z || dat.length;
+  var o = new u8(pre + s + 5 * (1 + Math.ceil(s / 7000)) + post);
+  var w = o.subarray(pre, o.length - post);
+  var lst = st.l;
+  var pos = (st.r || 0) & 7;
+  if (lvl) {
+    if (pos)
+      w[0] = st.r >> 3;
+    var opt = deo[lvl - 1];
+    var n = opt >> 13, c = opt & 8191;
+    var msk_1 = (1 << plvl) - 1;
+    var prev = st.p || new u16(32768), head = st.h || new u16(msk_1 + 1);
+    var bs1_1 = Math.ceil(plvl / 3), bs2_1 = 2 * bs1_1;
+    var hsh = function(i3) {
+      return (dat[i3] ^ dat[i3 + 1] << bs1_1 ^ dat[i3 + 2] << bs2_1) & msk_1;
+    };
+    var syms = new i32(25000);
+    var lf = new u16(288), df = new u16(32);
+    var lc_1 = 0, eb = 0, i2 = st.i || 0, li = 0, wi = st.w || 0, bs = 0;
+    for (;i2 + 2 < s; ++i2) {
+      var hv = hsh(i2);
+      var imod = i2 & 32767, pimod = head[hv];
+      prev[imod] = pimod;
+      head[hv] = imod;
+      if (wi <= i2) {
+        var rem = s - i2;
+        if ((lc_1 > 7000 || li > 24576) && (rem > 423 || !lst)) {
+          pos = wblk(dat, w, 0, syms, lf, df, eb, li, bs, i2 - bs, pos);
+          li = lc_1 = eb = 0, bs = i2;
+          for (var j = 0;j < 286; ++j)
+            lf[j] = 0;
+          for (var j = 0;j < 30; ++j)
+            df[j] = 0;
+        }
+        var l = 2, d = 0, ch_1 = c, dif = imod - pimod & 32767;
+        if (rem > 2 && hv == hsh(i2 - dif)) {
+          var maxn = Math.min(n, rem) - 1;
+          var maxd = Math.min(32767, i2);
+          var ml = Math.min(258, rem);
+          while (dif <= maxd && --ch_1 && imod != pimod) {
+            if (dat[i2 + l] == dat[i2 + l - dif]) {
+              var nl = 0;
+              for (;nl < ml && dat[i2 + nl] == dat[i2 + nl - dif]; ++nl)
+                ;
+              if (nl > l) {
+                l = nl, d = dif;
+                if (nl > maxn)
+                  break;
+                var mmd = Math.min(dif, nl - 2);
+                var md = 0;
+                for (var j = 0;j < mmd; ++j) {
+                  var ti = i2 - dif + j & 32767;
+                  var pti = prev[ti];
+                  var cd = ti - pti & 32767;
+                  if (cd > md)
+                    md = cd, pimod = ti;
+                }
+              }
+            }
+            imod = pimod, pimod = prev[imod];
+            dif += imod - pimod & 32767;
+          }
+        }
+        if (d) {
+          syms[li++] = 268435456 | revfl[l] << 18 | revfd[d];
+          var lin = revfl[l] & 31, din = revfd[d] & 31;
+          eb += fleb[lin] + fdeb[din];
+          ++lf[257 + lin];
+          ++df[din];
+          wi = i2 + l;
+          ++lc_1;
+        } else {
+          syms[li++] = dat[i2];
+          ++lf[dat[i2]];
+        }
+      }
+    }
+    for (i2 = Math.max(i2, wi);i2 < s; ++i2) {
+      syms[li++] = dat[i2];
+      ++lf[dat[i2]];
+    }
+    pos = wblk(dat, w, lst, syms, lf, df, eb, li, bs, i2 - bs, pos);
+    if (!lst) {
+      st.r = pos & 7 | w[pos / 8 | 0] << 3;
+      pos -= 7;
+      st.h = head, st.p = prev, st.i = i2, st.w = wi;
+    }
+  } else {
+    for (var i2 = st.w || 0;i2 < s + lst; i2 += 65535) {
+      var e = i2 + 65535;
+      if (e >= s) {
+        w[pos / 8 | 0] = lst;
+        e = s;
+      }
+      pos = wfblk(w, pos + 1, dat.subarray(i2, e));
+    }
+    st.i = s;
+  }
+  return slc(o, 0, pre + shft(pos) + post);
+};
+var crct = /* @__PURE__ */ function() {
+  var t2 = new Int32Array(256);
+  for (var i2 = 0;i2 < 256; ++i2) {
+    var c = i2, k2 = 9;
+    while (--k2)
+      c = (c & 1 && -306674912) ^ c >>> 1;
+    t2[i2] = c;
+  }
+  return t2;
+}();
+var crc = function() {
+  var c = -1;
+  return {
+    p: function(d) {
+      var cr = c;
+      for (var i2 = 0;i2 < d.length; ++i2)
+        cr = crct[cr & 255 ^ d[i2]] ^ cr >>> 8;
+      c = cr;
+    },
+    d: function() {
+      return ~c;
+    }
+  };
+};
+var dopt = function(dat, opt, pre, post, st) {
+  if (!st) {
+    st = { l: 1 };
+    if (opt.dictionary) {
+      var dict = opt.dictionary.subarray(-32768);
+      var newDat = new u8(dict.length + dat.length);
+      newDat.set(dict);
+      newDat.set(dat, dict.length);
+      dat = newDat;
+      st.w = dict.length;
+    }
+  }
+  return dflt(dat, opt.level == null ? 6 : opt.level, opt.mem == null ? st.l ? Math.ceil(Math.max(8, Math.min(13, Math.log(dat.length))) * 1.5) : 20 : 12 + opt.mem, pre, post, st);
+};
+var mrg = function(a, b) {
+  var o = {};
+  for (var k2 in a)
+    o[k2] = a[k2];
+  for (var k2 in b)
+    o[k2] = b[k2];
+  return o;
+};
+var b2 = function(d, b) {
+  return d[b] | d[b + 1] << 8;
+};
+var b4 = function(d, b) {
+  return (d[b] | d[b + 1] << 8 | d[b + 2] << 16 | d[b + 3] << 24) >>> 0;
+};
+var b8 = function(d, b) {
+  return b4(d, b) + b4(d, b + 4) * 4294967296;
+};
+var wbytes = function(d, b, v) {
+  for (;v; ++b)
+    d[b] = v, v >>>= 8;
+};
+function deflateSync(data, opts) {
+  return dopt(data, opts || {}, 0, 0);
+}
+function inflateSync(data, opts) {
+  return inflt(data, { i: 2 }, opts && opts.out, opts && opts.dictionary);
+}
+var fltn = function(d, p, t2, o) {
+  for (var k2 in d) {
+    var val = d[k2], n = p + k2, op = o;
+    if (Array.isArray(val))
+      op = mrg(o, val[1]), val = val[0];
+    if (ArrayBuffer.isView(val))
+      t2[n] = [val, op];
+    else {
+      t2[n += "/"] = [new u8(0), op];
+      fltn(val, n, t2, o);
+    }
+  }
+};
+var te = typeof TextEncoder != "undefined" && /* @__PURE__ */ new TextEncoder;
+var td = typeof TextDecoder != "undefined" && /* @__PURE__ */ new TextDecoder;
+var tds = 0;
+try {
+  td.decode(et, { stream: true });
+  tds = 1;
+} catch (e) {}
+var dutf8 = function(d) {
+  for (var r = "", i2 = 0;; ) {
+    var c = d[i2++];
+    var eb = (c > 127) + (c > 223) + (c > 239);
+    if (i2 + eb > d.length)
+      return { s: r, r: slc(d, i2 - 1) };
+    if (!eb)
+      r += String.fromCharCode(c);
+    else if (eb == 3) {
+      c = ((c & 15) << 18 | (d[i2++] & 63) << 12 | (d[i2++] & 63) << 6 | d[i2++] & 63) - 65536, r += String.fromCharCode(55296 | c >> 10, 56320 | c & 1023);
+    } else if (eb & 1)
+      r += String.fromCharCode((c & 31) << 6 | d[i2++] & 63);
+    else
+      r += String.fromCharCode((c & 15) << 12 | (d[i2++] & 63) << 6 | d[i2++] & 63);
+  }
+};
+function strToU8(str, latin1) {
+  if (latin1) {
+    var ar_1 = new u8(str.length);
+    for (var i2 = 0;i2 < str.length; ++i2)
+      ar_1[i2] = str.charCodeAt(i2);
+    return ar_1;
+  }
+  if (te)
+    return te.encode(str);
+  var l = str.length;
+  var ar = new u8(str.length + (str.length >> 1));
+  var ai = 0;
+  var w = function(v) {
+    ar[ai++] = v;
+  };
+  for (var i2 = 0;i2 < l; ++i2) {
+    if (ai + 5 > ar.length) {
+      var n = new u8(ai + 8 + (l - i2 << 1));
+      n.set(ar);
+      ar = n;
+    }
+    var c = str.charCodeAt(i2);
+    if (c < 128 || latin1)
+      w(c);
+    else if (c < 2048)
+      w(192 | c >> 6), w(128 | c & 63);
+    else if (c > 55295 && c < 57344)
+      c = 65536 + (c & 1023 << 10) | str.charCodeAt(++i2) & 1023, w(240 | c >> 18), w(128 | c >> 12 & 63), w(128 | c >> 6 & 63), w(128 | c & 63);
+    else
+      w(224 | c >> 12), w(128 | c >> 6 & 63), w(128 | c & 63);
+  }
+  return slc(ar, 0, ai);
+}
+function strFromU8(dat, latin1) {
+  if (latin1) {
+    var r = "";
+    for (var i2 = 0;i2 < dat.length; i2 += 16384)
+      r += String.fromCharCode.apply(null, dat.subarray(i2, i2 + 16384));
+    return r;
+  } else if (td) {
+    return td.decode(dat);
+  } else {
+    var _a3 = dutf8(dat), s = _a3.s, r = _a3.r;
+    if (r.length)
+      err(8);
+    return s;
+  }
+}
+var slzh = function(d, b) {
+  return b + 30 + b2(d, b + 26) + b2(d, b + 28);
+};
+var zh = function(d, b, z2) {
+  var fnl = b2(d, b + 28), efl = b2(d, b + 30), fn = strFromU8(d.subarray(b + 46, b + 46 + fnl), !(b2(d, b + 8) & 2048)), es = b + 46 + fnl;
+  var _a3 = z64hs(d, es, efl, z2, b4(d, b + 20), b4(d, b + 24), b4(d, b + 42)), sc = _a3[0], su = _a3[1], off = _a3[2];
+  return [b2(d, b + 10), sc, su, fn, es + efl + b2(d, b + 32), off];
+};
+var z64hs = function(d, b, l, z2, sc, su, off) {
+  var nsc = sc == 4294967295, nsu = su == 4294967295, noff = off == 4294967295, e = b + l;
+  var nf = nsc + nsu + noff;
+  if (z2 && nf) {
+    for (;b + 4 < e; b += 4 + b2(d, b + 2)) {
+      if (b2(d, b) == 1) {
+        return [
+          nsc ? b8(d, b + 4 + 8 * nsu) : sc,
+          nsu ? b8(d, b + 4) : su,
+          noff ? b8(d, b + 4 + 8 * (nsu + nsc)) : off,
+          1
+        ];
+      }
+    }
+    if (z2 < 2)
+      err(13);
+  }
+  return [sc, su, off, 0];
+};
+var exfl = function(ex) {
+  var le = 0;
+  if (ex) {
+    for (var k2 in ex) {
+      var l = ex[k2].length;
+      if (l > 65535)
+        err(9);
+      le += l + 4;
+    }
+  }
+  return le;
+};
+var wzh = function(d, b, f, fn, u, c, ce, co) {
+  var fl2 = fn.length, ex = f.extra, col = co && co.length;
+  var exl = exfl(ex);
+  wbytes(d, b, ce != null ? 33639248 : 67324752), b += 4;
+  if (ce != null)
+    d[b++] = 20, d[b++] = f.os;
+  d[b] = 20, b += 2;
+  d[b++] = f.flag << 1 | (c < 0 && 8), d[b++] = u && 8;
+  d[b++] = f.compression & 255, d[b++] = f.compression >> 8;
+  var dt = new Date(f.mtime == null ? Date.now() : f.mtime), y = dt.getFullYear() - 1980;
+  if (y < 0 || y > 119)
+    err(10);
+  wbytes(d, b, y << 25 | dt.getMonth() + 1 << 21 | dt.getDate() << 16 | dt.getHours() << 11 | dt.getMinutes() << 5 | dt.getSeconds() >> 1), b += 4;
+  if (c != -1) {
+    wbytes(d, b, f.crc);
+    wbytes(d, b + 4, c < 0 ? -c - 2 : c);
+    wbytes(d, b + 8, f.size);
+  }
+  wbytes(d, b + 12, fl2);
+  wbytes(d, b + 14, exl), b += 16;
+  if (ce != null) {
+    wbytes(d, b, col);
+    wbytes(d, b + 6, f.attrs);
+    wbytes(d, b + 10, ce), b += 14;
+  }
+  d.set(fn, b);
+  b += fl2;
+  if (exl) {
+    for (var k2 in ex) {
+      var exf = ex[k2], l = exf.length;
+      wbytes(d, b, +k2);
+      wbytes(d, b + 2, l);
+      d.set(exf, b + 4), b += 4 + l;
+    }
+  }
+  if (col)
+    d.set(co, b), b += col;
+  return b;
+};
+var wzf = function(o, b, c, d, e) {
+  wbytes(o, b, 101010256);
+  wbytes(o, b + 8, c);
+  wbytes(o, b + 10, c);
+  wbytes(o, b + 12, d);
+  wbytes(o, b + 16, e);
+};
+function zipSync(data, opts) {
+  if (!opts)
+    opts = {};
+  var r = {};
+  var files = [];
+  fltn(data, "", r, opts);
+  var o = 0;
+  var tot = 0;
+  for (var fn in r) {
+    var _a3 = r[fn], file2 = _a3[0], p = _a3[1];
+    var compression = p.level == 0 ? 0 : 8;
+    var f = strToU8(fn), s = f.length;
+    var com = p.comment, m = com && strToU8(com), ms = m && m.length;
+    var exl = exfl(p.extra);
+    if (s > 65535)
+      err(11);
+    var d = compression ? deflateSync(file2, p) : file2, l = d.length;
+    var c = crc();
+    c.p(file2);
+    files.push(mrg(p, {
+      size: file2.length,
+      crc: c.d(),
+      c: d,
+      f,
+      m,
+      u: s != fn.length || m && com.length != ms,
+      o,
+      compression
+    }));
+    o += 30 + s + exl + l;
+    tot += 76 + 2 * (s + exl) + (ms || 0) + l;
+  }
+  var out = new u8(tot + 22), oe = o, cdl = tot - o;
+  for (var i2 = 0;i2 < files.length; ++i2) {
+    var f = files[i2];
+    wzh(out, f.o, f, f.f, f.u, f.c.length);
+    var badd = 30 + f.f.length + exfl(f.extra);
+    out.set(f.c, f.o + badd);
+    wzh(out, o, f, f.f, f.u, f.c.length, f.o, f.m), o += 16 + badd + (f.m ? f.m.length : 0);
+  }
+  wzf(out, o, files.length, cdl, oe);
+  return out;
+}
+function unzipSync(data, opts) {
+  var files = {};
+  var e = data.length - 22;
+  for (;b4(data, e) != 101010256; --e) {
+    if (!e || data.length - e > 65558)
+      err(13);
+  }
+  var c = b2(data, e + 8);
+  if (!c)
+    return {};
+  var o = b4(data, e + 16);
+  var z2 = b4(data, e - 20) == 117853008;
+  if (z2) {
+    var ze = b4(data, e - 12);
+    z2 = b4(data, ze) == 101075792;
+    if (z2) {
+      c = b4(data, ze + 32);
+      o = b4(data, ze + 48);
+    }
+  }
+  var fltr = opts && opts.filter;
+  for (var i2 = 0;i2 < c; ++i2) {
+    var _a3 = zh(data, o, z2), c_2 = _a3[0], sc = _a3[1], su = _a3[2], fn = _a3[3], no = _a3[4], off = _a3[5], b = slzh(data, off);
+    o = no;
+    if (!fltr || fltr({
+      name: fn,
+      size: sc,
+      originalSize: su,
+      compression: c_2
+    })) {
+      if (!c_2)
+        files[fn] = slc(data, b, b + sc);
+      else if (c_2 == 8)
+        files[fn] = inflateSync(data.subarray(b, b + sc), { out: new u8(su) });
+      else
+        err(14, "unknown compression type " + c_2);
+    }
+  }
+  return files;
+}
+
+// backend/src/services/text-export.ts
+function sanitizeSegment(value) {
+  const cleaned = value.replace(/[^a-zA-Z0-9_.-]+/g, "-").replace(/^-+|-+$/g, "");
+  return cleaned.length > 0 ? cleaned : "unnamed";
+}
+function refKey(repository, specId) {
+  return `${repository}::${specId}`;
+}
+function buildSpecIndex(specs) {
+  const byKey = new Map;
+  const byPath = new Map;
+  const byRef = new Map;
+  for (const s of specs) {
+    byKey.set(s.key, s);
+    byPath.set(`${sanitizeSegment(s.repository)}/${sanitizeSegment(s.spec_id)}`, s);
+    byRef.set(refKey(s.repository, s.spec_id), s);
+  }
+  return { byKey, byPath, byRef };
+}
+function putJson(files, path, value) {
+  files[path] = new TextEncoder().encode(`${JSON.stringify(value, null, 2)}
+`);
+}
+function buildTextExportZip(db) {
+  const specs = listSpecs(db, { limit: Number.MAX_SAFE_INTEGER, offset: 0 });
+  const index = buildSpecIndex(specs);
+  const files = {};
+  const relsBySource = new Map;
+  for (const rel of listAllRelationships(db)) {
+    const list = relsBySource.get(rel.source_spec_key) ?? [];
+    list.push(rel);
+    relsBySource.set(rel.source_spec_key, list);
+  }
   for (const spec of specs) {
     const overlay = getOverlay(db, spec.key);
     const metadata = {};
-    if (overlay) {
-      if (overlay.title)
-        metadata.displayTitle = overlay.title;
-      if (overlay.summary)
-        metadata.summary = overlay.summary;
-      if (overlay.owner)
-        metadata.owner = { name: overlay.owner };
-      if (overlay.theme)
-        metadata.theme = overlay.theme;
-      if (overlay.tags) {
-        try {
-          metadata.tags = JSON.parse(overlay.tags);
-        } catch {
-          metadata.tags = [];
-        }
-      }
-      if (overlay.target_release)
-        metadata.targetRelease = overlay.target_release;
-      if (overlay.retention_policy) {
-        try {
-          metadata.retentionPolicy = JSON.parse(overlay.retention_policy);
-        } catch {}
-      }
+    if (overlay?.title)
+      metadata.displayTitle = overlay.title;
+    if (overlay?.summary)
+      metadata.summary = overlay.summary;
+    if (overlay?.owner)
+      metadata.owner = { name: overlay.owner };
+    if (overlay?.theme)
+      metadata.theme = overlay.theme;
+    if (overlay?.tags) {
+      try {
+        metadata.tags = JSON.parse(overlay.tags);
+      } catch {}
     }
-    exported.push({
+    if (overlay?.target_release)
+      metadata.targetRelease = overlay.target_release;
+    if (overlay?.retention_policy) {
+      try {
+        metadata.retentionPolicy = JSON.parse(overlay.retention_policy);
+      } catch {}
+    }
+    const relationships = (relsBySource.get(spec.key) ?? []).map((rel) => {
+      const target = index.byKey.get(rel.target_spec_key);
+      if (!target)
+        return null;
+      return {
+        targetSpecId: target.spec_id,
+        targetRepository: target.repository,
+        type: rel.type
+      };
+    }).filter((r) => r !== null);
+    const sidecar = {
       schemaVersion: 1,
       specId: spec.spec_id,
-      metadata
+      metadata,
+      ...relationships.length > 0 ? { relationships } : {}
+    };
+    putJson(files, `specs/${sanitizeSegment(spec.repository)}/${sanitizeSegment(spec.spec_id)}.json`, sidecar);
+  }
+  const sources = listSources(db).map((s) => ({
+    id: s.id,
+    type: s.type,
+    path: s.path ?? undefined,
+    url: s.url ?? undefined,
+    branch: s.branch ?? undefined,
+    webUrlTemplate: s.web_url_template ?? undefined,
+    addedAt: s.added_at
+  }));
+  putJson(files, "sources.json", sources);
+  const suggestions = listAllSuggestions(db).map((row) => {
+    const source = index.byKey.get(row.source_spec_key);
+    const target = index.byKey.get(row.target_spec_key);
+    if (!source || !target)
+      return null;
+    return {
+      source: { specId: source.spec_id, repository: source.repository },
+      target: { specId: target.spec_id, repository: target.repository },
+      type: row.type,
+      confidence: row.confidence,
+      reason: row.reason,
+      evidence: row.evidence,
+      status: row.status,
+      createdAt: row.created_at,
+      resolvedAt: row.resolved_at ?? undefined,
+      dataHash: row.data_hash
+    };
+  }).filter((s) => s !== null);
+  putJson(files, "suggestions.json", suggestions);
+  const rejections = listAllRejections(db).map((row) => {
+    const source = index.byKey.get(row.source_spec_key);
+    const target = index.byKey.get(row.target_spec_key);
+    if (!source || !target)
+      return null;
+    return {
+      source: { specId: source.spec_id, repository: source.repository },
+      target: { specId: target.spec_id, repository: target.repository },
+      type: row.type,
+      dataHash: row.data_hash,
+      rejectedAt: row.rejected_at
+    };
+  }).filter((r) => r !== null);
+  putJson(files, "rejections.json", rejections);
+  const proposals = listAllProposals(db).map((row) => {
+    const spec = index.byKey.get(row.spec_key);
+    if (!spec)
+      return null;
+    let patch = {};
+    try {
+      patch = JSON.parse(row.patch);
+    } catch {}
+    return {
+      id: row.id,
+      spec: { specId: spec.spec_id, repository: spec.repository },
+      patch,
+      status: row.status,
+      submittedAt: row.submitted_at,
+      resolvedAt: row.resolved_at ?? undefined,
+      resolvedBy: row.resolved_by ?? undefined,
+      rationale: row.rationale ?? undefined,
+      source: row.source ?? undefined
+    };
+  }).filter((p) => p !== null);
+  putJson(files, "proposals.json", proposals);
+  const snapshots = listAllSnapshots(db).map((row) => {
+    const spec = index.byKey.get(row.spec_key);
+    if (!spec)
+      return null;
+    const artifacts = getSnapshotArtifacts(db, row.id);
+    return {
+      id: row.id,
+      spec: { specId: spec.spec_id, repository: spec.repository },
+      createdAt: row.created_at,
+      contentDigest: row.content_digest,
+      retentionPolicy: row.retention_policy ?? undefined,
+      purged: row.purged === 1,
+      purgedAt: row.purged_at ?? undefined,
+      artifactNames: artifacts.map((a) => a.name)
+    };
+  }).filter((s) => s !== null);
+  putJson(files, "snapshots.json", snapshots);
+  const auditEvents = listAllAuditEvents(db);
+  const auditLines = auditEvents.map((e) => {
+    const spec = e.spec_key ? index.byKey.get(e.spec_key) : undefined;
+    return JSON.stringify({
+      id: e.id,
+      operation: e.operation,
+      spec: spec ? { specId: spec.spec_id, repository: spec.repository } : undefined,
+      snapshotId: e.snapshot_id ?? undefined,
+      actor: e.actor,
+      timestamp: e.timestamp
     });
-  }
-  return {
+  });
+  files["audit-log.jsonl"] = new TextEncoder().encode(auditLines.length > 0 ? `${auditLines.join(`
+`)}
+` : "");
+  const manifest = {
+    schemaVersion: 1,
     exportedAt: new Date().toISOString(),
-    specs: exported
+    counts: {
+      sources: sources.length,
+      specs: specs.length,
+      suggestions: suggestions.length,
+      rejections: rejections.length,
+      proposals: proposals.length,
+      snapshots: snapshots.length,
+      auditEvents: auditEvents.length
+    }
   };
+  putJson(files, "manifest.json", manifest);
+  return zipSync(files, { level: 6 });
 }
-function previewImport(db, sidecars) {
-  const specs = listSpecs(db, { limit: 1e4, offset: 0 });
-  const existingKeys = new Set(specs.map((s) => s.spec_id));
-  let add = 0;
-  let modify = 0;
-  for (const sidecar of sidecars) {
-    if (existingKeys.has(sidecar.specId)) {
-      modify++;
-    } else {
-      add++;
+function applyTextExportZip(db, zipBytes) {
+  const MAX_UNCOMPRESSED_SIZE = 100 * 1024 * 1024;
+  let totalSize = 0;
+  const files = unzipSync(zipBytes);
+  for (const bytes of Object.values(files)) {
+    totalSize += bytes.length;
+    if (totalSize > MAX_UNCOMPRESSED_SIZE) {
+      throw new Error("Uploaded archive exceeds maximum allowed size");
     }
   }
-  const importIds = new Set(sidecars.map((s) => s.specId));
-  let remove = 0;
-  for (const specId of existingKeys) {
-    if (!importIds.has(specId)) {
-      const specRow = specs.find((s) => s.spec_id === specId);
-      if (specRow && getOverlay(db, specRow.key)) {
-        remove++;
-      }
-    }
-  }
-  return {
-    valid: true,
-    specCount: sidecars.length,
-    changes: { add, modify, remove }
+  const decoder = new TextDecoder;
+  const readJsonArray = (path) => {
+    const bytes = files[path];
+    if (!bytes)
+      return [];
+    const parsed = JSON.parse(decoder.decode(bytes));
+    return Array.isArray(parsed) ? parsed : [];
   };
-}
-function applyImport(db, sidecars) {
-  const specs = listSpecs(db, { limit: 1e4, offset: 0 });
-  const specBySpecId = new Map;
-  for (const s of specs) {
-    specBySpecId.set(s.spec_id, s);
-  }
-  let applied = 0;
-  for (const sidecar of sidecars) {
-    const specRow = specBySpecId.get(sidecar.specId);
-    if (!specRow)
+  const specs = listSpecs(db, { limit: Number.MAX_SAFE_INTEGER, offset: 0 });
+  const index = buildSpecIndex(specs);
+  const result = {
+    specsUpdated: [],
+    specsSkipped: [],
+    relationshipsApplied: 0,
+    suggestionsAdded: 0,
+    rejectionsAdded: 0,
+    proposalsAdded: 0,
+    errors: []
+  };
+  for (const [path, bytes] of Object.entries(files)) {
+    if (!path.startsWith("specs/") || !path.endsWith(".json"))
       continue;
-    const existing = getOverlay(db, specRow.key);
-    const expectedRevision = existing?.revision ?? 0;
+    let parsed;
+    try {
+      parsed = JSON.parse(decoder.decode(bytes));
+    } catch {
+      result.errors.push(`${path}: invalid JSON`);
+      continue;
+    }
+    const sidecarResult = SpecLibrarySidecarV1Schema.safeParse(parsed);
+    if (!sidecarResult.success) {
+      result.errors.push(`${path}: ${sidecarResult.error.issues.map((i2) => i2.message).join("; ")}`);
+      continue;
+    }
+    const sidecar = sidecarResult.data;
+    const pathParts = path.split("/");
+    if (pathParts.length < 3) {
+      result.errors.push(`${path}: invalid path format (expected specs/<repo>/<specId>.json)`);
+      continue;
+    }
+    const repoSegment = pathParts[1];
+    const specRow = index.byPath.get(`${repoSegment}/${sanitizeSegment(sidecar.specId)}`);
+    if (!specRow) {
+      result.specsSkipped.push(sidecar.specId);
+      continue;
+    }
     const patch = {};
     const m = sidecar.metadata;
     if (m.displayTitle)
@@ -25308,66 +26972,154 @@ function applyImport(db, sidecars) {
     if (m.retentionPolicy)
       patch.retentionPolicy = m.retentionPolicy;
     if (Object.keys(patch).length > 0) {
-      upsertOverlay(db, specRow.key, patch, expectedRevision);
-      applied++;
+      const existing = getOverlay(db, specRow.key);
+      upsertOverlay(db, specRow.key, patch, existing?.revision ?? 0);
     }
+    const resolvedRelationships = [];
+    for (const rel of sidecar.relationships ?? []) {
+      const targetRepo = rel.targetRepository ?? repoSegment;
+      const target = index.byRef.get(refKey(targetRepo, rel.targetSpecId));
+      if (!target) {
+        result.errors.push(`${path}: relationship target "${rel.targetSpecId}" not found`);
+        continue;
+      }
+      resolvedRelationships.push({ targetSpecKey: target.key, type: rel.type });
+    }
+    replaceOutgoingRelationships(db, specRow.key, resolvedRelationships);
+    result.relationshipsApplied += resolvedRelationships.length;
+    result.specsUpdated.push(sidecar.specId);
   }
-  return { applied };
+  const suggestionsParsed = TextExportSuggestionSchema.array().safeParse(readJsonArray("suggestions.json"));
+  if (suggestionsParsed.success) {
+    for (const s of suggestionsParsed.data) {
+      if (s.status !== "pending")
+        continue;
+      const source = index.byRef.get(refKey(s.source.repository, s.source.specId));
+      const target = index.byRef.get(refKey(s.target.repository, s.target.specId));
+      if (!source || !target)
+        continue;
+      const type = s.type;
+      if (suggestionExists(db, source.key, target.key, type))
+        continue;
+      createSuggestion(db, {
+        id: crypto.randomUUID(),
+        sourceSpecKey: source.key,
+        targetSpecKey: target.key,
+        type,
+        confidence: s.confidence,
+        reason: s.reason,
+        evidence: s.evidence,
+        dataHash: s.dataHash
+      });
+      result.suggestionsAdded++;
+    }
+  } else {
+    result.errors.push(`suggestions.json: ${suggestionsParsed.error.issues.map((i2) => i2.message).join("; ")}`);
+  }
+  const rejectionsParsed = TextExportRejectionSchema.array().safeParse(readJsonArray("rejections.json"));
+  if (rejectionsParsed.success) {
+    for (const r of rejectionsParsed.data) {
+      const source = index.byRef.get(refKey(r.source.repository, r.source.specId));
+      const target = index.byRef.get(refKey(r.target.repository, r.target.specId));
+      if (!source || !target)
+        continue;
+      const type = r.type;
+      if (isRejected(db, source.key, target.key, type, r.dataHash))
+        continue;
+      createRejection(db, {
+        sourceSpecKey: source.key,
+        targetSpecKey: target.key,
+        type,
+        dataHash: r.dataHash,
+        rejectedAt: r.rejectedAt
+      });
+      result.rejectionsAdded++;
+    }
+  } else {
+    result.errors.push(`rejections.json: ${rejectionsParsed.error.issues.map((i2) => i2.message).join("; ")}`);
+  }
+  const proposalsParsed = TextExportProposalSchema.array().safeParse(readJsonArray("proposals.json"));
+  if (proposalsParsed.success) {
+    for (const p of proposalsParsed.data) {
+      if (p.status !== "pending")
+        continue;
+      if (getProposal(db, p.id))
+        continue;
+      const spec = index.byRef.get(refKey(p.spec.repository, p.spec.specId));
+      if (!spec)
+        continue;
+      createProposal(db, {
+        id: p.id,
+        specKey: spec.key,
+        patch: p.patch,
+        submittedAt: p.submittedAt,
+        rationale: p.rationale,
+        source: p.source
+      });
+      result.proposalsAdded++;
+    }
+  } else {
+    result.errors.push(`proposals.json: ${proposalsParsed.error.issues.map((i2) => i2.message).join("; ")}`);
+  }
+  return result;
 }
-function importExportRoutes(deps) {
+
+// backend/src/routes/text-export.ts
+function textExportRoutes(deps) {
   const { db } = deps;
-  return new Elysia({ prefix: "" }).get("/export", () => {
-    const payload = buildExportPayload(db);
-    return new Response(JSON.stringify(payload, null, 2), {
+  return new Elysia({ prefix: "" }).get("/export/text", () => {
+    const zip = buildTextExportZip(db);
+    recordEvent(db, "text_export_created");
+    const filename = `spec-library-export-${new Date().toISOString().replace(/[:.]/g, "-")}.zip`;
+    return new Response(zip, {
       status: 200,
       headers: {
-        "Content-Type": "application/json",
-        "Content-Disposition": 'attachment; filename="spec-library.json"'
+        "Content-Type": "application/zip",
+        "Content-Disposition": `attachment; filename="${filename}"`
       }
     });
-  }).post("/import/preview", async ({ body, set }) => {
-    const parsed = SpecLibrarySidecarV1Schema.array().safeParse(body);
-    if (!parsed.success) {
+  }).post("/export/text/apply", async ({ request, set }) => {
+    let formData;
+    try {
+      formData = await request.formData();
+    } catch {
+      set.status = 400;
+      return { code: "INVALID_REQUEST", message: "Expected multipart/form-data body." };
+    }
+    const file2 = formData.get("file");
+    if (!(file2 instanceof File)) {
+      set.status = 400;
+      return { code: "FILE_REQUIRED", message: "No export archive was uploaded." };
+    }
+    const zipBytes = new Uint8Array(await file2.arrayBuffer());
+    let result;
+    try {
+      result = applyTextExportZip(db, zipBytes);
+    } catch (err2) {
       set.status = 400;
       return {
-        valid: false,
-        specCount: 0,
-        changes: { add: 0, modify: 0, remove: 0 },
-        errors: parsed.error.issues.map((i) => ({
-          path: i.path.join("."),
-          message: i.message
-        }))
+        code: "INVALID_EXPORT_FILE",
+        message: err2 instanceof Error ? err2.message : "Uploaded file could not be read as a text export archive."
       };
     }
-    const result = previewImport(db, parsed.data);
-    return result;
-  }).post("/import/apply", async ({ body, set }) => {
-    const parsed = SpecLibrarySidecarV1Schema.array().safeParse(body);
-    if (!parsed.success) {
-      set.status = 400;
-      return {
-        code: "VALIDATION_ERROR",
-        message: "Invalid sidecar payload"
-      };
-    }
-    const result = applyImport(db, parsed.data);
+    recordEvent(db, "text_export_applied");
     return result;
   });
 }
 
 // backend/src/router.ts
-function truncate(msg, max) {
-  return msg.length > max ? msg.slice(0, max - 1) + "\u2026" : msg;
+function truncate(msg, max2) {
+  return msg.length > max2 ? msg.slice(0, max2 - 1) + "\u2026" : msg;
 }
-function isKnownError(err) {
-  return err instanceof Error && typeof err.code === "string";
+function isKnownError(err2) {
+  return err2 instanceof Error && typeof err2.code === "string";
 }
-function isValidationError(err) {
-  return err instanceof Error && err.code === "VALIDATION_ERROR";
+function isValidationError(err2) {
+  return err2 instanceof Error && err2.code === "VALIDATION_ERROR";
 }
 function createRouter(deps) {
-  const { db, scanner, archiver, ready } = deps;
-  const app = new Elysia({ prefix: "/api" }).use(cors()).onError(({ error, set }) => {
+  const { db, scanner, archiver, ready, dataDir, mcpToken, enforceMcpAuth } = deps;
+  const app = new Elysia({ prefix: "/api" }).use(cors({ exposeHeaders: ["Content-Disposition"] })).onError(({ error, set }) => {
     const requestId = crypto.randomUUID();
     if (isValidationError(error)) {
       const details = (error.all ?? []).map((e) => ({
@@ -25396,6 +27148,18 @@ function createRouter(deps) {
       message: "An unexpected error occurred",
       requestId
     };
+  }).onBeforeHandle(({ request, path, set }) => {
+    if (!enforceMcpAuth || path.endsWith("/health"))
+      return;
+    const provided = request.headers.get("x-mcp-token");
+    if (!provided || provided !== mcpToken) {
+      set.status = 401;
+      return {
+        code: "UNAUTHORIZED",
+        message: "Missing or invalid X-MCP-Token",
+        requestId: crypto.randomUUID()
+      };
+    }
   }).get("/health", ({ set }) => {
     if (!ready()) {
       set.status = 503;
@@ -25416,7 +27180,7 @@ function createRouter(deps) {
     const syncStatus = lastSyncRow?.status ?? "never";
     const types2 = db.query("SELECT DISTINCT type FROM specs").all().map((r) => r.type);
     const stages = db.query("SELECT DISTINCT stage FROM specs").all().map((r) => r.stage);
-    const themes = db.query("SELECT DISTINCT theme FROM metadata WHERE theme IS NOT NULL AND theme != ''").all().map((r) => r.theme);
+    const themes = db.query("SELECT DISTINCT theme FROM metadata_overlays WHERE theme IS NOT NULL AND theme != ''").all().map((r) => r.theme);
     const owners = db.query("SELECT DISTINCT owner FROM specs WHERE owner IS NOT NULL AND owner != ''").all().map((r) => r.owner);
     const repositories = db.query("SELECT DISTINCT repository FROM specs WHERE repository IS NOT NULL AND repository != ''").all().map((r) => r.repository);
     return {
@@ -25432,7 +27196,32 @@ function createRouter(deps) {
         repositories
       }
     };
-  }).use(specRoutes({ db })).use(syncRoutes({ db, scanner })).use(settingsRoutes({ db })).use(archiveRoutes({ db, archiver })).use(relationshipRoutes({ db })).use(proposalRoutes({ db })).use(auditRoutes({ db })).use(importExportRoutes({ db }));
+  }).get("/spec-detail", ({ query, set }) => {
+    const key = query.key;
+    if (!key) {
+      set.status = 400;
+      return { code: "BAD_REQUEST", message: "key required" };
+    }
+    const spec = findByKey(db, key);
+    if (!spec) {
+      set.status = 404;
+      return { code: "NOT_FOUND", message: `Spec '${key}' not found` };
+    }
+    const overlay = getOverlay(db, spec.key);
+    const metadata = resolveMetadata({ title: spec.title, owner: spec.owner }, overlay ? overlayRowToMetadataOverlay(overlay) : null, null);
+    return { spec, metadata, revision: overlay?.revision ?? 0 };
+  }).get("/spec-suggestions", ({ query }) => {
+    const key = query.key ?? "";
+    return { suggestions: listPending(db, key) };
+  }).get("/spec-proposals", ({ query, set }) => {
+    const key = query.key ?? "";
+    const spec = findByKey(db, key);
+    if (!spec) {
+      set.status = 404;
+      return { code: "NOT_FOUND", message: "Spec not found" };
+    }
+    return { proposals: listPendingProposals(db, spec.key) };
+  }).use(specRoutes({ db })).use(syncRoutes({ db, scanner })).use(settingsRoutes({ db })).use(archiveRoutes({ db, archiver })).use(relationshipRoutes({ db })).use(proposalRoutes({ db })).use(auditRoutes({ db })).use(backupRoutes({ db, dataDir })).use(textExportRoutes({ db }));
   return app;
 }
 
@@ -25468,9 +27257,9 @@ async function validatePath(filePath, sourceRoot) {
     if (relFromReal.startsWith("..")) {
       return reject(`Symlink escapes source root: ${absolute} -> ${realFile}`);
     }
-  } catch (err) {
-    if (err.code !== "ENOENT") {
-      return reject(`Cannot resolve path: ${err.message}`);
+  } catch (err2) {
+    if (err2.code !== "ENOENT") {
+      return reject(`Cannot resolve path: ${err2.message}`);
     }
   }
   try {
@@ -25580,18 +27369,18 @@ function extractTitle(content, fallbackSlug) {
 }
 function calculateStage(artifacts, taskCounts) {
   if (artifacts["tasks.md"] && taskCounts.total > 0 && taskCounts.completed === taskCounts.total) {
-    return "completed";
+    return "done";
+  }
+  if (artifacts["tasks.md"] && taskCounts.total > 0 && taskCounts.completed > 0) {
+    return "in-flight";
   }
   if (artifacts["tasks.md"]) {
-    return "tasks";
+    return "refined";
   }
-  if (artifacts["design.md"]) {
-    return "design";
+  if (artifacts["design.md"] || artifacts["bugfix.md"] && !artifacts["requirements.md"]) {
+    return "scoped";
   }
-  if (artifacts["bugfix.md"] && !artifacts["requirements.md"]) {
-    return "bug_analysis";
-  }
-  return "requirements";
+  return "new";
 }
 function calculateProgress(artifacts, taskCounts) {
   let base = 0;
@@ -25918,7 +27707,7 @@ async function extractCreatedAt(repoPath, specPath) {
   }
 }
 async function extractCompletedAt(stage, repoPath, specPath) {
-  if (stage !== "completed")
+  if (stage !== "done")
     return;
   try {
     const output = await execGit(repoPath, ["log", "--format=%aI", "-1", "--", specPath]);
@@ -25933,7 +27722,7 @@ async function extractCompletedAt(stage, repoPath, specPath) {
 }
 async function autoPopulate(raw, repoPath, currentOwner) {
   const specPath = raw.relativePath;
-  const stage = isCompleted(raw.contents["tasks.md"]) ? "completed" : "tasks";
+  const stage = isCompleted(raw.contents["tasks.md"]) ? "done" : "in-flight";
   const [approversRaw, createdAt, completedAt] = await Promise.all([
     extractApprovers(repoPath, specPath),
     extractCreatedAt(repoPath, specPath),
@@ -25961,17 +27750,313 @@ function isCompleted(tasksContent) {
   return matches.every((m) => m[1] === "x");
 }
 
+// backend/src/services/suggester.ts
+import { createHash as createHash2 } from "crypto";
+var STOP_WORDS2 = new Set([
+  "the",
+  "a",
+  "an",
+  "and",
+  "or",
+  "but",
+  "in",
+  "on",
+  "at",
+  "to",
+  "for",
+  "of",
+  "with",
+  "by",
+  "from",
+  "is",
+  "are",
+  "was",
+  "were",
+  "be",
+  "been",
+  "being",
+  "have",
+  "has",
+  "had",
+  "do",
+  "does",
+  "did",
+  "will",
+  "would",
+  "could",
+  "should",
+  "may",
+  "might",
+  "shall",
+  "can",
+  "this",
+  "that",
+  "these",
+  "those",
+  "it",
+  "its",
+  "not",
+  "no",
+  "if",
+  "then",
+  "else"
+]);
+function tokenize(text) {
+  return text.toLowerCase().replace(/[^a-z0-9\s-]/g, " ").split(/\s+/).filter((t2) => t2.length > 2 && !STOP_WORDS2.has(t2));
+}
+function buildTfIdfVectors(documents) {
+  const N = documents.size;
+  if (N === 0)
+    return new Map;
+  const df = new Map;
+  const tokensByDoc = new Map;
+  for (const [key, content] of documents) {
+    const tokens = tokenize(content);
+    tokensByDoc.set(key, tokens);
+    const uniqueTerms = new Set(tokens);
+    for (const term of uniqueTerms) {
+      df.set(term, (df.get(term) ?? 0) + 1);
+    }
+  }
+  const vectors = new Map;
+  for (const [key, tokens] of tokensByDoc) {
+    const tf = new Map;
+    for (const token of tokens) {
+      tf.set(token, (tf.get(token) ?? 0) + 1);
+    }
+    const vector = new Map;
+    const docLen = tokens.length || 1;
+    for (const [term, count] of tf) {
+      const termFreq = count / docLen;
+      const inverseDocFreq = Math.log(N / (df.get(term) ?? 1));
+      const tfidf = termFreq * inverseDocFreq;
+      if (tfidf > 0) {
+        vector.set(term, tfidf);
+      }
+    }
+    vectors.set(key, vector);
+  }
+  return vectors;
+}
+function cosineSimilarity(a, b) {
+  if (a.size === 0 || b.size === 0)
+    return 0;
+  let dotProduct = 0;
+  let magnitudeA = 0;
+  let magnitudeB = 0;
+  for (const [term, weightA] of a) {
+    magnitudeA += weightA * weightA;
+    const weightB = b.get(term);
+    if (weightB !== undefined) {
+      dotProduct += weightA * weightB;
+    }
+  }
+  for (const [, weightB] of b) {
+    magnitudeB += weightB * weightB;
+  }
+  const magnitude = Math.sqrt(magnitudeA) * Math.sqrt(magnitudeB);
+  if (magnitude === 0)
+    return 0;
+  return Math.min(1, Math.max(0, dotProduct / magnitude));
+}
+function extractMarkdownLinks(content, currentSpecKey, knownKeys) {
+  const refs = [];
+  const specPathRegex = /\.kiro\/specs\/([a-z0-9-]+)/g;
+  let match;
+  while ((match = specPathRegex.exec(content)) !== null) {
+    const slug = match[1];
+    for (const key of knownKeys) {
+      if (key !== currentSpecKey && key.includes(slug)) {
+        refs.push({
+          targetKey: key,
+          context: content.slice(Math.max(0, match.index - 20), match.index + match[0].length + 20)
+        });
+        break;
+      }
+    }
+  }
+  const linkRegex = /\[([^\]]+)\]\(\.\.\/([a-z0-9-]+)\/?[^)]*\)/g;
+  while ((match = linkRegex.exec(content)) !== null) {
+    const slug = match[2];
+    for (const key of knownKeys) {
+      if (key !== currentSpecKey && key.includes(slug)) {
+        refs.push({
+          targetKey: key,
+          context: match[0]
+        });
+        break;
+      }
+    }
+  }
+  return refs;
+}
+function isProximate(a, b) {
+  if (a.provenance.repository !== b.provenance.repository)
+    return false;
+  const aDir = a.provenance.relativePath.replace(/\/[^/]+$/, "");
+  const bDir = b.provenance.relativePath.replace(/\/[^/]+$/, "");
+  return aDir === bDir;
+}
+function filterRejected(suggestions, rejections) {
+  const rejectionIndex = new Map;
+  for (const r of rejections) {
+    const key = `${r.sourceSpecKey}|${r.targetSpecKey}|${r.type}`;
+    rejectionIndex.set(key, r.dataHash);
+  }
+  return suggestions.filter((s) => {
+    const key = `${s.sourceSpecKey}|${s.targetSpecKey}|${s.type}`;
+    const rejectedHash = rejectionIndex.get(key);
+    return rejectedHash === undefined || rejectedHash !== s.dataHash;
+  });
+}
+function computeDataHash(specA, specB) {
+  const combined = [specA.contentDigest, specB.contentDigest].sort().join("|");
+  return createHash2("sha256").update(combined).digest("hex").slice(0, 16);
+}
+function generateAll(specs, metadataMap, contentMap = new Map, rejections = []) {
+  if (specs.length < 2)
+    return [];
+  const candidates = [];
+  const knownKeys = new Set(specs.map((s) => s.key));
+  const documents = new Map;
+  for (const spec of specs) {
+    const meta = metadataMap.get(spec.key);
+    const rawContent = contentMap.get(spec.key) ?? "";
+    const doc = [
+      spec.title,
+      meta?.theme ?? "",
+      (meta?.tags ?? []).join(" "),
+      rawContent
+    ].join(" ");
+    documents.set(spec.key, doc);
+  }
+  const vectors = buildTfIdfVectors(documents);
+  for (let i2 = 0;i2 < specs.length; i2++) {
+    const a = specs[i2];
+    const metaA = metadataMap.get(a.key);
+    for (let j = i2 + 1;j < specs.length; j++) {
+      const b = specs[j];
+      const metaB = metadataMap.get(b.key);
+      const dataHash = computeDataHash(a, b);
+      const base = {
+        id: "",
+        sourceSpecKey: a.key,
+        targetSpecKey: b.key,
+        type: "related",
+        status: "pending",
+        createdAt: new Date().toISOString(),
+        dataHash
+      };
+      const vecA = vectors.get(a.key);
+      const vecB = vectors.get(b.key);
+      if (vecA && vecB) {
+        const sim = cosineSimilarity(vecA, vecB);
+        if (sim >= SUGGESTION_THRESHOLD) {
+          candidates.push({
+            ...base,
+            id: crypto.randomUUID(),
+            confidence: sim,
+            reason: "content_similarity",
+            evidence: `Content similarity: ${(sim * 100).toFixed(0)}%`
+          });
+        }
+      }
+      const tagsA = metaA?.tags ?? [];
+      const tagsB = metaB?.tags ?? [];
+      const shared = tagsA.filter((t2) => tagsB.includes(t2));
+      if (shared.length > 0) {
+        const confidence = Math.min(1, CONFIDENCE_WEIGHTS.shared_tags_base + CONFIDENCE_WEIGHTS.shared_tags_increment * shared.length);
+        candidates.push({
+          ...base,
+          id: crypto.randomUUID(),
+          confidence,
+          reason: "shared_tags",
+          evidence: `Shared tags: ${shared.join(", ")}`
+        });
+      }
+      if (metaA?.theme && metaB?.theme && metaA.theme === metaB.theme) {
+        candidates.push({
+          ...base,
+          id: crypto.randomUUID(),
+          confidence: CONFIDENCE_WEIGHTS.shared_theme,
+          reason: "shared_theme",
+          evidence: `Shared theme: ${metaA.theme}`
+        });
+      }
+      if (isProximate(a, b)) {
+        candidates.push({
+          ...base,
+          id: crypto.randomUUID(),
+          confidence: CONFIDENCE_WEIGHTS.repository_proximity,
+          reason: "repository_proximity",
+          evidence: `Same spec directory: ${a.provenance.repository}`
+        });
+      }
+    }
+  }
+  for (const spec of specs) {
+    const rawContent = contentMap.get(spec.key) ?? "";
+    if (!rawContent)
+      continue;
+    const links = extractMarkdownLinks(rawContent, spec.key, knownKeys);
+    for (const link of links) {
+      const target = specs.find((s) => s.key === link.targetKey);
+      if (!target)
+        continue;
+      const dataHash = computeDataHash(spec, target);
+      candidates.push({
+        id: crypto.randomUUID(),
+        sourceSpecKey: spec.key,
+        targetSpecKey: link.targetKey,
+        type: "related",
+        confidence: CONFIDENCE_WEIGHTS.markdown_link,
+        reason: "markdown_link",
+        evidence: `Explicit link: ${link.context}`,
+        status: "pending",
+        createdAt: new Date().toISOString(),
+        dataHash
+      });
+    }
+  }
+  const deduped = new Map;
+  for (const c of candidates) {
+    const dedupKey = [c.sourceSpecKey, c.targetSpecKey, c.type].sort().join("|") + "|" + c.reason;
+    const existing = deduped.get(dedupKey);
+    if (!existing || c.confidence > existing.confidence) {
+      deduped.set(dedupKey, c);
+    }
+  }
+  let results = filterRejected([...deduped.values()], rejections);
+  results = results.filter((s) => s.confidence >= SUGGESTION_THRESHOLD);
+  results.sort((a, b) => b.confidence - a.confidence);
+  const countPerSpec = new Map;
+  const limited = [];
+  for (const s of results) {
+    const countA = countPerSpec.get(s.sourceSpecKey) ?? 0;
+    const countB = countPerSpec.get(s.targetSpecKey) ?? 0;
+    if (countA >= MAX_SUGGESTIONS_PER_SPEC || countB >= MAX_SUGGESTIONS_PER_SPEC) {
+      continue;
+    }
+    limited.push(s);
+    countPerSpec.set(s.sourceSpecKey, countA + 1);
+    countPerSpec.set(s.targetSpecKey, countB + 1);
+  }
+  return limited;
+}
+
 // backend/src/services/scanner.ts
-import { join as join2, relative as relative2 } from "path";
-import { readdirSync, existsSync } from "fs";
+import { join as join3, relative as relative2 } from "path";
+import { readdirSync as readdirSync2, existsSync as existsSync2 } from "fs";
 
 class ScannerService {
   db;
   dataDir;
+  archiver;
   inFlight = null;
-  constructor(db, dataDir) {
+  constructor(db, dataDir, archiver) {
     this.db = db;
     this.dataDir = dataDir;
+    this.archiver = archiver;
   }
   async triggerScan(sources) {
     if (this.inFlight) {
@@ -25990,23 +28075,30 @@ class ScannerService {
     const startedAt = new Date().toISOString();
     const errors = [];
     let specsDiscovered = 0;
+    const allSpecs = [];
+    const contentMap = new Map;
     insertScan(this.db, { runId, startedAt, status: "running" });
     for (const source of sources) {
       try {
-        const specs = await this.scanSource(source);
+        const specs = await this.scanSource(source, contentMap);
         specsDiscovered += specs.length;
-        for (const spec of specs) {
-          upsertSpec(this.db, spec);
-        }
-      } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        const category = this.categorizeError(err);
+        allSpecs.push(...specs);
+      } catch (err2) {
+        const message = err2 instanceof Error ? err2.message : String(err2);
+        const category = this.categorizeError(err2);
         errors.push({
           sourceId: source.id,
           category,
           message,
           timestamp: new Date().toISOString()
         });
+      }
+    }
+    if (allSpecs.length >= 2) {
+      try {
+        this.generateSuggestions(allSpecs, contentMap);
+      } catch (err2) {
+        console.warn("[scanner] Suggestion generation failed:", err2 instanceof Error ? err2.message : err2);
       }
     }
     const completedAt = new Date().toISOString();
@@ -26027,17 +28119,46 @@ class ScannerService {
       errors
     };
   }
-  async scanSource(source) {
+  generateSuggestions(specs, contentMap) {
+    const metadataMap = new Map;
+    for (const spec of specs) {
+      const overlay = getOverlay(this.db, spec.key);
+      metadataMap.set(spec.key, resolveMetadata(spec, overlay ? overlayRowToMetadataOverlay(overlay) : null, null));
+    }
+    const rejections = listAllRejections(this.db).map((r) => ({
+      sourceSpecKey: r.source_spec_key,
+      targetSpecKey: r.target_spec_key,
+      type: r.type,
+      dataHash: r.data_hash
+    }));
+    const suggestions = generateAll(specs, metadataMap, contentMap, rejections);
+    for (const s of suggestions) {
+      if (suggestionExists(this.db, s.sourceSpecKey, s.targetSpecKey, s.type))
+        continue;
+      createSuggestion(this.db, {
+        id: s.id,
+        sourceSpecKey: s.sourceSpecKey,
+        targetSpecKey: s.targetSpecKey,
+        type: s.type,
+        confidence: s.confidence,
+        reason: s.reason,
+        evidence: s.evidence,
+        dataHash: s.dataHash
+      });
+    }
+  }
+  async scanSource(source, contentMap) {
     if (source.type === "remote") {
       await this.refreshRemote(source);
     }
-    const repoPath = source.type === "local" ? source.path : join2(this.dataDir, "clones", source.id);
+    const repoPath = source.type === "local" ? source.path : join3(this.dataDir, "clones", source.id);
     const specDirs = this.discoverSpecDirs(repoPath, source.id);
     const results = [];
     for (const specDir of specDirs) {
       try {
         const raw = await this.readArtifacts(specDir, source);
         const normalized = normalize2(raw, source);
+        const rowid = upsertSpec(this.db, normalized);
         try {
           const existingOverlay = getOverlay(this.db, normalized.key);
           if (!existingOverlay) {
@@ -26073,17 +28194,46 @@ class ScannerService {
         } catch (autoErr) {
           console.warn(`[scanner] Auto-populate failed for ${specDir.slug}:`, autoErr instanceof Error ? autoErr.message : autoErr);
         }
+        const contentText = Object.values(raw.contents).join(`
+`);
+        contentMap.set(normalized.key, contentText);
+        let resolved;
+        try {
+          const overlay = getOverlay(this.db, normalized.key);
+          resolved = resolveMetadata(normalized, overlay ? overlayRowToMetadataOverlay(overlay) : null, null);
+          syncSpecFts(this.db, rowid, {
+            title: normalized.title,
+            content: contentText,
+            owner: normalized.owner,
+            theme: resolved.theme ?? "",
+            tags: resolved.tags.join(" "),
+            repository: normalized.provenance.repository
+          });
+        } catch (ftsErr) {
+          console.warn(`[scanner] FTS sync failed for ${specDir.slug}:`, ftsErr instanceof Error ? ftsErr.message : ftsErr);
+        }
+        if (normalized.stage === "done" && resolved) {
+          try {
+            const artifactContents = Object.entries(raw.contents).map(([name, content]) => ({
+              name,
+              content
+            }));
+            await this.archiver.maybeCreateSnapshot(normalized, resolved, artifactContents);
+          } catch (snapshotErr) {
+            console.warn(`[scanner] Snapshot auto-creation failed for ${specDir.slug}:`, snapshotErr instanceof Error ? snapshotErr.message : snapshotErr);
+          }
+        }
         results.push(normalized);
-      } catch (err) {
-        console.error(`[scanner] Failed to read spec ${specDir.slug} in source ${source.id}:`, err instanceof Error ? err.message : err);
+      } catch (err2) {
+        console.error(`[scanner] Failed to read spec ${specDir.slug} in source ${source.id}:`, err2 instanceof Error ? err2.message : err2);
       }
     }
     return results;
   }
   async refreshRemote(source) {
-    const clonePath = join2(this.dataDir, "clones", source.id);
+    const clonePath = join3(this.dataDir, "clones", source.id);
     const branch = source.branch ?? "main";
-    if (!existsSync(clonePath)) {
+    if (!existsSync2(clonePath)) {
       const cmd = buildCloneCommand(source.url, clonePath, branch);
       await this.execGit(cmd);
     } else {
@@ -26105,15 +28255,15 @@ class ScannerService {
     }
   }
   discoverSpecDirs(repoPath, sourceId) {
-    const specsRoot = join2(repoPath, ".kiro", "specs");
-    if (!existsSync(specsRoot)) {
+    const specsRoot = join3(repoPath, ".kiro", "specs");
+    if (!existsSync2(specsRoot)) {
       return [];
     }
-    const entries = readdirSync(specsRoot, { withFileTypes: true });
+    const entries = readdirSync2(specsRoot, { withFileTypes: true });
     const dirs = [];
     for (const entry of entries) {
       if (entry.isDirectory()) {
-        const absolutePath = join2(specsRoot, entry.name);
+        const absolutePath = join3(specsRoot, entry.name);
         const relativePath = relative2(repoPath, absolutePath);
         dirs.push({
           slug: entry.name,
@@ -26126,12 +28276,12 @@ class ScannerService {
     return dirs;
   }
   async readArtifacts(specDir, source) {
-    const repoPath = source.type === "local" ? source.path : join2(this.dataDir, "clones", source.id);
+    const repoPath = source.type === "local" ? source.path : join3(this.dataDir, "clones", source.id);
     const contents = {};
     let config = null;
     const artifactNames = Object.values(SPEC_ARTIFACTS);
     for (const filename of artifactNames) {
-      const filePath = join2(specDir.absolutePath, filename);
+      const filePath = join3(specDir.absolutePath, filename);
       const relFromRepo = relative2(repoPath, filePath);
       const validation = await validatePath(relFromRepo, repoPath);
       if (!validation.valid) {
@@ -26152,8 +28302,8 @@ class ScannerService {
             }
           }
         }
-      } catch (err) {
-        console.warn(`[scanner] Could not read ${filename} in ${specDir.slug}:`, err instanceof Error ? err.message : err);
+      } catch (err2) {
+        console.warn(`[scanner] Could not read ${filename} in ${specDir.slug}:`, err2 instanceof Error ? err2.message : err2);
       }
     }
     const provenance = await this.getProvenance(repoPath, specDir.relativePath);
@@ -26220,10 +28370,10 @@ ${stderr}`);
       clearTimeout(timeout);
     }
   }
-  categorizeError(err) {
-    if (!(err instanceof Error))
+  categorizeError(err2) {
+    if (!(err2 instanceof Error))
       return "io";
-    const msg = err.message.toLowerCase();
+    const msg = err2.message.toLowerCase();
     if (msg.includes("timeout") || msg.includes("timed out"))
       return "timeout";
     if (msg.includes("auth") || msg.includes("permission") || msg.includes("403") || msg.includes("401"))
@@ -26237,15 +28387,15 @@ ${stderr}`);
 }
 
 // backend/src/services/archiver.ts
-import { createHash as createHash2 } from "crypto";
+import { createHash as createHash3 } from "crypto";
 import { mkdir, writeFile, readFile, chmod, rm } from "fs/promises";
-import { join as join3 } from "path";
+import { join as join4 } from "path";
 function sha256(content) {
-  return createHash2("sha256").update(content).digest("hex");
+  return createHash3("sha256").update(content).digest("hex");
 }
 function computeContentDigest2(artifacts) {
   const sorted = [...artifacts].sort((a, b) => a.name.localeCompare(b.name));
-  const hash2 = createHash2("sha256");
+  const hash2 = createHash3("sha256");
   for (const a of sorted) {
     hash2.update(a.content);
   }
@@ -26260,7 +28410,7 @@ class ArchiverService {
     this.config = config;
   }
   async maybeCreateSnapshot(spec, metadata, artifactContents) {
-    if (spec.stage !== "completed") {
+    if (spec.stage !== "done") {
       return null;
     }
     const contentDigest = computeContentDigest2(artifactContents);
@@ -26269,7 +28419,7 @@ class ArchiverService {
       return null;
     }
     const snapshotId = crypto.randomUUID();
-    const snapshotDir = join3(this.config.archiveDir, snapshotId);
+    const snapshotDir = join4(this.config.archiveDir, snapshotId);
     try {
       const storedArtifacts = await this.storeArtifacts(snapshotId, snapshotDir, artifactContents);
       const snapshot = {
@@ -26339,11 +28489,11 @@ class ArchiverService {
         if (currentHash !== artifactRow.content_hash) {
           throw new Error(`Content hash mismatch for artifact "${artifactRow.name}" in snapshot ${snapshotId}: ` + `expected ${artifactRow.content_hash}, got ${currentHash}`);
         }
-      } catch (err) {
-        if (err instanceof Error && err.message.includes("hash mismatch")) {
-          throw err;
+      } catch (err2) {
+        if (err2 instanceof Error && err2.message.includes("hash mismatch")) {
+          throw err2;
         }
-        throw new Error(`Cannot read artifact "${artifactRow.name}" for snapshot ${snapshotId}: ${err.message}`);
+        throw new Error(`Cannot read artifact "${artifactRow.name}" for snapshot ${snapshotId}: ${err2.message}`);
       }
       artifacts.push({
         name: artifactRow.name,
@@ -26383,7 +28533,7 @@ class ArchiverService {
       throw new Error(`Purge not eligible: ${eligibility.reason}`);
     }
     purgeSnapshot(this.db, snapshotId);
-    const snapshotDir = join3(this.config.archiveDir, snapshotId);
+    const snapshotDir = join4(this.config.archiveDir, snapshotId);
     await rm(snapshotDir, { recursive: true, force: true });
     recordEvent(this.db, "snapshot_purged", {
       snapshotId,
@@ -26425,7 +28575,7 @@ class ArchiverService {
     const stored = [];
     for (const artifact of artifacts) {
       const contentHash = sha256(artifact.content);
-      const storagePath = join3(snapshotDir, artifact.name);
+      const storagePath = join4(snapshotDir, artifact.name);
       const sizeBytes = Buffer.byteLength(artifact.content, "utf-8");
       await writeFile(storagePath, artifact.content, { encoding: "utf-8" });
       await chmod(storagePath, 292);
@@ -26452,25 +28602,32 @@ class ArchiverService {
 
 // backend/src/index.ts
 var port = Number(process.env["PORT"]) || Number(process.env["SPEC_LIBRARY_PORT"]) || 3100;
-var dataDir = process.env["SPEC_LIBRARY_DATA_DIR"] || join4(process.cwd(), "data");
-var archiveDir = join4(dataDir, "archive");
+var dataDir = process.env["SPEC_LIBRARY_DATA_DIR"] || join5(process.cwd(), "data");
+var archiveDir = join5(dataDir, "archive");
 console.log("[startup] Kiro Spec Library backend starting...");
 var mcpToken = crypto.randomUUID();
 console.log(`[startup] MCP token generated: ${mcpToken.slice(0, 8)}...`);
-mkdirSync(dataDir, { recursive: true });
-mkdirSync(archiveDir, { recursive: true });
+var enforceMcpAuth = process.env["MCP_AUTH_ENFORCE"] === "1";
+mkdirSync2(dataDir, { recursive: true });
+mkdirSync2(archiveDir, { recursive: true });
+var mcpTokenPath = join5(dataDir, "mcp-token");
+writeFileSync2(mcpTokenPath, mcpToken, { mode: 384 });
+chmodSync(mcpTokenPath, 384);
 console.log("[startup] Opening database...");
 var db = createDatabase(dataDir);
 console.log("[startup] Running migrations...");
 runMigrations(db);
-var scanner = new ScannerService(db, dataDir);
 var archiver = new ArchiverService(db, { archiveDir });
+var scanner = new ScannerService(db, dataDir, archiver);
 var isReady = false;
 var app = createRouter({
   db,
   scanner,
   archiver,
-  ready: () => isReady
+  ready: () => isReady,
+  dataDir,
+  mcpToken,
+  enforceMcpAuth
 });
 var server = Bun.serve({
   port,
@@ -26487,8 +28644,8 @@ console.log(`[startup] Server listening on port ${server.port}`);
     } else {
       console.log("[startup] No sources configured \u2014 skipping initial scan");
     }
-  } catch (err) {
-    console.error("[startup] Initial scan failed:", err);
+  } catch (err2) {
+    console.error("[startup] Initial scan failed:", err2);
   } finally {
     isReady = true;
     console.log("[startup] Backend ready");
@@ -26500,8 +28657,8 @@ var scanInterval = setInterval(async () => {
     if (sources.length > 0) {
       await scanner.triggerScan(sources);
     }
-  } catch (err) {
-    console.error("[scan] Periodic scan failed:", err);
+  } catch (err2) {
+    console.error("[scan] Periodic scan failed:", err2);
   }
 }, DEFAULT_SCAN_INTERVAL_MS);
 process.on("SIGINT", () => shutdown("SIGINT"));

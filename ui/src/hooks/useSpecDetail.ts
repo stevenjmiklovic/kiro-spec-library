@@ -43,6 +43,7 @@ export interface SpecDetail {
 /** A pending metadata/relationship suggestion awaiting accept/reject. */
 export interface PendingSuggestion {
   id: string;
+  sourceSpecKey: string;
   targetSpecKey: string;
   type: string;
   confidence: number;
@@ -167,6 +168,7 @@ function normalizeSuggestions(raw: unknown): PendingSuggestion[] {
     .filter((s): s is Record<string, unknown> => !!s && typeof s === 'object')
     .map((s) => ({
       id: str(s['id']),
+      sourceSpecKey: str(s['source_spec_key'] ?? s['sourceSpecKey']),
       targetSpecKey: str(s['target_spec_key'] ?? s['targetSpecKey']),
       type: str(s['type'], 'related'),
       confidence: num(s['confidence']),
@@ -228,9 +230,9 @@ export function useSpecDetail(specKey: string | undefined): UseSpecDetailResult 
     setError(null);
     try {
       const [detailRes, sugRes, propRes] = await Promise.all([
-        api.fetch(`/specs/${encodeURIComponent(specKey)}`),
-        api.fetch(`/specs/${encodeURIComponent(specKey)}/suggestions`),
-        api.fetch(`/specs/${encodeURIComponent(specKey)}/proposals`),
+        api.fetch(`/spec-detail?key=${encodeURIComponent(specKey)}`),
+        api.fetch(`/spec-suggestions?key=${encodeURIComponent(specKey)}`),
+        api.fetch(`/spec-proposals?key=${encodeURIComponent(specKey)}`),
       ]);
       if (!detailRes.ok) throw new Error(`Failed to load spec: ${detailRes.status}`);
       const detailData: unknown = await detailRes.json();

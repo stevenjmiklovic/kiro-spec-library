@@ -111,6 +111,33 @@ export function specRoutes(deps: { db: Database }) {
       },
     )
     .get(
+      "/by-key",
+      ({ query, set }) => {
+        const key = query.key;
+        if (!key) {
+          set.status = 400;
+          return { code: "BAD_REQUEST", message: "key query parameter required" };
+        }
+        const spec = findByKey(db, key);
+        if (!spec) {
+          set.status = 404;
+          return { code: "NOT_FOUND", message: `Spec '${key}' not found` };
+        }
+
+        const overlay = getOverlay(db, spec.key);
+        const metadata = resolveMetadata(
+          { title: spec.title, owner: spec.owner } as any,
+          overlay ? overlayRowToMetadataOverlay(overlay) : null,
+          null,
+        );
+
+        return { spec, metadata, revision: overlay?.revision ?? 0 };
+      },
+      {
+        query: t.Object({ key: t.String() }),
+      },
+    )
+    .get(
       "/:id",
       ({ params, set }) => {
         const spec = findByKey(db, params.id);
