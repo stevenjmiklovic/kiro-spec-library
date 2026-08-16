@@ -297,7 +297,7 @@ export function applyTextExportZip(db: Database, zipBytes: Uint8Array): ApplyTex
     return Array.isArray(parsed) ? parsed : [];
   };
 
-  const specs = listSpecs(db, { limit: 10_000, offset: 0 });
+  const specs = listSpecs(db, { limit: Number.MAX_SAFE_INTEGER, offset: 0 });
   const index = buildSpecIndex(specs);
 
   const result: ApplyTextExportResult = {
