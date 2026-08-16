@@ -70,7 +70,7 @@ export async function restoreFromBackup(
     throw new InvalidBackupError("Uploaded file is not a SQLite database.");
   }
 
-  let tempDb: Database;
+  let tempDb: Database | undefined;
   try {
     tempDb = Database.deserialize(uploaded);
   } catch {
