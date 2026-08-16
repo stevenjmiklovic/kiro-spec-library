@@ -3050,3 +3050,37 @@ button.archive-row:hover {
 [data-theme="light"] .audit-log-panel__error {
   color: #e03131;
 }
+
+.error-boundary {
+  display: flex;
+  text-align: center;
+  background: var(--canvas-bg, #111115);
+  color: var(--canvas-text, #c1c2c5);
+  flex-direction: column;
+  justify-content: center;
+  align-items:  center;
+  gap: .5rem;
+  height: 100vh;
+  padding: 2rem;
+}
+
+.error-boundary h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.error-boundary p {
+  color: var(--canvas-text-muted, #909296);
+  max-width: 32rem;
+  margin: 0;
+  font-size: .85rem;
+}
+
+[data-theme="light"] .error-boundary {
+  color: #343a40;
+  background: #fff;
+}
+
+[data-theme="light"] .error-boundary p {
+  color: #868e96;
+}

@@ -13,9 +13,9 @@ if (typeof document !== 'undefined' && !document.querySelector(`link[href="${css
   document.head.appendChild(link);
 }
 import { AppChrome } from './components/AppChrome.js';
+import { ErrorBoundary } from './components/ErrorBoundary.js';
 import './styles/global.css';
 
-// Temporarily skip the ErrorBoundary — render AppProvider directly
 function AppProvider({
   children,
   overrides,
@@ -64,9 +64,11 @@ function AppContent() {
 
 export function App({ crewOverrides }: { crewOverrides?: Partial<CrewIntegration> } = {}) {
   return (
-    <AppProvider overrides={crewOverrides}>
-      <AppContent />
-    </AppProvider>
+    <ErrorBoundary>
+      <AppProvider overrides={crewOverrides}>
+        <AppContent />
+      </AppProvider>
+    </ErrorBoundary>
   );
 }
 

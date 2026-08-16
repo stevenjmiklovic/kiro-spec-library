@@ -1687,3 +1687,29 @@ button.archive-row:hover { background: #f5f3fb; }
   color: #868e96;
 }
 [data-theme='light'] .audit-log-panel__error { color: #e03131; }
+
+/* Error boundary fallback */
+.error-boundary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 100vh;
+  padding: 2rem;
+  text-align: center;
+  background: var(--canvas-bg, #111115);
+  color: var(--canvas-text, #c1c2c5);
+}
+.error-boundary h2 { margin: 0; font-size: 1.1rem; }
+.error-boundary p {
+  margin: 0;
+  max-width: 32rem;
+  color: var(--canvas-text-muted, #909296);
+  font-size: 0.85rem;
+}
+[data-theme='light'] .error-boundary {
+  background: #ffffff;
+  color: #343a40;
+}
+[data-theme='light'] .error-boundary p { color: #868e96; }

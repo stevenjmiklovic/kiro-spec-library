@@ -36,15 +36,6 @@ export function deleteRelationship(db: Database, id: string): void {
   stmt.run({ $id: id });
 }
 
-export function listBySpec(db: Database, specKey: string): RelationshipRow[] {
-  const stmt = db.prepare(`
-    SELECT * FROM relationships
-    WHERE source_spec_key = $spec_key OR target_spec_key = $spec_key
-    ORDER BY created_at DESC
-  `);
-  return stmt.all({ $spec_key: specKey }) as RelationshipRow[];
-}
-
 /** Every relationship in the database, for full-library export. */
 export function listAllRelationships(db: Database): RelationshipRow[] {
   const stmt = db.prepare("SELECT * FROM relationships ORDER BY created_at ASC");

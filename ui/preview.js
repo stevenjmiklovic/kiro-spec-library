@@ -29785,8 +29785,39 @@ function AppChrome({
   }, undefined, true, undefined, this);
 }
 
-// src/App.tsx
+// src/components/ErrorBoundary.tsx
+var import_react23 = __toESM(require_react(), 1);
 var jsx_dev_runtime17 = __toESM(require_jsx_dev_runtime(), 1);
+
+class ErrorBoundary extends import_react23.Component {
+  state = { error: null };
+  static getDerivedStateFromError(error) {
+    return { error };
+  }
+  componentDidCatch(error, info) {
+    console.error("[ErrorBoundary] Caught render error:", error, info.componentStack);
+  }
+  render() {
+    if (this.state.error) {
+      return /* @__PURE__ */ jsx_dev_runtime17.jsxDEV("div", {
+        role: "alert",
+        className: "error-boundary",
+        children: [
+          /* @__PURE__ */ jsx_dev_runtime17.jsxDEV("h2", {
+            children: "Something went wrong"
+          }, undefined, false, undefined, this),
+          /* @__PURE__ */ jsx_dev_runtime17.jsxDEV("p", {
+            children: this.state.error.message
+          }, undefined, false, undefined, this)
+        ]
+      }, undefined, true, undefined, this);
+    }
+    return this.props.children;
+  }
+}
+
+// src/App.tsx
+var jsx_dev_runtime18 = __toESM(require_jsx_dev_runtime(), 1);
 var cssUrl = new URL("./index.css", import.meta.url).href;
 if (typeof document !== "undefined" && !document.querySelector(`link[href="${cssUrl}"]`)) {
   const link2 = document.createElement("link");
@@ -29798,7 +29829,7 @@ function AppProvider({
   children: children2,
   overrides
 }) {
-  return /* @__PURE__ */ jsx_dev_runtime17.jsxDEV(CrewProvider, {
+  return /* @__PURE__ */ jsx_dev_runtime18.jsxDEV(CrewProvider, {
     overrides,
     children: children2
   }, undefined, false, undefined, this);
@@ -29807,52 +29838,54 @@ function AppContent() {
   const { ready, error } = useCrew();
   const [urlState, setUrlState] = useUrlState();
   if (error) {
-    return /* @__PURE__ */ jsx_dev_runtime17.jsxDEV("div", {
+    return /* @__PURE__ */ jsx_dev_runtime18.jsxDEV("div", {
       role: "alert",
       className: "crew-error",
       children: [
-        /* @__PURE__ */ jsx_dev_runtime17.jsxDEV("h2", {
+        /* @__PURE__ */ jsx_dev_runtime18.jsxDEV("h2", {
           children: "Integration Error"
         }, undefined, false, undefined, this),
-        /* @__PURE__ */ jsx_dev_runtime17.jsxDEV("p", {
+        /* @__PURE__ */ jsx_dev_runtime18.jsxDEV("p", {
           children: error
         }, undefined, false, undefined, this)
       ]
     }, undefined, true, undefined, this);
   }
   if (!ready) {
-    return /* @__PURE__ */ jsx_dev_runtime17.jsxDEV("div", {
+    return /* @__PURE__ */ jsx_dev_runtime18.jsxDEV("div", {
       className: "loading",
       "aria-busy": "true",
-      children: /* @__PURE__ */ jsx_dev_runtime17.jsxDEV("p", {
+      children: /* @__PURE__ */ jsx_dev_runtime18.jsxDEV("p", {
         children: "Initializing…"
       }, undefined, false, undefined, this)
     }, undefined, false, undefined, this);
   }
   const { view, themeMode } = urlState;
-  return /* @__PURE__ */ jsx_dev_runtime17.jsxDEV("div", {
+  return /* @__PURE__ */ jsx_dev_runtime18.jsxDEV("div", {
     "data-theme": themeMode,
     className: `app-root theme-${themeMode}`,
     children: [
-      /* @__PURE__ */ jsx_dev_runtime17.jsxDEV(AppChrome, {
+      /* @__PURE__ */ jsx_dev_runtime18.jsxDEV(AppChrome, {
         view,
         themeMode,
         onViewChange: (v) => setUrlState({ view: v }),
         onThemeChange: (m) => setUrlState({ themeMode: m })
       }, undefined, false, undefined, this),
-      view === "relationship" ? /* @__PURE__ */ jsx_dev_runtime17.jsxDEV(RelationshipView, {}, undefined, false, undefined, this) : /* @__PURE__ */ jsx_dev_runtime17.jsxDEV(ArchiveView, {}, undefined, false, undefined, this)
+      view === "relationship" ? /* @__PURE__ */ jsx_dev_runtime18.jsxDEV(RelationshipView, {}, undefined, false, undefined, this) : /* @__PURE__ */ jsx_dev_runtime18.jsxDEV(ArchiveView, {}, undefined, false, undefined, this)
     ]
   }, undefined, true, undefined, this);
 }
 function App({ crewOverrides } = {}) {
-  return /* @__PURE__ */ jsx_dev_runtime17.jsxDEV(AppProvider, {
-    overrides: crewOverrides,
-    children: /* @__PURE__ */ jsx_dev_runtime17.jsxDEV(AppContent, {}, undefined, false, undefined, this)
+  return /* @__PURE__ */ jsx_dev_runtime18.jsxDEV(ErrorBoundary, {
+    children: /* @__PURE__ */ jsx_dev_runtime18.jsxDEV(AppProvider, {
+      overrides: crewOverrides,
+      children: /* @__PURE__ */ jsx_dev_runtime18.jsxDEV(AppContent, {}, undefined, false, undefined, this)
+    }, undefined, false, undefined, this)
   }, undefined, false, undefined, this);
 }
 
 // src/preview.tsx
-var jsx_dev_runtime18 = __toESM(require_jsx_dev_runtime(), 1);
+var jsx_dev_runtime19 = __toESM(require_jsx_dev_runtime(), 1);
 var sampleSpecs = [
   { key: "agent-memory", title: "Agent Memory v2", type: "feature", stage: "scoped", progress: 66, owner: "Maya Chen", theme: "AI Foundations", repository: "crew-platform", indexed_at: "2026-06-02T10:00:00Z", relationships: [{ targetKey: "retention", type: "depends_on" }] },
   { key: "retention", title: "Memory retention controls", type: "feature", stage: "in-flight", progress: 78, owner: "Maya Chen", theme: "AI Foundations", repository: "crew-platform", indexed_at: "2026-07-14T10:00:00Z", suggestions: [{ targetKey: "usage-alerts", type: "related" }] },
@@ -30041,6 +30074,6 @@ var overrides = {
     }
   }
 };
-import_client.createRoot(document.getElementById("root")).render(/* @__PURE__ */ jsx_dev_runtime18.jsxDEV(App, {
+import_client.createRoot(document.getElementById("root")).render(/* @__PURE__ */ jsx_dev_runtime19.jsxDEV(App, {
   crewOverrides: overrides
 }, undefined, false, undefined, this));
