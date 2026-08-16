@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/wordmark-horizontal.png" alt="Kiro" width="200" />
+  <img src="assets/kiro-icon/wordmark-horizontal.png" alt="Kiro Spec Library" width="200" />
 </p>
 
 <h1 align="center">Spec Library</h1>
@@ -20,7 +20,7 @@
 ---
 
 <p align="center">
-  <img src="assets/hero-dark@2x.png" alt="Spec Library Hero" width="800" />
+  <img src="assets/kiro-icon/hero-dark@2x.png" alt="Spec Library Hero" width="800" />
 </p>
 
 A [Kiro Crew](https://kiro.dev/docs/crew/apps/) app that discovers `.kiro/specs/` artifacts from local and remote Git repositories, normalizes them into a browsable catalog, visualizes relationships on a dark graph canvas, archives completed specs as immutable snapshots, and provides an AI agent for metadata curation.
@@ -242,7 +242,7 @@ This project uses [changelog fragments](changes/README.md). Add a `changes/<name
 ---
 
 <p align="center">
-  <img src="assets/hero-dark@2x.png" alt="Spec Library Hero" width="800" />
+  <img src="assets/kiro-icon/hero-dark@2x.png" alt="Spec Library Hero" width="800" />
 </p>
 
 <p align="center">
