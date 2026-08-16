@@ -45,6 +45,58 @@ export function listBySpec(db: Database, specKey: string): RelationshipRow[] {
   return stmt.all({ $spec_key: specKey }) as RelationshipRow[];
 }
 
+/** Every relationship in the database, for full-library export. */
+export function listAllRelationships(db: Database): RelationshipRow[] {
+  const stmt = db.prepare("SELECT * FROM relationships ORDER BY created_at ASC");
+  return stmt.all() as RelationshipRow[];
+}
+
+/** Bulk-fetch relationships whose source is one of the given spec keys (for graph edge building). */
+export function listBySourceKeys(db: Database, specKeys: string[]): RelationshipRow[] {
+  if (specKeys.length === 0) return [];
+  const placeholders = specKeys.map((_, i) => `$k${i}`).join(", ");
+  const params: Record<string, string> = {};
+  specKeys.forEach((key, i) => {
+    params[`$k${i}`] = key;
+  });
+  const stmt = db.prepare(`
+    SELECT * FROM relationships
+    WHERE source_spec_key IN (${placeholders})
+  `);
+  return stmt.all(params) as RelationshipRow[];
+}
+
+/**
+ * Replace every outgoing relationship for `sourceSpecKey` with exactly the
+ * given set (delete then re-insert, in one transaction). Used by the
+ * textual/git export's apply path, where a spec's relationships file is the
+ * source of truth for that spec's outgoing relationships.
+ */
+export function replaceOutgoingRelationships(
+  db: Database,
+  sourceSpecKey: string,
+  relationships: Array<{ targetSpecKey: string; type: RelationshipType }>,
+): void {
+  db.transaction(() => {
+    db.prepare("DELETE FROM relationships WHERE source_spec_key = $source").run({
+      $source: sourceSpecKey,
+    });
+    const insert = db.prepare(`
+      INSERT INTO relationships (id, source_spec_key, target_spec_key, type, created_at)
+      VALUES ($id, $source_spec_key, $target_spec_key, $type, $created_at)
+    `);
+    for (const rel of relationships) {
+      insert.run({
+        $id: crypto.randomUUID(),
+        $source_spec_key: sourceSpecKey,
+        $target_spec_key: rel.targetSpecKey,
+        $type: rel.type,
+        $created_at: new Date().toISOString(),
+      });
+    }
+  })();
+}
+
 export function checkDuplicate(
   db: Database,
   sourceSpecKey: string,

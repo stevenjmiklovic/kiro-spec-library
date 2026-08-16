@@ -10,6 +10,7 @@ import {
 import GraphCanvas from '../components/GraphCanvas.js';
 import type { GraphSpec } from '../components/GraphCanvas.js';
 import { Y_AXIS_OPTIONS, type YAxisField } from '../components/GraphCanvas.js';
+import { X_AXIS_OPTIONS, type XAxisField } from '../components/GraphCanvas.js';
 import { DetailPanel } from '../components/DetailPanel.js';
 
 // ---------------------------------------------------------------------------
@@ -98,6 +99,7 @@ function normalizeSpec(record: unknown): GraphSpec {
     theme: str('theme'),
     progress: num('progress', 0),
     reviewed: !!(r['reviewed_at'] || r['reviewedAt']),
+    indexedAt: str('indexed_at') || str('indexedAt') || undefined,
     relationships: parseRelArray('relationships'),
     suggestions: parseRelArray('suggestions'),
   };
@@ -440,6 +442,18 @@ export function RelationshipView(): React.ReactElement {
           <div className="graph-with-rail">
             <div className="graph-column">
               <div className="graph-toolbar">
+                <label className="x-axis-selector">
+                  <span>X-axis:</span>
+                  <select
+                    value={urlState.xAxis}
+                    onChange={(e) => setUrlState({ xAxis: e.target.value as XAxisField })}
+                    aria-label="X-axis grouping"
+                  >
+                    {X_AXIS_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </label>
                 <label className="y-axis-selector">
                   <span>Y-axis:</span>
                   <select
@@ -460,6 +474,7 @@ export function RelationshipView(): React.ReactElement {
                   onSelect={handleCanvasSelect}
                   colorMode={urlState.themeMode}
                   yAxisField={urlState.yAxis}
+                  xAxisField={urlState.xAxis}
                 />
               </div>
 

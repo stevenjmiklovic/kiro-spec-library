@@ -41,6 +41,13 @@ export function createProposal(
     .get(params.id)!;
 }
 
+/** Every proposal in the database (any status), for full-library export. */
+export function listAllProposals(db: Database): ProposalRow[] {
+  return db
+    .query<ProposalRow, []>("SELECT * FROM proposals ORDER BY submitted_at ASC")
+    .all();
+}
+
 export function listPendingProposals(db: Database, specKey: string): ProposalRow[] {
   return db
     .query<ProposalRow, [string]>(

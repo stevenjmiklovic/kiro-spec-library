@@ -1,5 +1,6 @@
 import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
 import { useCallback, type KeyboardEvent } from 'react';
+import { Target, AlertTriangle, Zap, HelpCircle, type LucideIcon } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
 // Data shape
@@ -26,14 +27,14 @@ export interface SpecNodeData {
 export type SpecNodeType = Node<SpecNodeData>;
 
 // ---------------------------------------------------------------------------
-// Type glyphs — simple accessible text, no icon library
+// Type glyphs
 // ---------------------------------------------------------------------------
 
-const TYPE_GLYPHS: Record<SpecType, string> = {
-  feature: '◆',
-  bugfix: '⚠',
-  quick: '⚡',
-  unknown: '?',
+const TYPE_GLYPHS: Record<SpecType, LucideIcon> = {
+  feature: Target,
+  bugfix: AlertTriangle,
+  quick: Zap,
+  unknown: HelpCircle,
 };
 
 const TYPE_LABELS: Record<SpecType, string> = {
@@ -77,6 +78,7 @@ export function SpecNode({ data }: NodeProps<SpecNodeType>) {
 
   const ariaLabel = `${title}, ${TYPE_LABELS[type]}, ${stage}, ${progress}%`;
   const isSelected = selected ?? false;
+  const TypeGlyph = TYPE_GLYPHS[type];
 
   return (
     <button
@@ -95,7 +97,7 @@ export function SpecNode({ data }: NodeProps<SpecNodeType>) {
       {/* Header: type glyph + type label + reviewed badge */}
       <span className="spec-node__header">
         <span className="spec-node__glyph" aria-hidden="true">
-          {TYPE_GLYPHS[type]}
+          <TypeGlyph size={14} />
         </span>
         <span className="spec-node__type-label">{TYPE_LABELS[type]}</span>
         {reviewed && (

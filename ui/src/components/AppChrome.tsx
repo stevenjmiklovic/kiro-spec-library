@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { DatabaseBackup, Link, Moon, Sun } from 'lucide-react';
 import type { ThemeMode, ViewMode } from '../hooks/useUrlState.js';
+import { BackupPanel } from './BackupPanel.js';
 
 interface Props {
   view: ViewMode;
@@ -20,6 +22,7 @@ export function AppChrome({
 }: Props): React.ReactElement {
   const nextTheme: ThemeMode = themeMode === 'dark' ? 'light' : 'dark';
   const [copyLabel, setCopyLabel] = useState('Copy link');
+  const [backupPanelOpen, setBackupPanelOpen] = useState(false);
 
   const handleCopyLink = (): void => {
     navigator.clipboard.writeText(window.location.href);
@@ -57,11 +60,23 @@ export function AppChrome({
       <div className="chrome-actions">
         <button
           type="button"
+          className="chrome-icon-btn"
+          onClick={() => setBackupPanelOpen(true)}
+          aria-label="Backup and restore"
+          title="Backup and restore"
+        >
+          <DatabaseBackup size={14} aria-hidden="true" />
+          Backup
+        </button>
+
+        <button
+          type="button"
           className="copy-link-btn"
           onClick={handleCopyLink}
           aria-label="Copy current page link"
           title="Copy current page link"
         >
+          <Link size={14} aria-hidden="true" />
           {copyLabel}
         </button>
 
@@ -72,9 +87,12 @@ export function AppChrome({
           aria-label={`Switch to ${nextTheme} theme`}
           title={`Switch to ${nextTheme} theme`}
         >
-          {themeMode === 'dark' ? '☾ Dark' : '☀ Light'}
+          {themeMode === 'dark' ? <Moon size={14} aria-hidden="true" /> : <Sun size={14} aria-hidden="true" />}
+          {themeMode === 'dark' ? 'Dark' : 'Light'}
         </button>
       </div>
+
+      {backupPanelOpen && <BackupPanel onClose={() => setBackupPanelOpen(false)} />}
     </div>
   );
 }

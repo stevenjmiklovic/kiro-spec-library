@@ -41,7 +41,11 @@ export type AuditOperation =
   | "suggestion_accepted"
   | "suggestion_rejected"
   | "snapshot_created"
-  | "snapshot_purged";
+  | "snapshot_purged"
+  | "backup_created"
+  | "backup_restored"
+  | "text_export_created"
+  | "text_export_applied";
 
 /** Scan error category */
 export type ScanErrorCategory =

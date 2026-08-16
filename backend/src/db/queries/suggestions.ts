@@ -15,6 +15,15 @@ export interface SuggestionRow {
   data_hash: string;
 }
 
+export interface RejectionRow {
+  id: string;
+  source_spec_key: string;
+  target_spec_key: string;
+  type: string;
+  data_hash: string;
+  rejected_at: string;
+}
+
 export function createSuggestion(
   db: Database,
   suggestion: {
@@ -93,6 +102,45 @@ export function rejectSuggestion(
   })();
 }
 
+/** Whether a suggestion between this source/target/type already exists, in any status. */
+export function suggestionExists(
+  db: Database,
+  sourceSpecKey: string,
+  targetSpecKey: string,
+  type: RelationshipType,
+): boolean {
+  const stmt = db.prepare(`
+    SELECT 1 FROM suggestions
+    WHERE source_spec_key = $source AND target_spec_key = $target AND type = $type
+    LIMIT 1
+  `);
+  return stmt.get({ $source: sourceSpecKey, $target: targetSpecKey, $type: type }) !== null;
+}
+
+/** Directly record a rejection dedup entry (used by the textual export's apply path). */
+export function createRejection(
+  db: Database,
+  rejection: {
+    sourceSpecKey: string;
+    targetSpecKey: string;
+    type: RelationshipType;
+    dataHash: string;
+    rejectedAt: string;
+  },
+): void {
+  db.prepare(`
+    INSERT INTO rejections (id, source_spec_key, target_spec_key, type, data_hash, rejected_at)
+    VALUES ($id, $source, $target, $type, $data_hash, $rejected_at)
+  `).run({
+    $id: crypto.randomUUID(),
+    $source: rejection.sourceSpecKey,
+    $target: rejection.targetSpecKey,
+    $type: rejection.type,
+    $data_hash: rejection.dataHash,
+    $rejected_at: rejection.rejectedAt,
+  });
+}
+
 export function listPending(
   db: Database,
   specKey?: string,
@@ -112,6 +160,33 @@ export function listPending(
     ORDER BY confidence DESC, created_at DESC
   `);
   return stmt.all() as SuggestionRow[];
+}
+
+/** Every suggestion in the database (any status), for full-library export. */
+export function listAllSuggestions(db: Database): SuggestionRow[] {
+  const stmt = db.prepare("SELECT * FROM suggestions ORDER BY created_at ASC");
+  return stmt.all() as SuggestionRow[];
+}
+
+/** Every dismissed-suggestion dedup record, for full-library export. */
+export function listAllRejections(db: Database): RejectionRow[] {
+  const stmt = db.prepare("SELECT * FROM rejections ORDER BY rejected_at ASC");
+  return stmt.all() as RejectionRow[];
+}
+
+/** Bulk-fetch pending suggestions whose source is one of the given spec keys (for graph edge building). */
+export function listPendingBySourceKeys(db: Database, specKeys: string[]): SuggestionRow[] {
+  if (specKeys.length === 0) return [];
+  const placeholders = specKeys.map((_, i) => `$k${i}`).join(", ");
+  const params: Record<string, string> = {};
+  specKeys.forEach((key, i) => {
+    params[`$k${i}`] = key;
+  });
+  const stmt = db.prepare(`
+    SELECT * FROM suggestions
+    WHERE status = 'pending' AND source_spec_key IN (${placeholders})
+  `);
+  return stmt.all(params) as SuggestionRow[];
 }
 
 export function isRejected(

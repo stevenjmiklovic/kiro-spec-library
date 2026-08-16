@@ -49,6 +49,7 @@ const app = createRouter({
   scanner,
   archiver,
   ready: () => isReady,
+  dataDir,
 });
 
 const server = Bun.serve({

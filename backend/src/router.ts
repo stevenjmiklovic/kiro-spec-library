@@ -16,6 +16,8 @@ import { relationshipRoutes } from "./routes/relationships.js";
 import { proposalRoutes } from "./routes/proposals.js";
 import { auditRoutes } from "./routes/audit.js";
 import { importExportRoutes } from "./routes/import-export.js";
+import { backupRoutes } from "./routes/backup.js";
+import { textExportRoutes } from "./routes/text-export.js";
 
 // ─── Dependency interface ────────────────────────────────────────────────────
 
@@ -24,6 +26,8 @@ export interface RouterDeps {
   scanner: ScannerService;
   archiver: ArchiverService;
   ready: () => boolean;
+  /** Application-owned storage root — needed by backup/restore for file-level DB swaps. */
+  dataDir: string;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -58,10 +62,13 @@ function isValidationError(err: unknown): err is ValidationError {
 // ─── Factory ─────────────────────────────────────────────────────────────────
 
 export function createRouter(deps: RouterDeps) {
-  const { db, scanner, archiver, ready } = deps;
+  const { db, scanner, archiver, ready, dataDir } = deps;
 
   const app = new Elysia({ prefix: "/api" })
-    .use(cors())
+    // Content-Disposition isn't in the CORS-safelisted response headers by
+    // default, so cross-origin fetch() can't read it (and downloads fall
+    // back to a generic filename) unless it's explicitly exposed here.
+    .use(cors({ exposeHeaders: ["Content-Disposition"] }))
     // Global error handler
     .onError(({ error, set }) => {
       const requestId = crypto.randomUUID();
@@ -189,7 +196,9 @@ export function createRouter(deps: RouterDeps) {
     .use(relationshipRoutes({ db }))
     .use(proposalRoutes({ db }))
     .use(auditRoutes({ db }))
-    .use(importExportRoutes({ db }));
+    .use(importExportRoutes({ db }))
+    .use(backupRoutes({ db, dataDir }))
+    .use(textExportRoutes({ db }));
 
   return app;
 }

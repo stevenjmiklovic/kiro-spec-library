@@ -207,6 +207,7 @@ beforeAll(async () => {
     scanner: { triggerScan: async () => {} } as any,
     archiver: { createSnapshot: async () => ({}) } as any,
     ready: () => true,
+    dataDir: tmpDir,
   });
 
   // Compose spec routes into the app
