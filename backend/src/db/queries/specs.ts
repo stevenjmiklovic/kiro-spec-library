@@ -65,11 +65,11 @@ export function upsertSpec(db: Database, spec: NormalizedSpec): number {
     INSERT INTO specs (
       key, source_id, spec_id, type, workflow, title, owner, stage, progress,
       repository, relative_path, branch, commit_hash, is_dirty, remote_url,
-      total_tasks, completed_tasks, content_digest, indexed_at, updated_at
+      total_tasks, completed_tasks, content_digest, indexed_at
     ) VALUES (
       $key, $source_id, $spec_id, $type, $workflow, $title, $owner, $stage, $progress,
       $repository, $relative_path, $branch, $commit_hash, $is_dirty, $remote_url,
-      $total_tasks, $completed_tasks, $content_digest, $indexed_at, $updated_at
+      $total_tasks, $completed_tasks, $content_digest, $indexed_at
     )
     ON CONFLICT(key) DO UPDATE SET
       source_id = excluded.source_id,
@@ -89,8 +89,7 @@ export function upsertSpec(db: Database, spec: NormalizedSpec): number {
       total_tasks = excluded.total_tasks,
       completed_tasks = excluded.completed_tasks,
       content_digest = excluded.content_digest,
-      indexed_at = excluded.indexed_at,
-      updated_at = excluded.updated_at
+      indexed_at = excluded.indexed_at
   `);
   stmt.run({
     $key: spec.key,
@@ -112,7 +111,6 @@ export function upsertSpec(db: Database, spec: NormalizedSpec): number {
     $completed_tasks: spec.taskCounts.completed,
     $content_digest: spec.contentDigest,
     $indexed_at: spec.indexedAt,
-    $updated_at: spec.indexedAt,
   });
 
   const row = db

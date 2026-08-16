@@ -8,9 +8,6 @@ export interface SourceRow {
   branch: string | null;
   web_url_template: string | null;
   added_at: string;
-  last_scan_at: string | null;
-  last_error: string | null;
-  last_error_at: string | null;
 }
 
 export function listSources(db: Database): SourceRow[] {

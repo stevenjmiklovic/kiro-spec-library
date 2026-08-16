@@ -145,10 +145,10 @@ function seedTestData(db: Database): void {
   const stmt = db.prepare(`
     INSERT INTO specs (key, source_id, spec_id, type, workflow, title, owner, stage, progress,
       repository, relative_path, branch, commit_hash, is_dirty, remote_url,
-      total_tasks, completed_tasks, content_digest, indexed_at, updated_at)
+      total_tasks, completed_tasks, content_digest, indexed_at)
     VALUES ($key, $source_id, $spec_id, $type, $workflow, $title, $owner, $stage, $progress,
       $repository, $relative_path, $branch, $commit_hash, $is_dirty, $remote_url,
-      $total_tasks, $completed_tasks, $content_digest, $indexed_at, $indexed_at)
+      $total_tasks, $completed_tasks, $content_digest, $indexed_at)
   `);
 
   for (const spec of specs) {

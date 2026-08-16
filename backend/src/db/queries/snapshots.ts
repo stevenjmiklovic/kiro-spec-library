@@ -8,8 +8,6 @@ export interface SnapshotRow {
   metadata_projection: string;
   provenance: string;
   retention_policy: string | null;
-  legal_hold_active: number;
-  legal_hold_reason: string | null;
   purged: number;
   purged_at: string | null;
 }
