@@ -493,7 +493,7 @@ declare const app: import("elysia").default<"/api", {
                     headers: unknown;
                     response: {
                         200: {
-                            sources: import("./db/queries/sources.js").SourceRow[];
+                            sources: import("@kiro-spec-library/shared").Source[];
                         };
                     };
                 };
@@ -568,7 +568,7 @@ declare const app: import("elysia").default<"/api", {
                             message: string;
                             sources?: undefined;
                         } | {
-                            sources: import("./db/queries/sources.js").SourceRow[];
+                            sources: import("@kiro-spec-library/shared").Source[];
                             code?: undefined;
                             message?: undefined;
                         };

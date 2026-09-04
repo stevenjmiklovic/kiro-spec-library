@@ -50,7 +50,7 @@ function attachRelationshipData(db: Database, specs: SpecRow[]) {
   const suggestions = listPendingBySourceKeys(db, keys);
 
   const sourceById = new Map(
-    listSources(db).map((s) => [s.id, { id: s.id, path: s.path, url: s.url }]),
+    listSources(db).map((s) => [s.id, { id: s.id, path: s.path ?? null, url: s.url ?? null }]),
   );
 
   const relsByKey = new Map<string, Array<{ targetKey: string; type: string }>>();

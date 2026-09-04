@@ -1,13 +1,13 @@
-import { zipSync, unzipSync } from "fflate";
-import { SpecLibrarySidecarV1Schema, TextExportSuggestionSchema, TextExportRejectionSchema, TextExportProposalSchema, } from "@kiro-spec-library/shared";
-import { listSpecs } from "../db/queries/specs.js";
-import { getOverlay, upsertOverlay } from "../db/queries/metadata.js";
-import { listAllRelationships, replaceOutgoingRelationships, } from "../db/queries/relationships.js";
-import { listAllSuggestions, listAllRejections, createSuggestion, createRejection, suggestionExists, isRejected, } from "../db/queries/suggestions.js";
-import { listAllProposals, createProposal, getProposal } from "../db/queries/proposals.js";
-import { listAllSnapshots, getSnapshotArtifacts } from "../db/queries/snapshots.js";
-import { listSources } from "../db/queries/sources.js";
+import { SpecLibrarySidecarV1Schema, TextExportProposalSchema, TextExportRejectionSchema, TextExportSuggestionSchema, } from "@kiro-spec-library/shared";
+import { unzipSync, zipSync } from "fflate";
 import { listAllAuditEvents } from "../db/queries/audit.js";
+import { getOverlay, upsertOverlay } from "../db/queries/metadata.js";
+import { createProposal, getProposal, listAllProposals } from "../db/queries/proposals.js";
+import { listAllRelationships, replaceOutgoingRelationships } from "../db/queries/relationships.js";
+import { getSnapshotArtifacts, listAllSnapshots } from "../db/queries/snapshots.js";
+import { listSources } from "../db/queries/sources.js";
+import { listSpecs } from "../db/queries/specs.js";
+import { createRejection, createSuggestion, isRejected, listAllRejections, listAllSuggestions, suggestionExists, } from "../db/queries/suggestions.js";
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function sanitizeSegment(value) {
     const cleaned = value.replace(/[^a-zA-Z0-9_.-]+/g, "-").replace(/^-+|-+$/g, "");
@@ -96,8 +96,8 @@ export function buildTextExportZip(db) {
         path: s.path ?? undefined,
         url: s.url ?? undefined,
         branch: s.branch ?? undefined,
-        webUrlTemplate: s.web_url_template ?? undefined,
-        addedAt: s.added_at,
+        webUrlTemplate: s.webUrlTemplate ?? undefined,
+        addedAt: s.addedAt,
     }));
     putJson(files, "sources.json", sources);
     const suggestions = listAllSuggestions(db)

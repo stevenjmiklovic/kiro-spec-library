@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/stevenjmiklovic/kiro-spec-library/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/stevenjmiklovic/kiro-spec-library/actions/workflows/ci.yml/badge.svg" /></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-0.2.1-blue" />
+  <img alt="Version" src="https://img.shields.io/badge/version-0.2.2-blue" />
   <img alt="License" src="https://img.shields.io/badge/license-Apache--2.0-green" />
   <img alt="Crew" src="https://img.shields.io/badge/Kiro_Crew-%E2%89%A50.2.0-purple" />
   <img alt="Runtime" src="https://img.shields.io/badge/runtime-Bun-f9f1e1?logo=bun" />

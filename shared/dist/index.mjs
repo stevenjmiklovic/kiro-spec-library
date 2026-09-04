@@ -1,11 +1,6 @@
 // @bun
 // shared/src/constants.ts
-var SPEC_TYPES = [
-  "feature",
-  "bugfix",
-  "quick",
-  "unknown"
-];
+var SPEC_TYPES = ["feature", "bugfix", "quick", "unknown"];
 var WORKFLOW_TYPES = [
   "requirements-first",
   "design-first",
@@ -3962,7 +3957,9 @@ var ConfigKiroSchema = z.object({
 var RetentionPolicySchema = z.object({
   type: z.enum(RETENTION_POLICY_TYPES),
   customDate: z.string().datetime().optional()
-}).refine((data) => data.type !== "custom_date" || data.customDate !== undefined, { message: "customDate is required when type is custom_date" });
+}).refine((data) => data.type !== "custom_date" || data.customDate !== undefined, {
+  message: "customDate is required when type is custom_date"
+});
 var SidecarRelationshipSchema = z.object({
   targetSpecId: z.string().min(1),
   targetRepository: z.string().optional(),

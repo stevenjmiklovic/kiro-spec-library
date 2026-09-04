@@ -1,10 +1,10 @@
-import { Elysia, t } from "elysia";
-import { SourceConfigSchema } from "@kiro-spec-library/shared";
-import { listSources, putSource } from "../db/queries/sources.js";
-import { homedir } from "node:os";
-import { resolve, join, relative, basename, isAbsolute } from "node:path";
-import { readdir, stat, realpath } from "node:fs/promises";
 import { existsSync } from "node:fs";
+import { readdir, realpath, stat } from "node:fs/promises";
+import { homedir } from "node:os";
+import { basename, isAbsolute, join, relative, resolve } from "node:path";
+import { SourceConfigSchema } from "@kiro-spec-library/shared";
+import { Elysia, t } from "elysia";
+import { listSources, replaceSources } from "../db/queries/sources.js";
 /** True iff `abs` is the home dir or strictly inside it (cross-platform). */
 function isWithinHome(abs, home) {
     if (abs === home)
@@ -28,7 +28,7 @@ const BLOCKED_DIR_NAMES = new Set([
 ]);
 export function settingsRoutes(deps) {
     const { db } = deps;
-    return new Elysia({ prefix: "/settings" })
+    return (new Elysia({ prefix: "/settings" })
         .get("/sources", () => {
         const sources = listSources(db);
         return { sources };
@@ -39,8 +39,12 @@ export function settingsRoutes(deps) {
         // user's home directory, and credential/system directories are never
         // listed. Read-only: it never opens files, only enumerates directory names.
         .get("/browse", async ({ query, set }) => {
-        const home = homedir();
-        const requested = (query.path && query.path.trim()) || home;
+        // Browsing is confined to the user's home directory. SPEC_LIBRARY_BROWSE_ROOT
+        // overrides the base for tests only (os.homedir() ignores a runtime
+        // process.env.HOME mutation on macOS, so tests need an explicit seam);
+        // production leaves it unset and confines to the real home.
+        const home = process.env.SPEC_LIBRARY_BROWSE_ROOT || homedir();
+        const requested = query.path?.trim() || home;
         // Resolve the requested path to an absolute path.
         let abs;
         try {
@@ -182,9 +186,9 @@ export function settingsRoutes(deps) {
                 addedAt: raw.addedAt ?? new Date().toISOString(),
             });
         }
-        for (const source of validated) {
-            putSource(db, source);
-        }
+        // PUT replaces the entire source set (the UI's "Save & rescan"
+        // promises this). Do it atomically so a removed source can't linger.
+        replaceSources(db, validated);
         const sources = listSources(db);
         return { sources };
     }, {
@@ -197,5 +201,5 @@ export function settingsRoutes(deps) {
             webUrlTemplate: t.Optional(t.String()),
             addedAt: t.Optional(t.String()),
         })),
-    });
+    }));
 }
