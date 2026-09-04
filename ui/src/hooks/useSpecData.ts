@@ -190,6 +190,18 @@ export function useSpecData(options: UseSpecDataOptions): UseSpecDataResult {
     void fetchSpecs();
   }, [fetchSpecs]);
 
+  // Refetch when a rescan completes elsewhere in the app (AppChrome dispatches
+  // this after polling GET /sync/:runId to completion), so the graph reflects
+  // freshly-indexed specs without a manual page reload.
+  useEffect(() => {
+    const onRescanComplete = (): void => {
+      void fetchSpecs();
+    };
+    window.addEventListener('spec-library:rescan-complete', onRescanComplete);
+    return () =>
+      window.removeEventListener('spec-library:rescan-complete', onRescanComplete);
+  }, [fetchSpecs]);
+
   return { specs, total, loading, error, refetch: fetchSpecs };
 }
 

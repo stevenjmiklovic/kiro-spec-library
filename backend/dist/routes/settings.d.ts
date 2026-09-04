@@ -36,16 +36,63 @@ export declare function settingsRoutes(deps: SettingsDeps): Elysia<"/settings", 
     };
 } & {
     settings: {
+        browse: {
+            get: {
+                body: unknown;
+                params: {};
+                query: {
+                    path?: string | undefined;
+                };
+                headers: unknown;
+                response: {
+                    200: {
+                        code: string;
+                        message: string;
+                        path?: undefined;
+                        name?: undefined;
+                        parent?: undefined;
+                        home?: undefined;
+                        hasSpecs?: undefined;
+                        directories?: undefined;
+                    } | {
+                        path: string;
+                        name: string;
+                        parent: string | null;
+                        home: string;
+                        hasSpecs: boolean;
+                        directories: {
+                            name: string;
+                            path: string;
+                            hasSpecs: boolean;
+                        }[];
+                        code?: undefined;
+                        message?: undefined;
+                    };
+                    422: {
+                        type: "validation";
+                        on: string;
+                        summary?: string;
+                        message?: string;
+                        found?: unknown;
+                        property?: string;
+                        expected?: string;
+                    };
+                };
+            };
+        };
+    };
+} & {
+    settings: {
         sources: {
             put: {
                 body: {
                     path?: string | undefined;
-                    branch?: string | undefined;
                     url?: string | undefined;
+                    branch?: string | undefined;
                     webUrlTemplate?: string | undefined;
                     addedAt?: string | undefined;
-                    type: "local" | "remote";
                     id: string;
+                    type: "local" | "remote";
                 }[];
                 params: {};
                 query: unknown;

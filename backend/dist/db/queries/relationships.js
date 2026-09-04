@@ -15,13 +15,71 @@ export function deleteRelationship(db, id) {
     const stmt = db.prepare("DELETE FROM relationships WHERE id = $id");
     stmt.run({ $id: id });
 }
-export function listBySpec(db, specKey) {
+/** Every relationship in the database, for full-library export. */
+export function listAllRelationships(db) {
+    const stmt = db.prepare("SELECT * FROM relationships ORDER BY created_at ASC");
+    return stmt.all();
+}
+/** Bulk-fetch relationships whose source is one of the given spec keys (for graph edge building). */
+export function listBySourceKeys(db, specKeys) {
+    if (specKeys.length === 0)
+        return [];
+    const placeholders = specKeys.map(() => "?").join(", ");
     const stmt = db.prepare(`
     SELECT * FROM relationships
-    WHERE source_spec_key = $spec_key OR target_spec_key = $spec_key
-    ORDER BY created_at DESC
+    WHERE source_spec_key IN (${placeholders})
   `);
-    return stmt.all({ $spec_key: specKey });
+    return stmt.all(...specKeys);
+}
+/**
+ * For each of the given spec keys, find the spec (if any) that supersedes
+ * it — i.e. a `supersedes` relationship whose target is that key. Used to
+ * derive the Archive view's "Disposition" (Active vs. Superseded) per
+ * ADR-005, which replaced the legal-hold columns with this relationship.
+ */
+export function listSupersessionsByTargetKeys(db, specKeys) {
+    if (specKeys.length === 0)
+        return [];
+    const placeholders = specKeys.map((_, i) => `$k${i}`).join(", ");
+    const params = {};
+    specKeys.forEach((key, i) => {
+        params[`$k${i}`] = key;
+    });
+    const stmt = db.prepare(`
+    SELECT r.target_spec_key AS target_spec_key,
+           r.source_spec_key AS successor_spec_key,
+           s.title AS successor_title
+    FROM relationships r
+    JOIN specs s ON s.key = r.source_spec_key
+    WHERE r.type = 'supersedes' AND r.target_spec_key IN (${placeholders})
+  `);
+    return stmt.all(params);
+}
+/**
+ * Replace every outgoing relationship for `sourceSpecKey` with exactly the
+ * given set (delete then re-insert, in one transaction). Used by the
+ * textual/git export's apply path, where a spec's relationships file is the
+ * source of truth for that spec's outgoing relationships.
+ */
+export function replaceOutgoingRelationships(db, sourceSpecKey, relationships) {
+    db.transaction(() => {
+        db.prepare("DELETE FROM relationships WHERE source_spec_key = $source").run({
+            $source: sourceSpecKey,
+        });
+        const insert = db.prepare(`
+      INSERT INTO relationships (id, source_spec_key, target_spec_key, type, created_at)
+      VALUES ($id, $source_spec_key, $target_spec_key, $type, $created_at)
+    `);
+        for (const rel of relationships) {
+            insert.run({
+                $id: crypto.randomUUID(),
+                $source_spec_key: sourceSpecKey,
+                $target_spec_key: rel.targetSpecKey,
+                $type: rel.type,
+                $created_at: new Date().toISOString(),
+            });
+        }
+    })();
 }
 export function checkDuplicate(db, sourceSpecKey, targetSpecKey, type) {
     const stmt = db.prepare(`

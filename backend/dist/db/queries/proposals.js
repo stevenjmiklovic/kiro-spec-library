@@ -15,6 +15,12 @@ export function createProposal(db, params) {
         .query("SELECT * FROM proposals WHERE id = ?")
         .get(params.id);
 }
+/** Every proposal in the database (any status), for full-library export. */
+export function listAllProposals(db) {
+    return db
+        .query("SELECT * FROM proposals ORDER BY submitted_at ASC")
+        .all();
+}
 export function listPendingProposals(db, specKey) {
     return db
         .query("SELECT * FROM proposals WHERE spec_key = ? AND status = 'pending' ORDER BY submitted_at DESC")

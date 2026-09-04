@@ -28,6 +28,11 @@ interface SubmitMetadataProposalParams {
     }>;
     rationale: string;
 }
+/**
+ * List all registered spec sources (repositories) the library indexes.
+ * Returns id, type, path/url, and last scan status for each.
+ */
+export declare function listSources(client: BackendClient): Promise<string>;
 export declare function searchSpecs(client: BackendClient, params: SearchSpecsParams): Promise<string>;
 export declare function getSpecContext(client: BackendClient, params: GetSpecContextParams): Promise<string>;
 /**

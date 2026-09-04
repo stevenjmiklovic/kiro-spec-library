@@ -12,6 +12,11 @@ export function insertAuditEvent(db, event) {
         $timestamp: event.timestamp,
     });
 }
+/** Every audit event ever recorded, oldest first, for full-library export. */
+export function listAllAuditEvents(db) {
+    const stmt = db.prepare("SELECT * FROM audit_events ORDER BY timestamp ASC");
+    return stmt.all();
+}
 export function queryAuditEvents(db, filters) {
     const conditions = [];
     const params = {};

@@ -7,9 +7,11 @@ export interface SpecNodeData {
     stage: string;
     progress: number;
     owner: string;
+    project?: string;
     theme: string;
     selected?: boolean;
     superseded?: boolean;
+    reviewed?: boolean;
     onSelect?: (id: string) => void;
     [key: string]: unknown;
 }

@@ -30,7 +30,7 @@ export class ArchiverService {
      */
     async maybeCreateSnapshot(spec, metadata, artifactContents) {
         // Only archive completed specs
-        if (spec.stage !== "completed") {
+        if (spec.stage !== "done") {
             return null;
         }
         // Compute content digest

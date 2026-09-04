@@ -8,7 +8,6 @@ export interface ArchiveFilters {
     fromDate?: string;
     toDate?: string;
     retention?: string;
-    legalHold?: 'active' | 'none';
     metadataComplete?: boolean;
 }
 export interface ArchiveFilterOptions {

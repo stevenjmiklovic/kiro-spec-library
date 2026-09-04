@@ -24,19 +24,49 @@ export declare function specRoutes(deps: {
             body: unknown;
             params: {};
             query: {
+                owner?: string | undefined;
+                theme?: string | undefined;
                 limit?: string | undefined;
                 offset?: string | undefined;
                 type?: string | undefined;
                 stage?: string | undefined;
-                owner?: string | undefined;
-                theme?: string | undefined;
                 repository?: string | undefined;
                 metadataComplete?: string | undefined;
+                q?: string | undefined;
             };
             headers: unknown;
             response: {
                 200: {
-                    specs: SpecRow[];
+                    specs: {
+                        projectName: string;
+                        relationships: {
+                            targetKey: string;
+                            type: string;
+                        }[];
+                        suggestions: {
+                            targetKey: string;
+                            type: string;
+                        }[];
+                        key: string;
+                        source_id: string;
+                        spec_id: string;
+                        type: string;
+                        workflow: string;
+                        title: string;
+                        owner: string;
+                        stage: string;
+                        progress: number;
+                        repository: string;
+                        relative_path: string;
+                        branch: string;
+                        commit_hash: string;
+                        is_dirty: number;
+                        remote_url: string | null;
+                        total_tasks: number;
+                        completed_tasks: number;
+                        content_digest: string;
+                        indexed_at: string;
+                    }[];
                     total: number;
                     limit: number;
                     offset: number;
@@ -49,6 +79,43 @@ export declare function specRoutes(deps: {
                     found?: unknown;
                     property?: string;
                     expected?: string;
+                };
+            };
+        };
+    };
+} & {
+    specs: {
+        "by-key": {
+            get: {
+                body: unknown;
+                params: {};
+                query: {
+                    key: string;
+                };
+                headers: unknown;
+                response: {
+                    200: {
+                        code: string;
+                        message: string;
+                        spec?: undefined;
+                        metadata?: undefined;
+                        revision?: undefined;
+                    } | {
+                        spec: SpecRow;
+                        metadata: import("../services/metadata.js").ResolvedMetadata;
+                        revision: number;
+                        code?: undefined;
+                        message?: undefined;
+                    };
+                    422: {
+                        type: "validation";
+                        on: string;
+                        summary?: string;
+                        message?: string;
+                        found?: unknown;
+                        property?: string;
+                        expected?: string;
+                    };
                 };
             };
         };
@@ -98,16 +165,19 @@ export declare function specRoutes(deps: {
                     body: {
                         expectedRevision: number;
                         patch: {
-                            summary?: string | undefined;
-                            tags?: string[] | undefined;
+                            implementationRef?: string | undefined;
+                            title?: string | undefined;
                             owner?: string | undefined;
                             theme?: string | undefined;
-                            title?: string | undefined;
+                            tags?: string[] | undefined;
+                            approvers?: string[] | undefined;
+                            summary?: string | undefined;
+                            targetRelease?: string | undefined;
                             retentionPolicy?: {
                                 customDate?: string | undefined;
                                 type: string;
                             } | undefined;
-                            targetRelease?: string | undefined;
+                            reviewedAt?: string | undefined;
                         };
                     };
                     params: {

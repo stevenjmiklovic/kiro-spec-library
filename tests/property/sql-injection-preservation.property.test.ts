@@ -152,7 +152,7 @@ function seedData(database: Database): void {
   `);
 
   for (const key of ALL_SPEC_KEYS) {
-    const specId = key.split("::")[1];
+    const specId = key.split("::")[1]!;
     insertSpec.run(key, specId, `Title for ${specId}`);
   }
 
@@ -166,12 +166,12 @@ function seedData(database: Database): void {
   let relCounter = 0;
 
   for (let i = 0; i < SEEDED_SPEC_KEYS.length; i++) {
-    const sourceKey = SEEDED_SPEC_KEYS[i];
+    const sourceKey = SEEDED_SPEC_KEYS[i]!;
     // Each source spec gets a relationship to 1 or 2 targets
     const targetCount = (i % 2) + 1;
     for (let t = 0; t < targetCount; t++) {
-      const targetKey = TARGET_SPEC_KEYS[t % TARGET_SPEC_KEYS.length];
-      const relType = relTypes[relCounter % relTypes.length];
+      const targetKey = TARGET_SPEC_KEYS[t % TARGET_SPEC_KEYS.length]!;
+      const relType = relTypes[relCounter % relTypes.length]!;
       const rel = {
         id: `rel-${relCounter}`,
         source_spec_key: sourceKey,
@@ -194,9 +194,9 @@ function seedData(database: Database): void {
 
   let sugCounter = 0;
   for (let i = 0; i < SEEDED_SPEC_KEYS.length; i++) {
-    const sourceKey = SEEDED_SPEC_KEYS[i];
-    const targetKey = TARGET_SPEC_KEYS[i % TARGET_SPEC_KEYS.length];
-    const relType = relTypes[sugCounter % relTypes.length];
+    const sourceKey = SEEDED_SPEC_KEYS[i]!;
+    const targetKey = TARGET_SPEC_KEYS[i % TARGET_SPEC_KEYS.length]!;
+    const relType = relTypes[sugCounter % relTypes.length]!;
     const status = i < 7 ? "pending" : i < 9 ? "accepted" : "rejected";
     const sug = {
       id: `sug-${sugCounter}`,

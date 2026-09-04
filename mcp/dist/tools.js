@@ -14,13 +14,27 @@ async function backendFetch(client, path, options = {}) {
     });
     return response;
 }
+// ─── Tool: list_sources ──────────────────────────────────────────────────────
+/**
+ * List all registered spec sources (repositories) the library indexes.
+ * Returns id, type, path/url, and last scan status for each.
+ */
+export async function listSources(client) {
+    const response = await backendFetch(client, "/settings/sources");
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`List sources failed: ${error.message ?? response.statusText}`);
+    }
+    const data = await response.json();
+    return sanitizeJsonResponse(data);
+}
 // ─── Tool: search_specs ──────────────────────────────────────────────────────
 export async function searchSpecs(client, params) {
     const { query, filters, limit } = params;
     // Cap limit at 100
     const effectiveLimit = Math.min(limit ?? 50, 100);
     const searchParams = new URLSearchParams();
-    searchParams.set("query", query);
+    searchParams.set("q", query);
     searchParams.set("limit", String(effectiveLimit));
     if (filters) {
         if (filters.type)

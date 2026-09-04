@@ -61,6 +61,26 @@ export function upsertOverlay(db, specKey, patch, expectedRevision) {
     })();
     return result;
 }
+/** Map a raw `metadata_overlays` row to the shape `resolveMetadata()` expects. */
+export function overlayRowToMetadataOverlay(overlay) {
+    return {
+        specKey: overlay.spec_key,
+        title: overlay.title ?? undefined,
+        summary: overlay.summary ?? undefined,
+        owner: overlay.owner ?? undefined,
+        theme: overlay.theme ?? undefined,
+        tags: overlay.tags ? JSON.parse(overlay.tags) : undefined,
+        targetRelease: overlay.target_release ?? undefined,
+        retentionPolicy: overlay.retention_policy
+            ? JSON.parse(overlay.retention_policy)
+            : undefined,
+        approvers: overlay.approvers ? JSON.parse(overlay.approvers) : undefined,
+        implementationRef: overlay.implementation_ref ?? undefined,
+        reviewedAt: overlay.reviewed_at ?? undefined,
+        revision: overlay.revision,
+        updatedAt: overlay.updated_at,
+    };
+}
 export function deleteOverlay(db, specKey) {
     const stmt = db.prepare("DELETE FROM metadata_overlays WHERE spec_key = $spec_key");
     stmt.run({ $spec_key: specKey });

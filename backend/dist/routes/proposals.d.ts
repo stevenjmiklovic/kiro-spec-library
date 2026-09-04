@@ -54,6 +54,39 @@ export declare function proposalRoutes(deps: {
     };
 } & {
     specs: {
+        "proposals-by-key": {
+            get: {
+                body: unknown;
+                params: {};
+                query: {
+                    key: string;
+                };
+                headers: unknown;
+                response: {
+                    200: {
+                        code: string;
+                        message: string;
+                        proposals?: undefined;
+                    } | {
+                        proposals: import("../db/queries/proposals.js").ProposalRow[];
+                        code?: undefined;
+                        message?: undefined;
+                    };
+                    422: {
+                        type: "validation";
+                        on: string;
+                        summary?: string;
+                        message?: string;
+                        found?: unknown;
+                        property?: string;
+                        expected?: string;
+                    };
+                };
+            };
+        };
+    };
+} & {
+    specs: {
         ":id": {
             proposals: {
                 post: {

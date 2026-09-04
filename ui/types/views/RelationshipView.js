@@ -2,34 +2,17 @@ import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-run
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSpecData } from '../hooks/useSpecData.js';
 import { useUrlState } from '../hooks/useUrlState.js';
+import { GhostIcon } from '../components/GhostIcon.js';
 import { FilterBar, } from '../components/FilterBar.js';
 import GraphCanvas from '../components/GraphCanvas.js';
 import { Y_AXIS_OPTIONS } from '../components/GraphCanvas.js';
+import { X_AXIS_OPTIONS } from '../components/GraphCanvas.js';
 import { DetailPanel } from '../components/DetailPanel.js';
+import { getLocalAliases } from '../hooks/useLocalAliases.js';
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 const MAX_VISIBLE_NODES = 250;
-const LOCAL_ALIASES_KEY = 'kiro-spec-library:aliases';
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-/** Read user aliases from localStorage (never throws; not an auth boundary). */
-function getLocalAliases() {
-    try {
-        const raw = localStorage.getItem(LOCAL_ALIASES_KEY);
-        if (!raw)
-            return [];
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) {
-            return parsed.filter((v) => typeof v === 'string');
-        }
-        return [];
-    }
-    catch {
-        return [];
-    }
-}
 /** Cautiously normalize an unknown backend record into a GraphSpec. */
 function normalizeSpec(record) {
     const r = record;
@@ -79,7 +62,10 @@ function normalizeSpec(record) {
         stage: str('stage', 'draft'),
         owner: str('owner'),
         theme: str('theme'),
+        project: str('projectName') || str('project') || undefined,
         progress: num('progress', 0),
+        reviewed: !!(r['reviewed_at'] || r['reviewedAt']),
+        indexedAt: str('indexed_at') || str('indexedAt') || undefined,
         relationships: parseRelArray('relationships'),
         suggestions: parseRelArray('suggestions'),
     };
@@ -272,7 +258,7 @@ export function RelationshipView() {
     }, []);
     // --- Render ---
     if (error) {
-        return (_jsxs("div", { className: "relationship-view", role: "alert", "aria-live": "assertive", children: [_jsxs("header", { className: "relationship-header", children: [_jsx("p", { className: "eyebrow", children: "Relationship observatory" }), _jsx("h1", { children: "Spec Library" })] }), _jsxs("div", { className: "graph-shell", children: [_jsxs("p", { children: ["Failed to load specifications: ", error] }), _jsx("p", { children: "Check your connection and try again." })] })] }));
+        return (_jsxs("div", { className: "relationship-view", role: "alert", "aria-live": "assertive", children: [_jsxs("header", { className: "relationship-header", children: [_jsx("p", { className: "eyebrow", children: "Relationship observatory" }), _jsxs("h1", { children: [_jsx(GhostIcon, { size: 28 }), " Spec", _jsx("span", { className: "title-tral", children: "tral" }), " Library"] })] }), _jsxs("div", { className: "graph-shell", children: [_jsxs("p", { children: ["Failed to load specifications: ", error] }), _jsx("p", { children: "Check your connection and try again." })] })] }));
     }
-    return (_jsxs("div", { ref: containerRef, className: "relationship-view", tabIndex: 0, "aria-label": "Specification relationship graph view", role: "application", onFocus: handleContainerFocus, children: [_jsxs("header", { className: "relationship-header", children: [_jsx("p", { className: "eyebrow", children: "Relationship observatory" }), _jsx("h1", { children: "Spec Library" })] }), _jsx(FilterBar, { filters: filters, options: filterOptions, onChange: handleFilterChange, resultCount: visibleSpecs.length }), isTruncated && (_jsx("div", { role: "status", "aria-live": "polite", className: "truncation-prompt", children: _jsxs("p", { children: ["Showing ", MAX_VISIBLE_NODES, " of ", filteredSpecs.length, " specifications. Refine your filters to narrow the results."] }) })), _jsx("div", { className: "visually-hidden", "aria-live": "polite", "aria-atomic": "true", children: statusText }), loading ? (_jsx("div", { className: "graph-shell", "aria-busy": "true", "aria-label": "Loading specifications", children: _jsxs("div", { className: "skeleton-container", children: [_jsx("div", { className: "skeleton-node" }), _jsx("div", { className: "skeleton-node" }), _jsx("div", { className: "skeleton-node" }), _jsx("div", { className: "skeleton-node" }), _jsx("div", { className: "skeleton-node" })] }) })) : visibleSpecs.length === 0 ? (_jsx("div", { className: "graph-shell", children: _jsx("p", { children: "No specifications match the current view." }) })) : (_jsx(_Fragment, { children: _jsxs("div", { className: "graph-with-rail", children: [_jsxs("div", { className: "graph-column", children: [_jsx("div", { className: "graph-toolbar", children: _jsxs("label", { className: "y-axis-selector", children: [_jsx("span", { children: "Y-axis:" }), _jsx("select", { value: urlState.yAxis, onChange: (e) => setUrlState({ yAxis: e.target.value }), "aria-label": "Y-axis grouping", children: Y_AXIS_OPTIONS.map((opt) => (_jsx("option", { value: opt.value, children: opt.label }, opt.value))) })] }) }), _jsx("div", { className: "graph-shell", children: _jsx(GraphCanvas, { specs: graphSpecs, selectedKey: selectedKey, onSelect: handleCanvasSelect, colorMode: urlState.themeMode, yAxisField: urlState.yAxis }) }), hintVisible && (_jsx("p", { className: "keyboard-hint", children: "\u2191\u2193 navigate \u00B7 Enter select \u00B7 Home/End jump" }))] }), selectedKey && (_jsx(DetailPanel, { specKey: selectedKey, variant: "rail", onClose: () => selectSpec(undefined) }))] }) }))] }));
+    return (_jsxs("div", { ref: containerRef, className: "relationship-view", tabIndex: 0, "aria-label": "Specification relationship graph view", role: "application", onFocus: handleContainerFocus, children: [_jsxs("header", { className: "relationship-header", children: [_jsx("p", { className: "eyebrow", children: "Relationship observatory" }), _jsxs("h1", { children: [_jsx(GhostIcon, { size: 28 }), " Spec", _jsx("span", { className: "title-tral", children: "tral" }), " Library"] })] }), _jsx(FilterBar, { filters: filters, options: filterOptions, onChange: handleFilterChange, resultCount: visibleSpecs.length }), isTruncated && (_jsx("div", { role: "status", "aria-live": "polite", className: "truncation-prompt", children: _jsxs("p", { children: ["Showing ", MAX_VISIBLE_NODES, " of ", filteredSpecs.length, " specifications. Refine your filters to narrow the results."] }) })), _jsx("div", { className: "visually-hidden", "aria-live": "polite", "aria-atomic": "true", children: statusText }), loading ? (_jsx("div", { className: "graph-shell", "aria-busy": "true", "aria-label": "Loading specifications", children: _jsxs("div", { className: "skeleton-container", children: [_jsx("div", { className: "skeleton-node" }), _jsx("div", { className: "skeleton-node" }), _jsx("div", { className: "skeleton-node" }), _jsx("div", { className: "skeleton-node" }), _jsx("div", { className: "skeleton-node" })] }) })) : visibleSpecs.length === 0 ? (allSpecs.length === 0 ? (_jsx("div", { className: "graph-shell", children: _jsxs("div", { className: "getting-started", role: "region", "aria-label": "Getting started", children: [_jsx(GhostIcon, { size: 40 }), _jsxs("h2", { children: ["Welcome to Spec", _jsx("span", { className: "title-tral", children: "tral" }), " Library"] }), _jsxs("p", { children: ["Nothing is indexed yet. Spec Library builds this relationship graph from the", ' ', _jsx("code", { children: ".kiro/specs/" }), " directories in the repositories you point it at \u2014 it only reads them, never writes."] }), _jsxs("ol", { className: "getting-started__steps", children: [_jsx("li", { children: "Add a local repo path or a remote Git URL as a source." }), _jsx("li", { children: "Save & rescan \u2014 the app indexes every spec it finds." }), _jsx("li", { children: "Explore the graph, grouped by project, owner, or theme." })] }), _jsx("button", { type: "button", className: "getting-started__cta", onClick: () => window.dispatchEvent(new CustomEvent('spec-library:open-sources')), children: "Add your first source" })] }) })) : (_jsx("div", { className: "graph-shell", children: _jsx("p", { children: "No specifications match the current view. Adjust or clear the filters above." }) }))) : (_jsx(_Fragment, { children: _jsxs("div", { className: "graph-with-rail", children: [_jsxs("div", { className: "graph-column", children: [_jsxs("div", { className: "graph-toolbar", children: [_jsxs("label", { className: "x-axis-selector", children: [_jsx("span", { children: "X-axis:" }), _jsx("select", { value: urlState.xAxis, onChange: (e) => setUrlState({ xAxis: e.target.value }), "aria-label": "X-axis grouping", children: X_AXIS_OPTIONS.map((opt) => (_jsx("option", { value: opt.value, children: opt.label }, opt.value))) })] }), _jsxs("label", { className: "y-axis-selector", children: [_jsx("span", { children: "Y-axis:" }), _jsx("select", { value: urlState.yAxis, onChange: (e) => setUrlState({ yAxis: e.target.value }), "aria-label": "Y-axis grouping", children: Y_AXIS_OPTIONS.map((opt) => (_jsx("option", { value: opt.value, children: opt.label }, opt.value))) })] })] }), _jsx("div", { className: "graph-shell", children: _jsx(GraphCanvas, { specs: graphSpecs, selectedKey: selectedKey, onSelect: handleCanvasSelect, colorMode: urlState.themeMode, yAxisField: urlState.yAxis, xAxisField: urlState.xAxis }) }), hintVisible && (_jsx("p", { className: "keyboard-hint", children: "\u2191\u2193 navigate \u00B7 Enter select \u00B7 Home/End jump" }))] }), selectedKey && (_jsx(DetailPanel, { specKey: selectedKey, variant: "rail", onClose: () => selectSpec(undefined) }))] }) }))] }));
 }

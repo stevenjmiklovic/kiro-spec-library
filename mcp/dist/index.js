@@ -1,13 +1,31 @@
 // MCP server entry point — Spec Librarian agent tools
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListToolsRequestSchema, } from "@modelcontextprotocol/sdk/types.js";
-import { searchSpecs, getSpecContext, submitMetadataProposal } from "./tools.js";
+import { searchSpecs, getSpecContext, submitMetadataProposal, listSources } from "./tools.js";
 // ─── Configuration ───────────────────────────────────────────────────────────
 const BACKEND_PORT = Number(process.env["SPEC_LIBRARY_PORT"]) || 3100;
-const MCP_TOKEN = process.env["SPEC_LIBRARY_MCP_TOKEN"] || "";
+const DATA_DIR = process.env["SPEC_LIBRARY_DATA_DIR"] || join(process.cwd(), "data");
 const BACKEND_URL = `http://127.0.0.1:${BACKEND_PORT}`;
-const client = { baseUrl: BACKEND_URL, token: MCP_TOKEN };
+/**
+ * The backend and this MCP server are spawned as separate OS processes with
+ * no shared memory, so the token an env var doesn't cover falls back to the
+ * file the backend writes at startup (see backend/src/index.ts).
+ */
+function resolveMcpToken() {
+    const fromEnv = process.env["SPEC_LIBRARY_MCP_TOKEN"];
+    if (fromEnv)
+        return fromEnv;
+    try {
+        return readFileSync(join(DATA_DIR, "mcp-token"), "utf-8").trim();
+    }
+    catch {
+        return "";
+    }
+}
+const client = { baseUrl: BACKEND_URL, token: resolveMcpToken() };
 // ─── Server Setup ────────────────────────────────────────────────────────────
 const server = new Server({
     name: "spec-library-mcp",
@@ -20,6 +38,15 @@ const server = new Server({
 // ─── Tool Definitions ────────────────────────────────────────────────────────
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: [
+        {
+            name: "list_sources",
+            description: "List all registered repositories (sources) the Spec Library indexes. Returns each source's id, type (local/remote), path or URL, and last scan timestamp. Use this to discover what repositories are being tracked before searching.",
+            inputSchema: {
+                type: "object",
+                properties: {},
+                required: [],
+            },
+        },
         {
             name: "search_specs",
             description: "Search for Kiro Specs across all indexed repositories. Returns matching specs with title, stage, progress, and metadata.",
@@ -34,7 +61,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
                         type: "object",
                         properties: {
                             type: { type: "string", enum: ["feature", "bugfix", "quick", "unknown"] },
-                            stage: { type: "string", enum: ["requirements", "bug_analysis", "design", "tasks", "completed"] },
+                            stage: { type: "string", enum: ["new", "scoped", "refined", "in-flight", "done"] },
                             theme: { type: "string" },
                             owner: { type: "string" },
                             repository: { type: "string" },
@@ -114,6 +141,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     try {
         let result;
         switch (name) {
+            case "list_sources":
+                result = await listSources(client);
+                break;
             case "search_specs":
                 result = await searchSpecs(client, args);
                 break;

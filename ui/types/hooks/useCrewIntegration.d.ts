@@ -33,14 +33,10 @@ export interface CrewIntegration {
 }
 export interface CrewProviderProps {
     children: ReactNode;
-    /** Override any part of the integration (useful for tests / Storybook). */
     overrides?: Partial<CrewIntegration>;
 }
 export declare function CrewProvider({ children, overrides }: CrewProviderProps): import("react/jsx-runtime").JSX.Element;
-/** Full Crew integration object. */
 export declare function useCrew(): CrewIntegration;
-/** Shortcut – Crew API client. */
+/** Convenience: returns just the API object. */
 export declare function useCrewApi(): CrewAppApi;
-/** Shortcut – Crew theme (mode + color tokens). */
-export declare function useCrewTheme(): CrewTheme;
 //# sourceMappingURL=useCrewIntegration.d.ts.map

@@ -14,6 +14,7 @@ export interface ResolvedMetadata {
     };
     approvers: string[];
     implementationRef?: string;
+    reviewedAt?: string;
 }
 /**
  * Resolve metadata with priority: overlay > sidecar > artifact-derived.

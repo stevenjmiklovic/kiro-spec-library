@@ -16,8 +16,11 @@ export interface ArchiveSnapshot {
     /** e.g. "Aug 7, 2026" */
     dateLabel: string;
     retentionLabel: string;
-    legalHoldActive: boolean;
-    legalHoldReason?: string;
+    /** Per ADR-005: derived from the `supersedes` relationship graph, not legal-hold columns. */
+    supersededBy?: {
+        specKey: string;
+        title: string;
+    };
     metadataComplete: boolean;
     contentDigest: string;
     provenance: {

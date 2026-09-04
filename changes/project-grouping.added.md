@@ -1,0 +1,1 @@
+Added project-based grouping to the relationship graph: each spec now carries a friendly project name (derived from its source, not the raw absolute repo path), shown as a chip on every node, and "Project" is the default Y-axis grouping so specs cluster by the repository they belong to.

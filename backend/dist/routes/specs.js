@@ -1,8 +1,64 @@
 import { Elysia, t } from "elysia";
 import { listSpecs, countSpecs, findByKey, } from "../db/queries/specs.js";
-import { getOverlay } from "../db/queries/metadata.js";
+import { getOverlay, overlayRowToMetadataOverlay } from "../db/queries/metadata.js";
 import { RevisionConflictError } from "../db/queries/metadata.js";
 import { applyPatch, resolveMetadata, evaluateCompleteness } from "../services/metadata.js";
+import { listBySourceKeys } from "../db/queries/relationships.js";
+import { listPendingBySourceKeys } from "../db/queries/suggestions.js";
+import { listSources } from "../db/queries/sources.js";
+import { recordEvent } from "../services/audit.js";
+/**
+ * Derive a friendly, human-readable project name for a spec.
+ *
+ * Specs store `repository` as the absolute filesystem path of the repo, which
+ * is unreadable in the UI ("/Users/.../kiro-spec-library"). Prefer the source's
+ * configured id; otherwise fall back to the basename of the repository path (or
+ * remote URL), which is the repo folder name a human recognizes.
+ */
+function deriveProjectName(spec, sourceById) {
+    const source = sourceById.get(spec.source_id);
+    if (source?.id)
+        return source.id;
+    const basename = (p) => {
+        const trimmed = p.replace(/[/\\]+$/, "");
+        const seg = trimmed.split(/[/\\]/).pop() ?? trimmed;
+        return seg.replace(/\.git$/, "");
+    };
+    if (source?.url)
+        return basename(source.url);
+    if (source?.path)
+        return basename(source.path);
+    if (spec.remote_url)
+        return basename(spec.remote_url);
+    if (spec.repository)
+        return basename(spec.repository);
+    return spec.source_id || "Unknown project";
+}
+/** Attach each spec's outgoing accepted relationships and pending suggestions (for the graph view). */
+function attachRelationshipData(db, specs) {
+    const keys = specs.map((spec) => spec.key);
+    const relationships = listBySourceKeys(db, keys);
+    const suggestions = listPendingBySourceKeys(db, keys);
+    const sourceById = new Map(listSources(db).map((s) => [s.id, { id: s.id, path: s.path, url: s.url }]));
+    const relsByKey = new Map();
+    for (const rel of relationships) {
+        const list = relsByKey.get(rel.source_spec_key) ?? [];
+        list.push({ targetKey: rel.target_spec_key, type: rel.type });
+        relsByKey.set(rel.source_spec_key, list);
+    }
+    const sugsByKey = new Map();
+    for (const sug of suggestions) {
+        const list = sugsByKey.get(sug.source_spec_key) ?? [];
+        list.push({ targetKey: sug.target_spec_key, type: sug.type });
+        sugsByKey.set(sug.source_spec_key, list);
+    }
+    return specs.map((spec) => ({
+        ...spec,
+        projectName: deriveProjectName(spec, sourceById),
+        relationships: relsByKey.get(spec.key) ?? [],
+        suggestions: sugsByKey.get(spec.key) ?? [],
+    }));
+}
 export function specRoutes(deps) {
     const { db } = deps;
     return new Elysia({ prefix: "/specs" })
@@ -15,6 +71,7 @@ export function specRoutes(deps) {
             owner: query.owner || undefined,
             theme: query.theme || undefined,
             repository: query.repository || undefined,
+            query: query.q || undefined,
             limit,
             offset,
         };
@@ -30,22 +87,7 @@ export function specRoutes(deps) {
             const allSpecs = listSpecs(db, allFilters);
             const filtered = allSpecs.filter((spec) => {
                 const overlay = getOverlay(db, spec.key);
-                const resolved = resolveMetadata({ title: spec.title, owner: spec.owner }, overlay
-                    ? {
-                        specKey: overlay.spec_key,
-                        title: overlay.title ?? undefined,
-                        summary: overlay.summary ?? undefined,
-                        owner: overlay.owner ?? undefined,
-                        theme: overlay.theme ?? undefined,
-                        tags: overlay.tags ? JSON.parse(overlay.tags) : undefined,
-                        targetRelease: overlay.target_release ?? undefined,
-                        retentionPolicy: overlay.retention_policy
-                            ? JSON.parse(overlay.retention_policy)
-                            : undefined,
-                        revision: overlay.revision,
-                        updatedAt: overlay.updated_at,
-                    }
-                    : null, null);
+                const resolved = resolveMetadata({ title: spec.title, owner: spec.owner }, overlay ? overlayRowToMetadataOverlay(overlay) : null, null);
                 const completeness = evaluateCompleteness(resolved, spec.stage);
                 return completeness.complete === wantComplete;
             });
@@ -54,10 +96,10 @@ export function specRoutes(deps) {
         }
         else {
             specs = listSpecs(db, filters);
-            const { type, stage, owner, theme, repository } = filters;
-            total = countSpecs(db, { type, stage, owner, theme, repository });
+            const { type, stage, owner, theme, repository, query: q } = filters;
+            total = countSpecs(db, { type, stage, owner, theme, repository, query: q });
         }
-        return { specs, total, limit, offset };
+        return { specs: attachRelationshipData(db, specs), total, limit, offset };
     }, {
         query: t.Object({
             type: t.Optional(t.String()),
@@ -66,9 +108,27 @@ export function specRoutes(deps) {
             theme: t.Optional(t.String()),
             repository: t.Optional(t.String()),
             metadataComplete: t.Optional(t.String()),
+            q: t.Optional(t.String()),
             limit: t.Optional(t.String()),
             offset: t.Optional(t.String()),
         }),
+    })
+        .get("/by-key", ({ query, set }) => {
+        const key = query.key;
+        if (!key) {
+            set.status = 400;
+            return { code: "BAD_REQUEST", message: "key query parameter required" };
+        }
+        const spec = findByKey(db, key);
+        if (!spec) {
+            set.status = 404;
+            return { code: "NOT_FOUND", message: `Spec '${key}' not found` };
+        }
+        const overlay = getOverlay(db, spec.key);
+        const metadata = resolveMetadata({ title: spec.title, owner: spec.owner }, overlay ? overlayRowToMetadataOverlay(overlay) : null, null);
+        return { spec, metadata, revision: overlay?.revision ?? 0 };
+    }, {
+        query: t.Object({ key: t.String() }),
     })
         .get("/:id", ({ params, set }) => {
         const spec = findByKey(db, params.id);
@@ -77,22 +137,7 @@ export function specRoutes(deps) {
             return { code: "NOT_FOUND", message: `Spec '${params.id}' not found` };
         }
         const overlay = getOverlay(db, spec.key);
-        const metadata = resolveMetadata({ title: spec.title, owner: spec.owner }, overlay
-            ? {
-                specKey: overlay.spec_key,
-                title: overlay.title ?? undefined,
-                summary: overlay.summary ?? undefined,
-                owner: overlay.owner ?? undefined,
-                theme: overlay.theme ?? undefined,
-                tags: overlay.tags ? JSON.parse(overlay.tags) : undefined,
-                targetRelease: overlay.target_release ?? undefined,
-                retentionPolicy: overlay.retention_policy
-                    ? JSON.parse(overlay.retention_policy)
-                    : undefined,
-                revision: overlay.revision,
-                updatedAt: overlay.updated_at,
-            }
-            : null, null);
+        const metadata = resolveMetadata({ title: spec.title, owner: spec.owner }, overlay ? overlayRowToMetadataOverlay(overlay) : null, null);
         return { spec, metadata, revision: overlay?.revision ?? 0 };
     }, {
         params: t.Object({ id: t.String() }),
@@ -106,6 +151,7 @@ export function specRoutes(deps) {
         const { expectedRevision, patch } = body;
         try {
             const result = applyPatch(db, spec.key, patch, expectedRevision);
+            recordEvent(db, "metadata_updated", { specKey: spec.key });
             return { revision: result.revision, updatedAt: result.updatedAt };
         }
         catch (err) {
@@ -135,6 +181,9 @@ export function specRoutes(deps) {
                     type: t.String(),
                     customDate: t.Optional(t.String()),
                 })),
+                approvers: t.Optional(t.Array(t.String({ maxLength: 100 }), { maxItems: 20 })),
+                implementationRef: t.Optional(t.String({ maxLength: 500 })),
+                reviewedAt: t.Optional(t.String()),
             }),
         }),
     });

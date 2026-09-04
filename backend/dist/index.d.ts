@@ -47,6 +47,10 @@ declare const app: import("elysia").default<"/api", {
                         requestId: `${string}-${string}-${string}-${string}-${string}`;
                         details?: undefined;
                     } | {
+                        code: string;
+                        message: string;
+                        requestId: `${string}-${string}-${string}-${string}-${string}`;
+                    } | {
                         status: "starting";
                     } | {
                         status: "ok";
@@ -75,6 +79,10 @@ declare const app: import("elysia").default<"/api", {
                         requestId: `${string}-${string}-${string}-${string}-${string}`;
                         details?: undefined;
                     } | {
+                        code: string;
+                        message: string;
+                        requestId: `${string}-${string}-${string}-${string}-${string}`;
+                    } | {
                         status: "starting";
                         specCount?: undefined;
                         archiveCount?: undefined;
@@ -101,24 +109,160 @@ declare const app: import("elysia").default<"/api", {
     };
 } & {
     api: {
+        "spec-detail": {
+            get: {
+                body: unknown;
+                params: {};
+                query: unknown;
+                headers: unknown;
+                response: {
+                    200: {
+                        code: string;
+                        message: string;
+                        details: import("@kiro-spec-library/shared").FieldError[];
+                        requestId: `${string}-${string}-${string}-${string}-${string}`;
+                    } | {
+                        code: string;
+                        message: string;
+                        requestId: `${string}-${string}-${string}-${string}-${string}`;
+                        details?: undefined;
+                    } | {
+                        code: string;
+                        message: string;
+                        requestId: `${string}-${string}-${string}-${string}-${string}`;
+                    } | {
+                        code: string;
+                        message: string;
+                        spec?: undefined;
+                        metadata?: undefined;
+                        revision?: undefined;
+                    } | {
+                        spec: import("./db/queries/specs.js").SpecRow;
+                        metadata: import("./services/metadata.js").ResolvedMetadata;
+                        revision: number;
+                        code?: undefined;
+                        message?: undefined;
+                    };
+                };
+            };
+        };
+    };
+} & {
+    api: {
+        "spec-suggestions": {
+            get: {
+                body: unknown;
+                params: {};
+                query: unknown;
+                headers: unknown;
+                response: {
+                    200: {
+                        code: string;
+                        message: string;
+                        details: import("@kiro-spec-library/shared").FieldError[];
+                        requestId: `${string}-${string}-${string}-${string}-${string}`;
+                    } | {
+                        code: string;
+                        message: string;
+                        requestId: `${string}-${string}-${string}-${string}-${string}`;
+                        details?: undefined;
+                    } | {
+                        code: string;
+                        message: string;
+                        requestId: `${string}-${string}-${string}-${string}-${string}`;
+                    } | {
+                        suggestions: import("./db/queries/suggestions.js").SuggestionRow[];
+                    };
+                };
+            };
+        };
+    };
+} & {
+    api: {
+        "spec-proposals": {
+            get: {
+                body: unknown;
+                params: {};
+                query: unknown;
+                headers: unknown;
+                response: {
+                    200: {
+                        code: string;
+                        message: string;
+                        details: import("@kiro-spec-library/shared").FieldError[];
+                        requestId: `${string}-${string}-${string}-${string}-${string}`;
+                    } | {
+                        code: string;
+                        message: string;
+                        requestId: `${string}-${string}-${string}-${string}-${string}`;
+                        details?: undefined;
+                    } | {
+                        code: string;
+                        message: string;
+                        requestId: `${string}-${string}-${string}-${string}-${string}`;
+                    } | {
+                        code: string;
+                        message: string;
+                        proposals?: undefined;
+                    } | {
+                        proposals: import("./db/queries/proposals.js").ProposalRow[];
+                        code?: undefined;
+                        message?: undefined;
+                    };
+                };
+            };
+        };
+    };
+} & {
+    api: {
         specs: {
             get: {
                 body: unknown;
                 params: {};
                 query: {
-                    limit?: string | undefined;
-                    offset?: string | undefined;
                     type?: string | undefined;
                     stage?: string | undefined;
                     owner?: string | undefined;
                     theme?: string | undefined;
                     repository?: string | undefined;
                     metadataComplete?: string | undefined;
+                    q?: string | undefined;
+                    limit?: string | undefined;
+                    offset?: string | undefined;
                 };
                 headers: unknown;
                 response: {
                     200: {
-                        specs: import("./db/queries/specs.js").SpecRow[];
+                        specs: {
+                            projectName: string;
+                            relationships: {
+                                targetKey: string;
+                                type: string;
+                            }[];
+                            suggestions: {
+                                targetKey: string;
+                                type: string;
+                            }[];
+                            key: string;
+                            source_id: string;
+                            spec_id: string;
+                            type: string;
+                            workflow: string;
+                            title: string;
+                            owner: string;
+                            stage: string;
+                            progress: number;
+                            repository: string;
+                            relative_path: string;
+                            branch: string;
+                            commit_hash: string;
+                            is_dirty: number;
+                            remote_url: string | null;
+                            total_tasks: number;
+                            completed_tasks: number;
+                            content_digest: string;
+                            indexed_at: string;
+                        }[];
                         total: number;
                         limit: number;
                         offset: number;
@@ -131,6 +275,43 @@ declare const app: import("elysia").default<"/api", {
                         found?: unknown;
                         property?: string;
                         expected?: string;
+                    };
+                };
+            };
+        };
+    } & {
+        specs: {
+            "by-key": {
+                get: {
+                    body: unknown;
+                    params: {};
+                    query: {
+                        key: string;
+                    };
+                    headers: unknown;
+                    response: {
+                        200: {
+                            code: string;
+                            message: string;
+                            spec?: undefined;
+                            metadata?: undefined;
+                            revision?: undefined;
+                        } | {
+                            spec: import("./db/queries/specs.js").SpecRow;
+                            metadata: import("./services/metadata.js").ResolvedMetadata;
+                            revision: number;
+                            code?: undefined;
+                            message?: undefined;
+                        };
+                        422: {
+                            type: "validation";
+                            on: string;
+                            summary?: string;
+                            message?: string;
+                            found?: unknown;
+                            property?: string;
+                            expected?: string;
+                        };
                     };
                 };
             };
@@ -180,16 +361,19 @@ declare const app: import("elysia").default<"/api", {
                         body: {
                             expectedRevision: number;
                             patch: {
-                                summary?: string | undefined;
                                 tags?: string[] | undefined;
                                 owner?: string | undefined;
                                 theme?: string | undefined;
                                 title?: string | undefined;
+                                summary?: string | undefined;
+                                targetRelease?: string | undefined;
                                 retentionPolicy?: {
                                     customDate?: string | undefined;
                                     type: string;
                                 } | undefined;
-                                targetRelease?: string | undefined;
+                                approvers?: string[] | undefined;
+                                implementationRef?: string | undefined;
+                                reviewedAt?: string | undefined;
                             };
                         };
                         params: {
@@ -242,11 +426,11 @@ declare const app: import("elysia").default<"/api", {
                 body: {
                     sources: {
                         path?: string | undefined;
-                        branch?: string | undefined;
                         url?: string | undefined;
+                        branch?: string | undefined;
                         webUrlTemplate?: string | undefined;
-                        type: "local" | "remote";
                         id: string;
+                        type: "local" | "remote";
                         addedAt: string;
                     }[];
                 };
@@ -317,16 +501,63 @@ declare const app: import("elysia").default<"/api", {
         };
     } & {
         settings: {
+            browse: {
+                get: {
+                    body: unknown;
+                    params: {};
+                    query: {
+                        path?: string | undefined;
+                    };
+                    headers: unknown;
+                    response: {
+                        200: {
+                            code: string;
+                            message: string;
+                            path?: undefined;
+                            name?: undefined;
+                            parent?: undefined;
+                            home?: undefined;
+                            hasSpecs?: undefined;
+                            directories?: undefined;
+                        } | {
+                            path: string;
+                            name: string;
+                            parent: string | null;
+                            home: string;
+                            hasSpecs: boolean;
+                            directories: {
+                                name: string;
+                                path: string;
+                                hasSpecs: boolean;
+                            }[];
+                            code?: undefined;
+                            message?: undefined;
+                        };
+                        422: {
+                            type: "validation";
+                            on: string;
+                            summary?: string;
+                            message?: string;
+                            found?: unknown;
+                            property?: string;
+                            expected?: string;
+                        };
+                    };
+                };
+            };
+        };
+    } & {
+        settings: {
             sources: {
                 put: {
                     body: {
                         path?: string | undefined;
-                        branch?: string | undefined;
                         url?: string | undefined;
+                        branch?: string | undefined;
                         webUrlTemplate?: string | undefined;
                         addedAt?: string | undefined;
-                        type: "local" | "remote";
                         id: string;
+                        type: "local" | "remote";
                     }[];
                     params: {};
                     query: unknown;
@@ -368,7 +599,21 @@ declare const app: import("elysia").default<"/api", {
                 headers: unknown;
                 response: {
                     200: {
-                        snapshots: import("./db/queries/snapshots.js").SnapshotRow[];
+                        snapshots: {
+                            supersededBy: {
+                                specKey: string;
+                                title: string;
+                            } | null;
+                            id: string;
+                            spec_key: string;
+                            created_at: string;
+                            content_digest: string;
+                            metadata_projection: string;
+                            provenance: string;
+                            retention_policy: string | null;
+                            purged: number;
+                            purged_at: string | null;
+                        }[];
                         nextCursor: string | null;
                     };
                     422: {
@@ -549,6 +794,33 @@ declare const app: import("elysia").default<"/api", {
             };
         };
     } & {
+        specs: {
+            "suggestions-by-key": {
+                get: {
+                    body: unknown;
+                    params: {};
+                    query: {
+                        key: string;
+                    };
+                    headers: unknown;
+                    response: {
+                        200: {
+                            suggestions: import("./db/queries/suggestions.js").SuggestionRow[];
+                        };
+                        422: {
+                            type: "validation";
+                            on: string;
+                            summary?: string;
+                            message?: string;
+                            found?: unknown;
+                            property?: string;
+                            expected?: string;
+                        };
+                    };
+                };
+            };
+        };
+    } & {
         suggestions: {
             ":id": {
                 accept: {
@@ -650,6 +922,39 @@ declare const app: import("elysia").default<"/api", {
                                 property?: string;
                                 expected?: string;
                             };
+                        };
+                    };
+                };
+            };
+        };
+    } & {
+        specs: {
+            "proposals-by-key": {
+                get: {
+                    body: unknown;
+                    params: {};
+                    query: {
+                        key: string;
+                    };
+                    headers: unknown;
+                    response: {
+                        200: {
+                            code: string;
+                            message: string;
+                            proposals?: undefined;
+                        } | {
+                            proposals: import("./db/queries/proposals.js").ProposalRow[];
+                            code?: undefined;
+                            message?: undefined;
+                        };
+                        422: {
+                            type: "validation";
+                            on: string;
+                            summary?: string;
+                            message?: string;
+                            found?: unknown;
+                            property?: string;
+                            expected?: string;
                         };
                     };
                 };
@@ -790,12 +1095,12 @@ declare const app: import("elysia").default<"/api", {
                 body: unknown;
                 params: {};
                 query: {
-                    after?: string | undefined;
-                    before?: string | undefined;
                     limit?: string | undefined;
                     specKey?: string | undefined;
                     operation?: string | undefined;
                     actor?: string | undefined;
+                    after?: string | undefined;
+                    before?: string | undefined;
                 };
                 headers: unknown;
                 response: {
@@ -825,7 +1130,7 @@ declare const app: import("elysia").default<"/api", {
     };
 } & {
     api: {
-        export: {
+        backup: {
             get: {
                 body: unknown;
                 params: {};
@@ -837,43 +1142,61 @@ declare const app: import("elysia").default<"/api", {
             };
         };
     } & {
-        import: {
-            preview: {
+        backup: {
+            restore: {
                 post: {
                     body: unknown;
                     params: {};
                     query: unknown;
                     headers: unknown;
                     response: {
-                        200: import("./routes/import-export.js").ImportPreviewResult | {
-                            valid: boolean;
-                            specCount: number;
-                            changes: {
-                                add: number;
-                                modify: number;
-                                remove: number;
-                            };
-                            errors: {
-                                path: string;
-                                message: string;
-                            }[];
+                        200: {
+                            code: string;
+                            message: string;
+                            restored?: undefined;
+                            requiresRestart?: undefined;
+                            safetyBackupPath?: undefined;
+                        } | {
+                            restored: boolean;
+                            requiresRestart: boolean;
+                            message: string;
+                            safetyBackupPath: string;
+                            code?: undefined;
                         };
                     };
                 };
             };
         };
-    } & {
-        import: {
-            apply: {
-                post: {
+    };
+} & {
+    api: {
+        export: {
+            text: {
+                get: {
                     body: unknown;
                     params: {};
                     query: unknown;
                     headers: unknown;
                     response: {
-                        200: import("./routes/import-export.js").ImportApplyResult | {
-                            code: string;
-                            message: string;
+                        200: Response;
+                    };
+                };
+            };
+        };
+    } & {
+        export: {
+            text: {
+                apply: {
+                    post: {
+                        body: unknown;
+                        params: {};
+                        query: unknown;
+                        headers: unknown;
+                        response: {
+                            200: import("./services/text-export.js").ApplyTextExportResult | {
+                                code: string;
+                                message: string;
+                            };
                         };
                     };
                 };
@@ -902,6 +1225,10 @@ declare const app: import("elysia").default<"/api", {
             message: string;
             requestId: `${string}-${string}-${string}-${string}-${string}`;
             details?: undefined;
+        } | {
+            code: string;
+            message: string;
+            requestId: `${string}-${string}-${string}-${string}-${string}`;
         };
     };
 } & {
@@ -911,5 +1238,6 @@ declare const app: import("elysia").default<"/api", {
     standaloneSchema: {};
     response: {};
 }>;
-export { app, db, mcpToken };
+declare const server: Bun.Server;
+export { app, db, server, mcpToken };
 //# sourceMappingURL=index.d.ts.map

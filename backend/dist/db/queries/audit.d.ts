@@ -25,5 +25,7 @@ export declare function insertAuditEvent(db: Database, event: {
     actor: string;
     timestamp: string;
 }): void;
+/** Every audit event ever recorded, oldest first, for full-library export. */
+export declare function listAllAuditEvents(db: Database): AuditRow[];
 export declare function queryAuditEvents(db: Database, filters: AuditFilters): AuditRow[];
 //# sourceMappingURL=audit.d.ts.map

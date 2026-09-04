@@ -49,7 +49,7 @@ interface GatewayAppApi {
   fetch?(path: string, init?: RequestInit): Promise<Response>;
 }
 
-function wrapGatewayApi(gatewayApi: GatewayAppApi): CrewAppApi {
+function wrapGatewayApi(_gatewayApi: GatewayAppApi): CrewAppApi {
   return {
     async fetch(path: string, init?: RequestInit): Promise<Response> {
       const proxyPath = path.startsWith('/apps/')

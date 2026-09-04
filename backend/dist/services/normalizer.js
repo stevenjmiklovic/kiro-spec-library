@@ -40,18 +40,18 @@ export function extractTitle(content, fallbackSlug) {
 }
 export function calculateStage(artifacts, taskCounts) {
     if (artifacts['tasks.md'] && taskCounts.total > 0 && taskCounts.completed === taskCounts.total) {
-        return 'completed';
+        return 'done';
+    }
+    if (artifacts['tasks.md'] && taskCounts.total > 0 && taskCounts.completed > 0) {
+        return 'in-flight';
     }
     if (artifacts['tasks.md']) {
-        return 'tasks';
+        return 'refined';
     }
-    if (artifacts['design.md']) {
-        return 'design';
+    if (artifacts['design.md'] || (artifacts['bugfix.md'] && !artifacts['requirements.md'])) {
+        return 'scoped';
     }
-    if (artifacts['bugfix.md'] && !artifacts['requirements.md']) {
-        return 'bug_analysis';
-    }
-    return 'requirements';
+    return 'new';
 }
 export function calculateProgress(artifacts, taskCounts) {
     let base = 0;

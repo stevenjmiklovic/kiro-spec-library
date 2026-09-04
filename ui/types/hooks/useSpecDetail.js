@@ -22,7 +22,6 @@ function normalizeDetail(raw) {
         ? meta['approvers'].filter((a) => typeof a === 'string')
         : [];
     const retention = meta['retentionPolicy'];
-    const legal = meta['legalHold'];
     const stage = str(spec['stage'], 'draft');
     const indexedAt = str(spec['indexed_at'] ?? spec['indexedAt']);
     return {
@@ -45,11 +44,9 @@ function normalizeDetail(raw) {
                     customDate: str(retention.customDate) || undefined,
                 }
                 : undefined,
-            legalHold: legal
-                ? { active: legal.active === true, reason: str(legal.reason) || undefined }
-                : undefined,
             approvers,
             implementationRef: str(meta['implementationRef']) || undefined,
+            reviewedAt: str(meta['reviewedAt']) || undefined,
         },
         provenance: {
             repository: str(spec['repository'], '—'),
@@ -72,6 +69,7 @@ function normalizeSuggestions(raw) {
         .filter((s) => !!s && typeof s === 'object')
         .map((s) => ({
         id: str(s['id']),
+        sourceSpecKey: str(s['source_spec_key'] ?? s['sourceSpecKey']),
         targetSpecKey: str(s['target_spec_key'] ?? s['targetSpecKey']),
         type: str(s['type'], 'related'),
         confidence: num(s['confidence']),
@@ -128,9 +126,9 @@ export function useSpecDetail(specKey) {
         setError(null);
         try {
             const [detailRes, sugRes, propRes] = await Promise.all([
-                api.fetch(`/specs/${encodeURIComponent(specKey)}`),
-                api.fetch(`/specs/${encodeURIComponent(specKey)}/suggestions`),
-                api.fetch(`/specs/${encodeURIComponent(specKey)}/proposals`),
+                api.fetch(`/spec-detail?key=${encodeURIComponent(specKey)}`),
+                api.fetch(`/spec-suggestions?key=${encodeURIComponent(specKey)}`),
+                api.fetch(`/spec-proposals?key=${encodeURIComponent(specKey)}`),
             ]);
             if (!detailRes.ok)
                 throw new Error(`Failed to load spec: ${detailRes.status}`);

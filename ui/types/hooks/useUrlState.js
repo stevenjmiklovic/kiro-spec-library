@@ -8,6 +8,7 @@ const SELECTED_PARAM = 'selected';
 const REVISION_PARAM = 'revision';
 const QUERY_PARAM = 'q';
 const Y_AXIS_PARAM = 'yAxis';
+const X_AXIS_PARAM = 'xAxis';
 const FILTER_PARAMS = [
     'type',
     'stage',
@@ -39,9 +40,15 @@ function parseUrl() {
     const revision = params.get(REVISION_PARAM) ?? undefined;
     const query = params.get(QUERY_PARAM) ?? undefined;
     const yAxisRaw = params.get(Y_AXIS_PARAM);
-    const yAxis = yAxisRaw === 'owner' || yAxisRaw === 'repository' || yAxisRaw === 'type' || yAxisRaw === 'theme'
+    const yAxis = yAxisRaw === 'owner' ||
+        yAxisRaw === 'repository' ||
+        yAxisRaw === 'type' ||
+        yAxisRaw === 'theme' ||
+        yAxisRaw === 'project'
         ? yAxisRaw
-        : 'owner';
+        : 'project';
+    const xAxisRaw = params.get(X_AXIS_PARAM);
+    const xAxis = xAxisRaw === 'chronological' ? 'chronological' : 'status';
     const filters = {};
     for (const key of FILTER_PARAMS) {
         const urlKey = key === 'repository' ? REPO_URL_PARAM : key;
@@ -50,7 +57,7 @@ function parseUrl() {
             filters[key] = val;
         }
     }
-    return { view, themeMode, yAxis, selected, revision, query, filters };
+    return { view, themeMode, yAxis, xAxis, selected, revision, query, filters };
 }
 // ---------------------------------------------------------------------------
 // Serialize UrlState → query string and push to URL
@@ -63,8 +70,11 @@ function serializeToUrl(state) {
     if (state.themeMode === 'light') {
         params.set(MODE_PARAM, 'light');
     }
-    if (state.yAxis && state.yAxis !== 'owner') {
+    if (state.yAxis && state.yAxis !== 'project') {
         params.set(Y_AXIS_PARAM, state.yAxis);
+    }
+    if (state.xAxis && state.xAxis !== 'status') {
+        params.set(X_AXIS_PARAM, state.xAxis);
     }
     if (state.selected)
         params.set(SELECTED_PARAM, state.selected);
@@ -132,6 +142,7 @@ export function useUrlState() {
             view: patch.view ?? prev.view,
             themeMode: patch.themeMode ?? prev.themeMode,
             yAxis: patch.yAxis ?? prev.yAxis,
+            xAxis: patch.xAxis ?? prev.xAxis,
             selected: 'selected' in patch ? patch.selected : prev.selected,
             revision: 'revision' in patch ? patch.revision : prev.revision,
             query: 'query' in patch ? patch.query : prev.query,

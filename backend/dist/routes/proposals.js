@@ -18,6 +18,17 @@ export function proposalRoutes(deps) {
     }, {
         params: t.Object({ id: t.String() }),
     })
+        .get("/specs/proposals-by-key", ({ query, set }) => {
+        const spec = findByKey(db, query.key);
+        if (!spec) {
+            set.status = 404;
+            return { code: "NOT_FOUND", message: `Spec '${query.key}' not found` };
+        }
+        const proposals = listPendingProposals(db, spec.key);
+        return { proposals };
+    }, {
+        query: t.Object({ key: t.String() }),
+    })
         // Create a new proposal
         .post("/specs/:id/proposals", ({ params, body, set }) => {
         const spec = findByKey(db, params.id);

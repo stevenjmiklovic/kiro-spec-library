@@ -1,0 +1,1 @@
+Fixed the Rescan button, which appeared to do nothing: it now polls the scan to completion, reports how many specs were indexed, refreshes the graph in place, and warns clearly when no sources are configured instead of silently scanning nothing.
