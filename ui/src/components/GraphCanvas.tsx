@@ -20,6 +20,8 @@ export interface GraphSpec {
   owner: string;
   theme: string;
   repository?: string;
+  /** Friendly project/source name (derived backend-side from the source config). */
+  project?: string;
   reviewed?: boolean;
   /** ISO 8601 — last indexed/scanned time. Drives the "Chronological" X-axis. */
   indexedAt?: string;
@@ -28,12 +30,13 @@ export interface GraphSpec {
 }
 
 /** Available Y-axis grouping fields. */
-export type YAxisField = "theme" | "owner" | "repository" | "type";
+export type YAxisField = "project" | "theme" | "owner" | "repository" | "type";
 export const Y_AXIS_OPTIONS: { value: YAxisField; label: string }[] = [
+  { value: "project", label: "Project" },
   { value: "owner", label: "Owner" },
-  { value: "repository", label: "Repository" },
   { value: "type", label: "Type" },
   { value: "theme", label: "Theme" },
+  { value: "repository", label: "Repository (path)" },
 ];
 
 /** Available X-axis grouping modes. */
@@ -104,6 +107,7 @@ const edgeTypes = { spec: EdgeComponent };
 /** Extract the lane value for a spec given the chosen Y-axis field. */
 function getLaneValue(spec: GraphSpec, field: YAxisField): string {
   switch (field) {
+    case "project": return spec.project || "Unassigned";
     case "owner": return spec.owner || "Unassigned";
     case "repository": return spec.repository || "Unassigned";
     case "type": return spec.type || "unknown";
@@ -141,6 +145,7 @@ export function placeGraphNodes(
             stage: spec.stage,
             progress: spec.progress,
             owner: spec.owner,
+            project: spec.project || "",
             theme: spec.theme || "Unassigned",
             reviewed: spec.reviewed ?? false,
           },

@@ -15,6 +15,7 @@ export interface SpecNodeData {
   stage: string;
   progress: number;
   owner: string;
+  project?: string;
   theme: string;
   selected?: boolean;
   superseded?: boolean;
@@ -56,6 +57,7 @@ export function SpecNode({ data }: NodeProps<SpecNodeType>) {
     stage,
     progress,
     owner,
+    project,
     selected,
     superseded,
     reviewed,
@@ -76,7 +78,7 @@ export function SpecNode({ data }: NodeProps<SpecNodeType>) {
     onSelect?.(id);
   }, [onSelect, id]);
 
-  const ariaLabel = `${title}, ${TYPE_LABELS[type]}, ${stage}, ${progress}%`;
+  const ariaLabel = `${title}, ${TYPE_LABELS[type]}, ${stage}, ${progress}%${project ? `, project ${project}` : ''}`;
   const isSelected = selected ?? false;
   const TypeGlyph = TYPE_GLYPHS[type];
 
@@ -107,6 +109,13 @@ export function SpecNode({ data }: NodeProps<SpecNodeType>) {
 
       {/* Title — wraps up to two lines */}
       <strong className="spec-node__title">{title}</strong>
+
+      {/* Project chip — which project/source this spec belongs to */}
+      {project && (
+        <span className="spec-node__project" title={`Project: ${project}`}>
+          {project}
+        </span>
+      )}
 
       {/* Stage / progress / owner line */}
       <span className="spec-node__meta">

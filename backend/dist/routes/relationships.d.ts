@@ -118,6 +118,33 @@ export declare function relationshipRoutes(deps: {
         };
     };
 } & {
+    specs: {
+        "suggestions-by-key": {
+            get: {
+                body: unknown;
+                params: {};
+                query: {
+                    key: string;
+                };
+                headers: unknown;
+                response: {
+                    200: {
+                        suggestions: import("../db/queries/suggestions.js").SuggestionRow[];
+                    };
+                    422: {
+                        type: "validation";
+                        on: string;
+                        summary?: string;
+                        message?: string;
+                        found?: unknown;
+                        property?: string;
+                        expected?: string;
+                    };
+                };
+            };
+        };
+    };
+} & {
     suggestions: {
         ":id": {
             accept: {

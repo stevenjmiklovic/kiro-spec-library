@@ -54,6 +54,12 @@ export function relationshipRoutes(deps) {
     }, {
         params: t.Object({ id: t.String() }),
     })
+        .get("/specs/suggestions-by-key", ({ query }) => {
+        const suggestions = listPending(db, query.key);
+        return { suggestions };
+    }, {
+        query: t.Object({ key: t.String() }),
+    })
         .post("/suggestions/:id/accept", ({ params }) => {
         const suggestionId = params.id;
         // Fetch the suggestion before accepting to get its data

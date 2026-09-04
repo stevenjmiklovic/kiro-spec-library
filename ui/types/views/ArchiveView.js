@@ -2,6 +2,7 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import React, { useCallback, useEffect, useMemo, useRef, useState, } from 'react';
 import { useArchiveData } from '../hooks/useSpecData.js';
 import { useUrlState } from '../hooks/useUrlState.js';
+import { GhostIcon } from '../components/GhostIcon.js';
 import { ArchiveFilterBar, } from '../components/ArchiveFilterBar.js';
 import { DetailPanel } from '../components/DetailPanel.js';
 const MONTHS = [
@@ -75,7 +76,10 @@ function normalizeSnapshot(record) {
             str(metadata['owner']) !== '' &&
             str(metadata['theme']) !== '' &&
             tags.length > 0);
-    const legalHoldActive = r['legal_hold_active'] === 1 || r['legal_hold_active'] === true;
+    const supersededByRaw = r['supersededBy'];
+    const supersededBy = supersededByRaw && typeof supersededByRaw === 'object'
+        ? { specKey: str(supersededByRaw['specKey']), title: str(supersededByRaw['title']) }
+        : undefined;
     return {
         id: str(r['id']) || str(r['spec_key']) || crypto.randomUUID(),
         specKey: str(r['spec_key'] ?? r['specKey']),
@@ -89,8 +93,7 @@ function normalizeSnapshot(record) {
         monthLabel,
         dateLabel,
         retentionLabel: retentionLabel(r['retention_policy'] ?? metadata['retentionPolicy'], metadataComplete),
-        legalHoldActive,
-        legalHoldReason: str(r['legal_hold_reason']) || undefined,
+        supersededBy,
         metadataComplete,
         contentDigest: str(r['content_digest'] ?? r['contentDigest']),
         provenance: {
@@ -119,10 +122,6 @@ function applyFilters(snapshots, filters) {
         if (filters.repository && s.repository !== filters.repository)
             return false;
         if (filters.owner && s.owner !== filters.owner)
-            return false;
-        if (filters.legalHold === 'active' && s.legalHoldActive)
-            return false;
-        if (filters.legalHold === 'none' && !s.legalHoldActive)
             return false;
         if (filters.metadataComplete === true && !s.metadataComplete)
             return false;
@@ -293,10 +292,10 @@ export function ArchiveView() {
     }, [loading, nextCursor, loadMore]);
     // --- Error state ---
     if (error) {
-        return (_jsxs("div", { className: "archive-view", role: "alert", children: [_jsx("header", { className: "archive-header", children: _jsxs("div", { children: [_jsx("h1", { children: "Spec Library" }), _jsx("p", { children: "Browse, retrieve, and curate completed Kiro Specs." })] }) }), _jsx("div", { className: "archive-empty", children: _jsxs("p", { children: ["Failed to load the archive: ", error] }) })] }));
+        return (_jsxs("div", { className: "archive-view", role: "alert", children: [_jsx("header", { className: "archive-header", children: _jsxs("div", { children: [_jsxs("h1", { children: [_jsx(GhostIcon, { size: 28 }), " Spec", _jsx("span", { className: "title-tral", children: "tral" }), " Library"] }), _jsx("p", { children: "Browse, retrieve, and curate completed Kiro Specs." })] }) }), _jsx("div", { className: "archive-empty", children: _jsxs("p", { children: ["Failed to load the archive: ", error] }) })] }));
     }
     const detail = selected ? _jsx(SnapshotDetail, { snapshot: selected }) : null;
-    return (_jsxs("div", { className: `archive-view${isNarrow ? ' archive-view--narrow' : ''}`, children: [_jsxs("header", { className: "archive-header", children: [_jsxs("div", { children: [_jsx("h1", { children: "Spec Library" }), _jsx("p", { children: "Browse, retrieve, and curate completed Kiro Specs." })] }), _jsx("span", { "aria-live": "polite", children: loading
+    return (_jsxs("div", { className: `archive-view${isNarrow ? ' archive-view--narrow' : ''}`, children: [_jsxs("header", { className: "archive-header", children: [_jsxs("div", { children: [_jsxs("h1", { children: [_jsx(GhostIcon, { size: 28 }), " Spec", _jsx("span", { className: "title-tral", children: "tral" }), " Library"] }), _jsx("p", { children: "Browse, retrieve, and curate completed Kiro Specs." })] }), _jsx("span", { "aria-live": "polite", children: loading
                             ? 'Loading…'
                             : `${filtered.length} archived spec${filtered.length === 1 ? '' : 's'}` })] }), _jsx(ArchiveFilterBar, { filters: filters, options: filterOptions, onChange: handleFilterChange, resultCount: filtered.length }), _jsxs("div", { className: "archive-body", children: [_jsxs("section", { className: "archive-table", "aria-label": "Completed specs", ref: scrollRef, onScroll: handleScroll, children: [_jsxs("div", { className: "archive-row archive-row--head", role: "row", children: [_jsx("span", { children: "Spec name" }), _jsx("span", { children: "Type" }), _jsx("span", { children: "Theme" }), _jsx("span", { children: "Repository" }), _jsx("span", { children: "Owner" }), _jsx("span", { children: "Completed" })] }), groups.map((group) => (_jsxs("div", { className: "archive-month", "data-month": group.month, ref: (el) => {
                                     if (el)
@@ -310,5 +309,5 @@ export function ArchiveView() {
 // ---------------------------------------------------------------------------
 function SnapshotDetail({ snapshot, }) {
     const completenessPct = snapshot.metadataComplete ? 100 : 50;
-    return (_jsxs("section", { className: "archive-detail", "aria-label": `Details for ${snapshot.title}`, children: [_jsx("div", { className: "archive-detail__intro", children: _jsxs("div", { children: [_jsxs("div", { className: "archive-detail__title", children: [_jsx("h2", { children: snapshot.title }), _jsx("span", { children: "Completed" })] }), snapshot.tags.length > 0 && (_jsx("div", { className: "archive-tags", children: snapshot.tags.map((tag) => (_jsx("span", { children: tag }, tag))) }))] }) }), _jsxs("div", { className: "archive-columns", children: [_jsxs("section", { children: [_jsx("h3", { children: "Artifact completeness" }), _jsxs("div", { className: "archive-fact", children: [_jsx("span", { children: "Metadata" }), _jsx("strong", { children: snapshot.metadataComplete ? 'Complete' : 'Incomplete' }), _jsx("progress", { max: 100, value: completenessPct })] })] }), _jsxs("section", { children: [_jsx("h3", { children: "Source" }), _jsxs("div", { className: "archive-fact", children: [_jsx("span", { children: "Repository" }), _jsx("strong", { children: snapshot.provenance.repository })] }), _jsxs("div", { className: "archive-fact", children: [_jsx("span", { children: "Path" }), _jsx("strong", { children: snapshot.provenance.relativePath })] }), _jsxs("div", { className: "archive-fact", children: [_jsx("span", { children: "Branch" }), _jsx("strong", { children: snapshot.provenance.branch })] }), _jsxs("div", { className: "archive-fact", children: [_jsx("span", { children: "Commit" }), _jsx("strong", { children: snapshot.provenance.commitHash.slice(0, 12) || '—' })] })] }), _jsxs("section", { children: [_jsx("h3", { children: "Provenance" }), _jsxs("div", { className: "archive-fact", children: [_jsx("span", { children: "Owner" }), _jsx("strong", { children: snapshot.owner })] }), _jsxs("div", { className: "archive-fact", children: [_jsx("span", { children: "Archived on" }), _jsx("strong", { children: snapshot.dateLabel })] }), _jsxs("div", { className: "archive-fact", children: [_jsx("span", { children: "Spec key" }), _jsx("strong", { children: snapshot.specKey || '—' })] }), _jsxs("div", { className: "archive-fact", children: [_jsx("span", { children: "Content digest" }), _jsx("strong", { children: snapshot.contentDigest.slice(0, 12) || '—' })] })] }), _jsxs("section", { children: [_jsx("h3", { children: "Disposition" }), _jsxs("div", { className: "archive-fact", children: [_jsx("span", { children: "Status" }), _jsx("strong", { children: snapshot.legalHoldActive ? 'Superseded' : 'Active' })] }), snapshot.legalHoldActive && snapshot.legalHoldReason && (_jsxs("div", { className: "archive-fact", children: [_jsx("span", { children: "Successor" }), _jsx("strong", { children: snapshot.legalHoldReason })] }))] })] })] }));
+    return (_jsxs("section", { className: "archive-detail", "aria-label": `Details for ${snapshot.title}`, children: [_jsx("div", { className: "archive-detail__intro", children: _jsxs("div", { children: [_jsxs("div", { className: "archive-detail__title", children: [_jsx("h2", { children: snapshot.title }), _jsx("span", { children: "Completed" })] }), snapshot.tags.length > 0 && (_jsx("div", { className: "archive-tags", children: snapshot.tags.map((tag) => (_jsx("span", { children: tag }, tag))) }))] }) }), _jsxs("div", { className: "archive-columns", children: [_jsxs("section", { children: [_jsx("h3", { children: "Artifact completeness" }), _jsxs("div", { className: "archive-fact", children: [_jsx("span", { children: "Metadata" }), _jsx("strong", { children: snapshot.metadataComplete ? 'Complete' : 'Incomplete' }), _jsx("progress", { max: 100, value: completenessPct })] })] }), _jsxs("section", { children: [_jsx("h3", { children: "Source" }), _jsxs("div", { className: "archive-fact", children: [_jsx("span", { children: "Repository" }), _jsx("strong", { children: snapshot.provenance.repository })] }), _jsxs("div", { className: "archive-fact", children: [_jsx("span", { children: "Path" }), _jsx("strong", { children: snapshot.provenance.relativePath })] }), _jsxs("div", { className: "archive-fact", children: [_jsx("span", { children: "Branch" }), _jsx("strong", { children: snapshot.provenance.branch })] }), _jsxs("div", { className: "archive-fact", children: [_jsx("span", { children: "Commit" }), _jsx("strong", { children: snapshot.provenance.commitHash.slice(0, 12) || '—' })] })] }), _jsxs("section", { children: [_jsx("h3", { children: "Provenance" }), _jsxs("div", { className: "archive-fact", children: [_jsx("span", { children: "Owner" }), _jsx("strong", { children: snapshot.owner })] }), _jsxs("div", { className: "archive-fact", children: [_jsx("span", { children: "Archived on" }), _jsx("strong", { children: snapshot.dateLabel })] }), _jsxs("div", { className: "archive-fact", children: [_jsx("span", { children: "Spec key" }), _jsx("strong", { children: snapshot.specKey || '—' })] }), _jsxs("div", { className: "archive-fact", children: [_jsx("span", { children: "Content digest" }), _jsx("strong", { children: snapshot.contentDigest.slice(0, 12) || '—' })] })] }), _jsxs("section", { children: [_jsx("h3", { children: "Disposition" }), _jsxs("div", { className: "archive-fact", children: [_jsx("span", { children: "Status" }), _jsx("strong", { children: snapshot.supersededBy ? 'Superseded' : 'Active' })] }), snapshot.supersededBy && (_jsxs("div", { className: "archive-fact", children: [_jsx("span", { children: "Successor" }), _jsx("strong", { children: snapshot.supersededBy.title || snapshot.supersededBy.specKey })] }))] })] })] }));
 }

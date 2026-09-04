@@ -24,8 +24,17 @@ interface Props {
   resultCount: number;
 }
 
-const TYPES = ["spec", "design", "adr", "runbook", "reference"];
+// Actual normalized spec types (see shared SpecType / normalizer.classifyType).
+const TYPES = ["feature", "bugfix", "quick", "unknown"];
 const STAGES = ["new", "scoped", "refined", "in-flight", "done"];
+
+// Human-readable labels for the type options.
+const TYPE_LABELS: Record<string, string> = {
+  feature: "Feature",
+  bugfix: "Bugfix",
+  quick: "Quick",
+  unknown: "Unknown",
+};
 
 const DEFAULT_FILTERS: RelationshipFilters = { scope: "team" };
 
@@ -139,7 +148,7 @@ export function FilterBar({ filters, options, onChange, resultCount }: Props): R
             <option value="">All types</option>
             {TYPES.map((t) => (
               <option key={t} value={t}>
-                {t}
+                {TYPE_LABELS[t] ?? t}
               </option>
             ))}
           </select>

@@ -41,7 +41,7 @@ export function SpecActions({ detail }) {
             specId: detail.specId || detail.key,
             revisionId: commitHash || undefined,
             prompt,
-            agent: 'spec-librarian',
+            agent: 'spectral-librarian',
         });
     };
     return (_jsxs("div", { className: "spec-actions", role: "group", "aria-label": "Spec actions", children: [_jsx("button", { type: "button", className: "spec-actions__primary", onClick: openInChat, children: "Open in Crew chat" }), _jsxs("div", { className: "spec-actions__permalink", children: [permalink ? (_jsx("a", { className: "spec-actions__link", href: permalink, target: "_blank", rel: "noopener noreferrer", children: "Repository permalink \u2197" })) : (_jsx("span", { className: "spec-actions__link spec-actions__link--disabled", "aria-disabled": "true", title: "No web URL is available for this source", children: "Repository permalink" })), isDirty && (_jsx("span", { className: "spec-actions__dirty", title: "Working tree has uncommitted changes; the permalink points at the last commit", children: "\u25CF Uncommitted changes" }))] })] }));

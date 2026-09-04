@@ -336,6 +336,10 @@ export function applyTextExportZip(db: Database, zipBytes: Uint8Array): ApplyTex
       continue;
     }
     const repoSegment = pathParts[1];
+    if (!repoSegment) {
+      result.errors.push(`${path}: invalid path format (expected specs/<repo>/<specId>.json)`);
+      continue;
+    }
     const specRow = index.byPath.get(`${repoSegment}/${sanitizeSegment(sidecar.specId)}`);
 
     if (!specRow) {

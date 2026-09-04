@@ -18,6 +18,8 @@ export declare function createProposal(db: Database, params: {
     rationale?: string;
     source?: string;
 }): ProposalRow;
+/** Every proposal in the database (any status), for full-library export. */
+export declare function listAllProposals(db: Database): ProposalRow[];
 export declare function listPendingProposals(db: Database, specKey: string): ProposalRow[];
 export declare function acceptProposal(db: Database, id: string): ProposalRow | null;
 export declare function rejectProposal(db: Database, id: string): ProposalRow | null;

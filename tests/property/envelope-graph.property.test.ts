@@ -283,9 +283,10 @@ describe("Property 18: Node Placement Determinism", () => {
     owner: fc.string({ minLength: 1, maxLength: 30 }),
     theme: fc.string({ minLength: 0, maxLength: 30 }),
     repository: fc.string({ minLength: 0, maxLength: 40 }),
+    project: fc.string({ minLength: 0, maxLength: 40 }),
   });
 
-  const yAxisFieldArb: fc.Arbitrary<YAxisField> = fc.constantFrom("theme", "owner", "repository", "type");
+  const yAxisFieldArb: fc.Arbitrary<YAxisField> = fc.constantFrom("project", "theme", "owner", "repository", "type");
 
   test("identical input yields identical coordinates (100+ generated cases)", () => {
     fc.assert(
@@ -396,6 +397,7 @@ describe("Property 18: Node Placement Determinism", () => {
   test("y coordinate works for all yAxisField options (100+ generated cases)", () => {
     function getLaneValue(spec: GraphSpec, field: YAxisField): string {
       switch (field) {
+        case "project": return spec.project || "Unassigned";
         case "owner": return spec.owner || "Unassigned";
         case "repository": return spec.repository || "Unassigned";
         case "type": return spec.type || "unknown";

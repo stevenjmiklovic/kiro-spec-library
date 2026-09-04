@@ -23,12 +23,12 @@ export declare function auditRoutes(deps: {
             body: unknown;
             params: {};
             query: {
-                after?: string | undefined;
-                before?: string | undefined;
                 limit?: string | undefined;
                 specKey?: string | undefined;
                 operation?: string | undefined;
                 actor?: string | undefined;
+                after?: string | undefined;
+                before?: string | undefined;
             };
             headers: unknown;
             response: {

@@ -6629,6 +6629,10 @@ var require_dist = __commonJS((exports, module) => {
   exports.default = formatsPlugin;
 });
 
+// src/index.ts
+import { readFileSync } from "fs";
+import { join } from "path";
+
 // ../node_modules/.bun/zod@4.4.3/node_modules/zod/v4/core/core.js
 var _a;
 function $constructor(name, initializer, params) {
@@ -14108,11 +14112,11 @@ var WORKFLOW_TYPES = [
   "unknown"
 ];
 var LIFECYCLE_STAGES = [
-  "requirements",
-  "bug_analysis",
-  "design",
-  "tasks",
-  "completed"
+  "new",
+  "scoped",
+  "refined",
+  "in-flight",
+  "done"
 ];
 var RELATIONSHIP_TYPES = [
   "depends_on",
@@ -18023,6 +18027,73 @@ var SpecLibrarySidecarV1Schema = z.object({
   metadata: SidecarMetadataSchema,
   relationships: z.array(SidecarRelationshipSchema).max(50).optional()
 });
+var TextExportManifestSchema = z.object({
+  schemaVersion: z.literal(1),
+  exportedAt: z.string().datetime(),
+  counts: z.object({
+    sources: z.number().int().min(0),
+    specs: z.number().int().min(0),
+    suggestions: z.number().int().min(0),
+    rejections: z.number().int().min(0),
+    proposals: z.number().int().min(0),
+    snapshots: z.number().int().min(0),
+    auditEvents: z.number().int().min(0)
+  })
+});
+var TextExportSourceSchema = z.object({
+  id: z.string().min(1),
+  type: z.enum(["local", "remote"]),
+  path: z.string().optional(),
+  url: z.string().optional(),
+  branch: z.string().optional(),
+  webUrlTemplate: z.string().optional(),
+  addedAt: z.string().datetime()
+});
+var SpecRefSchema = z.object({
+  specId: z.string().min(1),
+  repository: z.string().min(1)
+});
+var TextExportSuggestionSchema = z.object({
+  source: SpecRefSchema,
+  target: SpecRefSchema,
+  type: z.enum(RELATIONSHIP_TYPES),
+  confidence: z.number().min(0).max(1),
+  reason: z.string().min(1),
+  evidence: z.string(),
+  status: z.enum(["pending", "accepted", "rejected"]),
+  createdAt: z.string().datetime(),
+  resolvedAt: z.string().datetime().optional(),
+  dataHash: z.string().min(1)
+});
+var TextExportRejectionSchema = z.object({
+  source: SpecRefSchema,
+  target: SpecRefSchema,
+  type: z.enum(RELATIONSHIP_TYPES),
+  dataHash: z.string().min(1),
+  rejectedAt: z.string().datetime()
+});
+var TextExportProposalSchema = z.object({
+  id: z.string().min(1),
+  spec: SpecRefSchema,
+  patch: z.record(z.string(), z.unknown()),
+  status: z.enum(["pending", "accepted", "rejected"]),
+  submittedAt: z.string().datetime(),
+  submittedBy: z.string().optional(),
+  resolvedAt: z.string().datetime().optional(),
+  resolvedBy: z.string().optional(),
+  rationale: z.string().optional(),
+  source: z.string().optional()
+});
+var TextExportSnapshotSchema = z.object({
+  id: z.string().min(1),
+  spec: SpecRefSchema,
+  createdAt: z.string().datetime(),
+  contentDigest: z.string().min(1),
+  retentionPolicy: z.string().optional(),
+  purged: z.boolean(),
+  purgedAt: z.string().datetime().optional(),
+  artifactNames: z.array(z.string())
+});
 var MetadataPatchSchema = z.object({
   title: z.string().max(200).optional(),
   summary: z.string().max(2000).optional(),
@@ -18140,11 +18211,20 @@ async function backendFetch(client, path, options = {}) {
   });
   return response;
 }
+async function listSources(client) {
+  const response = await backendFetch(client, "/settings/sources");
+  if (!response.ok) {
+    const error2 = await response.json();
+    throw new Error(`List sources failed: ${error2.message ?? response.statusText}`);
+  }
+  const data = await response.json();
+  return sanitizeJsonResponse(data);
+}
 async function searchSpecs(client, params) {
   const { query, filters, limit } = params;
   const effectiveLimit = Math.min(limit ?? 50, 100);
   const searchParams = new URLSearchParams;
-  searchParams.set("query", query);
+  searchParams.set("q", query);
   searchParams.set("limit", String(effectiveLimit));
   if (filters) {
     if (filters.type)
@@ -18206,9 +18286,19 @@ async function submitMetadataProposal(client, params) {
 
 // src/index.ts
 var BACKEND_PORT = Number(process.env["SPEC_LIBRARY_PORT"]) || 3100;
-var MCP_TOKEN = process.env["SPEC_LIBRARY_MCP_TOKEN"] || "";
+var DATA_DIR = process.env["SPEC_LIBRARY_DATA_DIR"] || join(process.cwd(), "data");
 var BACKEND_URL = `http://127.0.0.1:${BACKEND_PORT}`;
-var client = { baseUrl: BACKEND_URL, token: MCP_TOKEN };
+function resolveMcpToken() {
+  const fromEnv = process.env["SPEC_LIBRARY_MCP_TOKEN"];
+  if (fromEnv)
+    return fromEnv;
+  try {
+    return readFileSync(join(DATA_DIR, "mcp-token"), "utf-8").trim();
+  } catch {
+    return "";
+  }
+}
+var client = { baseUrl: BACKEND_URL, token: resolveMcpToken() };
 var server = new Server({
   name: "spec-library-mcp",
   version: "0.1.0"
@@ -18219,6 +18309,15 @@ var server = new Server({
 });
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: [
+    {
+      name: "list_sources",
+      description: "List all registered repositories (sources) the Spec Library indexes. Returns each source's id, type (local/remote), path or URL, and last scan timestamp. Use this to discover what repositories are being tracked before searching.",
+      inputSchema: {
+        type: "object",
+        properties: {},
+        required: []
+      }
+    },
     {
       name: "search_specs",
       description: "Search for Kiro Specs across all indexed repositories. Returns matching specs with title, stage, progress, and metadata.",
@@ -18233,7 +18332,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
             type: "object",
             properties: {
               type: { type: "string", enum: ["feature", "bugfix", "quick", "unknown"] },
-              stage: { type: "string", enum: ["requirements", "bug_analysis", "design", "tasks", "completed"] },
+              stage: { type: "string", enum: ["new", "scoped", "refined", "in-flight", "done"] },
               theme: { type: "string" },
               owner: { type: "string" },
               repository: { type: "string" }
@@ -18312,6 +18411,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   try {
     let result;
     switch (name) {
+      case "list_sources":
+        result = await listSources(client);
+        break;
       case "search_specs":
         result = await searchSpecs(client, args);
         break;

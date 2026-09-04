@@ -6,7 +6,7 @@ import { useCallback, useMemo, useState, useEffect } from 'react';
 
 export type ViewMode = 'relationship' | 'archive';
 export type ThemeMode = 'light' | 'dark';
-export type YAxisField = 'theme' | 'owner' | 'repository' | 'type';
+export type YAxisField = 'project' | 'theme' | 'owner' | 'repository' | 'type';
 export type XAxisField = 'status' | 'chronological';
 
 export interface UrlStateFilters {
@@ -83,9 +83,13 @@ function parseUrl(): UrlState {
 
   const yAxisRaw = params.get(Y_AXIS_PARAM);
   const yAxis: YAxisField =
-    yAxisRaw === 'owner' || yAxisRaw === 'repository' || yAxisRaw === 'type' || yAxisRaw === 'theme'
+    yAxisRaw === 'owner' ||
+    yAxisRaw === 'repository' ||
+    yAxisRaw === 'type' ||
+    yAxisRaw === 'theme' ||
+    yAxisRaw === 'project'
       ? yAxisRaw
-      : 'owner';
+      : 'project';
 
   const xAxisRaw = params.get(X_AXIS_PARAM);
   const xAxis: XAxisField = xAxisRaw === 'chronological' ? 'chronological' : 'status';
@@ -115,7 +119,7 @@ function serializeToUrl(state: UrlState): void {
   if (state.themeMode === 'light') {
     params.set(MODE_PARAM, 'light');
   }
-  if (state.yAxis && state.yAxis !== 'owner') {
+  if (state.yAxis && state.yAxis !== 'project') {
     params.set(Y_AXIS_PARAM, state.yAxis);
   }
   if (state.xAxis && state.xAxis !== 'status') {

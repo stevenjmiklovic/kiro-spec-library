@@ -233,7 +233,7 @@ export async function extractCreatedAt(repoPath, specPath) {
  * when the spec stage is 'completed'.
  */
 export async function extractCompletedAt(stage, repoPath, specPath) {
-    if (stage !== 'completed')
+    if (stage !== 'done')
         return undefined;
     try {
         const output = await execGit(repoPath, ['log', '--format=%aI', '-1', '--', specPath]);
@@ -258,7 +258,7 @@ export async function extractCompletedAt(stage, repoPath, specPath) {
 export async function autoPopulate(raw, repoPath, currentOwner) {
     const specPath = raw.relativePath;
     // Determine completion stage heuristically from task content
-    const stage = isCompleted(raw.contents['tasks.md']) ? 'completed' : 'tasks';
+    const stage = isCompleted(raw.contents['tasks.md']) ? 'done' : 'in-flight';
     const [approversRaw, createdAt, completedAt] = await Promise.all([
         extractApprovers(repoPath, specPath),
         extractCreatedAt(repoPath, specPath),

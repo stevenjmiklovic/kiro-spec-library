@@ -5342,7 +5342,7 @@ var require_dist = __commonJS((exports) => {
 
 // backend/src/index.ts
 import { mkdirSync as mkdirSync2, writeFileSync as writeFileSync2, chmodSync } from "fs";
-import { join as join5 } from "path";
+import { join as join6 } from "path";
 
 // backend/src/db/connection.ts
 import { Database } from "bun:sqlite";
@@ -24873,6 +24873,27 @@ function isRejected(db, sourceKey, targetKey, type, dataHash) {
   }) !== null;
 }
 
+// backend/src/db/queries/sources.ts
+function listSources(db) {
+  const stmt = db.prepare("SELECT * FROM sources ORDER BY added_at DESC");
+  return stmt.all();
+}
+function putSource(db, source) {
+  const stmt = db.prepare(`
+    INSERT OR REPLACE INTO sources (id, type, path, url, branch, web_url_template, added_at)
+    VALUES ($id, $type, $path, $url, $branch, $web_url_template, $added_at)
+  `);
+  stmt.run({
+    $id: source.id,
+    $type: source.type,
+    $path: source.path ?? null,
+    $url: source.url ?? null,
+    $branch: source.branch ?? null,
+    $web_url_template: source.webUrlTemplate ?? null,
+    $added_at: source.addedAt
+  });
+}
+
 // backend/src/db/queries/audit.ts
 function insertAuditEvent(db, event) {
   const stmt = db.prepare(`
@@ -24942,10 +24963,30 @@ function recordEvent(db, operation, options) {
 }
 
 // backend/src/routes/specs.ts
+function deriveProjectName(spec, sourceById) {
+  const source = sourceById.get(spec.source_id);
+  if (source?.id)
+    return source.id;
+  const basename = (p) => {
+    const trimmed = p.replace(/[/\\]+$/, "");
+    const seg = trimmed.split(/[/\\]/).pop() ?? trimmed;
+    return seg.replace(/\.git$/, "");
+  };
+  if (source?.url)
+    return basename(source.url);
+  if (source?.path)
+    return basename(source.path);
+  if (spec.remote_url)
+    return basename(spec.remote_url);
+  if (spec.repository)
+    return basename(spec.repository);
+  return spec.source_id || "Unknown project";
+}
 function attachRelationshipData(db, specs) {
   const keys = specs.map((spec) => spec.key);
   const relationships = listBySourceKeys(db, keys);
   const suggestions = listPendingBySourceKeys(db, keys);
+  const sourceById = new Map(listSources(db).map((s) => [s.id, { id: s.id, path: s.path, url: s.url }]));
   const relsByKey = new Map;
   for (const rel of relationships) {
     const list = relsByKey.get(rel.source_spec_key) ?? [];
@@ -24960,6 +25001,7 @@ function attachRelationshipData(db, specs) {
   }
   return specs.map((spec) => ({
     ...spec,
+    projectName: deriveProjectName(spec, sourceById),
     relationships: relsByKey.get(spec.key) ?? [],
     suggestions: sugsByKey.get(spec.key) ?? []
   }));
@@ -25160,33 +25202,131 @@ function syncRoutes(deps) {
   });
 }
 
-// backend/src/db/queries/sources.ts
-function listSources(db) {
-  const stmt = db.prepare("SELECT * FROM sources ORDER BY added_at DESC");
-  return stmt.all();
-}
-function putSource(db, source) {
-  const stmt = db.prepare(`
-    INSERT OR REPLACE INTO sources (id, type, path, url, branch, web_url_template, added_at)
-    VALUES ($id, $type, $path, $url, $branch, $web_url_template, $added_at)
-  `);
-  stmt.run({
-    $id: source.id,
-    $type: source.type,
-    $path: source.path ?? null,
-    $url: source.url ?? null,
-    $branch: source.branch ?? null,
-    $web_url_template: source.webUrlTemplate ?? null,
-    $added_at: source.addedAt
-  });
-}
-
 // backend/src/routes/settings.ts
+import { homedir } from "os";
+import { resolve, join as join2, relative, basename, isAbsolute } from "path";
+import { readdir, stat as stat2, realpath } from "fs/promises";
+import { existsSync } from "fs";
+function isWithinHome(abs, home) {
+  if (abs === home)
+    return true;
+  const rel = relative(home, abs);
+  return rel !== "" && !rel.startsWith("..") && !isAbsolute(rel);
+}
+var BLOCKED_DIR_NAMES = new Set([
+  ".ssh",
+  ".aws",
+  ".gnupg",
+  ".gpg",
+  ".config",
+  ".kube",
+  ".docker",
+  ".credentials",
+  ".secrets",
+  "node_modules",
+  ".git"
+]);
 function settingsRoutes(deps) {
   const { db } = deps;
   return new Elysia({ prefix: "/settings" }).get("/sources", () => {
     const sources = listSources(db);
     return { sources };
+  }).get("/browse", async ({ query, set }) => {
+    const home = homedir();
+    const requested = query.path && query.path.trim() || home;
+    let abs;
+    try {
+      abs = resolve(requested);
+    } catch {
+      set.status = 400;
+      return { code: "BAD_REQUEST", message: "Invalid path" };
+    }
+    let realAbs;
+    let realHome;
+    try {
+      realHome = await realpath(home);
+    } catch {
+      set.status = 500;
+      return { code: "INTERNAL", message: "Cannot resolve home directory." };
+    }
+    try {
+      realAbs = await realpath(abs);
+    } catch {
+      set.status = 404;
+      return { code: "NOT_FOUND", message: "Directory not found." };
+    }
+    if (!isWithinHome(realAbs, realHome)) {
+      set.status = 403;
+      return {
+        code: "FORBIDDEN",
+        message: "Browsing is confined to your home directory."
+      };
+    }
+    const relSegs = relative(realHome, realAbs).split(/[/\\]/).filter(Boolean);
+    if (relSegs.some((s) => BLOCKED_DIR_NAMES.has(s.toLowerCase()))) {
+      set.status = 403;
+      return { code: "FORBIDDEN", message: "That directory is not browsable." };
+    }
+    try {
+      const st = await stat2(realAbs);
+      if (!st.isDirectory()) {
+        set.status = 400;
+        return { code: "BAD_REQUEST", message: "Not a directory." };
+      }
+    } catch {
+      set.status = 404;
+      return { code: "NOT_FOUND", message: "Directory not found." };
+    }
+    let entries;
+    try {
+      entries = await readdir(realAbs, { withFileTypes: true });
+    } catch {
+      set.status = 403;
+      return { code: "FORBIDDEN", message: "Cannot read that directory." };
+    }
+    const dirs = [];
+    for (const e of entries) {
+      const name = e.name;
+      if (BLOCKED_DIR_NAMES.has(name.toLowerCase()))
+        continue;
+      if (!e.isDirectory() && !e.isSymbolicLink())
+        continue;
+      const childAbs = join2(realAbs, name);
+      let childReal;
+      try {
+        childReal = await realpath(childAbs);
+      } catch {
+        continue;
+      }
+      if (!isWithinHome(childReal, realHome))
+        continue;
+      try {
+        if (!(await stat2(childReal)).isDirectory())
+          continue;
+      } catch {
+        continue;
+      }
+      let hasSpecs = false;
+      try {
+        hasSpecs = existsSync(join2(childReal, ".kiro", "specs"));
+      } catch {
+        hasSpecs = false;
+      }
+      dirs.push({ name, path: childReal, hasSpecs });
+    }
+    dirs.sort((a, b) => a.name.localeCompare(b.name));
+    const parentAbs = realAbs === realHome ? null : resolve(realAbs, "..");
+    const parent = parentAbs !== null && isWithinHome(parentAbs, realHome) ? parentAbs : null;
+    return {
+      path: realAbs,
+      name: basename(realAbs) || realAbs,
+      parent,
+      home: realHome,
+      hasSpecs: existsSync(join2(realAbs, ".kiro", "specs")),
+      directories: dirs
+    };
+  }, {
+    query: t.Object({ path: t.Optional(t.String()) })
   }).put("/sources", ({ body, set }) => {
     const validated = [];
     for (const raw of body) {
@@ -25666,8 +25806,8 @@ function auditRoutes(deps) {
 
 // backend/src/services/backup.ts
 import { Database as Database2 } from "bun:sqlite";
-import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "fs";
-import { join as join2 } from "path";
+import { existsSync as existsSync2, mkdirSync, readdirSync, rmSync, writeFileSync } from "fs";
+import { join as join3 } from "path";
 var DB_FILENAME = "spec-library.db";
 var SAFETY_BACKUP_PREFIX = "pre-restore-";
 var MAX_SAFETY_BACKUPS = 5;
@@ -25722,16 +25862,16 @@ async function restoreFromBackup(db, dataDir, uploaded) {
       tempDb.close();
     }
   }
-  const safetyDir = join2(dataDir, "backups");
+  const safetyDir = join3(dataDir, "backups");
   mkdirSync(safetyDir, { recursive: true });
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const safetyBackupPath = join2(safetyDir, `${SAFETY_BACKUP_PREFIX}${timestamp}.db`);
+  const safetyBackupPath = join3(safetyDir, `${SAFETY_BACKUP_PREFIX}${timestamp}.db`);
   writeFileSync(safetyBackupPath, serializeForPortability(db));
   pruneOldSafetyBackups(safetyDir);
-  const dbPath = join2(dataDir, DB_FILENAME);
+  const dbPath = join3(dataDir, DB_FILENAME);
   for (const suffix of ["-wal", "-shm"]) {
     const sidecar = `${dbPath}${suffix}`;
-    if (existsSync(sidecar))
+    if (existsSync2(sidecar))
       rmSync(sidecar, { force: true });
   }
   writeFileSync(dbPath, migratedBytes);
@@ -25741,7 +25881,7 @@ function pruneOldSafetyBackups(safetyDir) {
   const files = readdirSync(safetyDir).filter((f) => f.startsWith(SAFETY_BACKUP_PREFIX) && f.endsWith(".db")).sort();
   const excess = files.length - MAX_SAFETY_BACKUPS;
   for (let i = 0;i < excess; i++) {
-    rmSync(join2(safetyDir, files[i]), { force: true });
+    rmSync(join3(safetyDir, files[i]), { force: true });
   }
 }
 
@@ -26950,6 +27090,10 @@ function applyTextExportZip(db, zipBytes) {
       continue;
     }
     const repoSegment = pathParts[1];
+    if (!repoSegment) {
+      result.errors.push(`${path}: invalid path format (expected specs/<repo>/<specId>.json)`);
+      continue;
+    }
     const specRow = index.byPath.get(`${repoSegment}/${sanitizeSegment(sidecar.specId)}`);
     if (!specRow) {
       result.specsSkipped.push(sidecar.specId);
@@ -27226,8 +27370,8 @@ function createRouter(deps) {
 }
 
 // backend/src/security/path-validator.ts
-import { realpath, stat as stat2 } from "fs/promises";
-import { resolve, relative, normalize } from "path";
+import { realpath as realpath2, stat as stat3 } from "fs/promises";
+import { resolve as resolve2, relative as relative2, normalize } from "path";
 var ok = { valid: true };
 var reject = (reason) => ({ valid: false, reason });
 async function validatePath(filePath, sourceRoot) {
@@ -27238,10 +27382,10 @@ async function validatePath(filePath, sourceRoot) {
   if (filePath.split(/[/\\]/).includes("..")) {
     return reject(`Path contains traversal component: ${filePath}`);
   }
-  const absolute = resolve(sourceRoot, normalized);
-  const resolvedRoot = resolve(sourceRoot);
-  const rel = relative(resolvedRoot, absolute);
-  if (rel.startsWith("..") || resolve(resolvedRoot, rel) !== absolute) {
+  const absolute = resolve2(sourceRoot, normalized);
+  const resolvedRoot = resolve2(sourceRoot);
+  const rel = relative2(resolvedRoot, absolute);
+  if (rel.startsWith("..") || resolve2(resolvedRoot, rel) !== absolute) {
     return reject(`Path resolves outside source root: ${absolute}`);
   }
   const lowerRel = rel.toLowerCase();
@@ -27251,9 +27395,9 @@ async function validatePath(filePath, sourceRoot) {
     }
   }
   try {
-    const realFile = await realpath(absolute);
-    const realRoot = await realpath(resolvedRoot);
-    const relFromReal = relative(realRoot, realFile);
+    const realFile = await realpath2(absolute);
+    const realRoot = await realpath2(resolvedRoot);
+    const relFromReal = relative2(realRoot, realFile);
     if (relFromReal.startsWith("..")) {
       return reject(`Symlink escapes source root: ${absolute} -> ${realFile}`);
     }
@@ -27263,7 +27407,7 @@ async function validatePath(filePath, sourceRoot) {
     }
   }
   try {
-    const stats = await stat2(absolute);
+    const stats = await stat3(absolute);
     if (stats.isFile() && stats.size > MAX_ARTIFACT_BYTES) {
       return reject(`File exceeds maximum size (${stats.size} > ${MAX_ARTIFACT_BYTES} bytes): ${normalized}`);
     }
@@ -28045,8 +28189,8 @@ function generateAll(specs, metadataMap, contentMap = new Map, rejections = []) 
 }
 
 // backend/src/services/scanner.ts
-import { join as join3, relative as relative2 } from "path";
-import { readdirSync as readdirSync2, existsSync as existsSync2 } from "fs";
+import { join as join4, relative as relative3 } from "path";
+import { readdirSync as readdirSync2, existsSync as existsSync3 } from "fs";
 
 class ScannerService {
   db;
@@ -28151,7 +28295,7 @@ class ScannerService {
     if (source.type === "remote") {
       await this.refreshRemote(source);
     }
-    const repoPath = source.type === "local" ? source.path : join3(this.dataDir, "clones", source.id);
+    const repoPath = source.type === "local" ? source.path : join4(this.dataDir, "clones", source.id);
     const specDirs = this.discoverSpecDirs(repoPath, source.id);
     const results = [];
     for (const specDir of specDirs) {
@@ -28231,9 +28375,9 @@ class ScannerService {
     return results;
   }
   async refreshRemote(source) {
-    const clonePath = join3(this.dataDir, "clones", source.id);
+    const clonePath = join4(this.dataDir, "clones", source.id);
     const branch = source.branch ?? "main";
-    if (!existsSync2(clonePath)) {
+    if (!existsSync3(clonePath)) {
       const cmd = buildCloneCommand(source.url, clonePath, branch);
       await this.execGit(cmd);
     } else {
@@ -28255,16 +28399,16 @@ class ScannerService {
     }
   }
   discoverSpecDirs(repoPath, sourceId) {
-    const specsRoot = join3(repoPath, ".kiro", "specs");
-    if (!existsSync2(specsRoot)) {
+    const specsRoot = join4(repoPath, ".kiro", "specs");
+    if (!existsSync3(specsRoot)) {
       return [];
     }
     const entries = readdirSync2(specsRoot, { withFileTypes: true });
     const dirs = [];
     for (const entry of entries) {
       if (entry.isDirectory()) {
-        const absolutePath = join3(specsRoot, entry.name);
-        const relativePath = relative2(repoPath, absolutePath);
+        const absolutePath = join4(specsRoot, entry.name);
+        const relativePath = relative3(repoPath, absolutePath);
         dirs.push({
           slug: entry.name,
           absolutePath,
@@ -28276,13 +28420,13 @@ class ScannerService {
     return dirs;
   }
   async readArtifacts(specDir, source) {
-    const repoPath = source.type === "local" ? source.path : join3(this.dataDir, "clones", source.id);
+    const repoPath = source.type === "local" ? source.path : join4(this.dataDir, "clones", source.id);
     const contents = {};
     let config = null;
     const artifactNames = Object.values(SPEC_ARTIFACTS);
     for (const filename of artifactNames) {
-      const filePath = join3(specDir.absolutePath, filename);
-      const relFromRepo = relative2(repoPath, filePath);
+      const filePath = join4(specDir.absolutePath, filename);
+      const relFromRepo = relative3(repoPath, filePath);
       const validation = await validatePath(relFromRepo, repoPath);
       if (!validation.valid) {
         console.warn(`[scanner] Skipping invalid path ${relFromRepo}: ${validation.reason}`);
@@ -28389,7 +28533,7 @@ ${stderr}`);
 // backend/src/services/archiver.ts
 import { createHash as createHash3 } from "crypto";
 import { mkdir, writeFile, readFile, chmod, rm } from "fs/promises";
-import { join as join4 } from "path";
+import { join as join5 } from "path";
 function sha256(content) {
   return createHash3("sha256").update(content).digest("hex");
 }
@@ -28419,7 +28563,7 @@ class ArchiverService {
       return null;
     }
     const snapshotId = crypto.randomUUID();
-    const snapshotDir = join4(this.config.archiveDir, snapshotId);
+    const snapshotDir = join5(this.config.archiveDir, snapshotId);
     try {
       const storedArtifacts = await this.storeArtifacts(snapshotId, snapshotDir, artifactContents);
       const snapshot = {
@@ -28533,7 +28677,7 @@ class ArchiverService {
       throw new Error(`Purge not eligible: ${eligibility.reason}`);
     }
     purgeSnapshot(this.db, snapshotId);
-    const snapshotDir = join4(this.config.archiveDir, snapshotId);
+    const snapshotDir = join5(this.config.archiveDir, snapshotId);
     await rm(snapshotDir, { recursive: true, force: true });
     recordEvent(this.db, "snapshot_purged", {
       snapshotId,
@@ -28575,7 +28719,7 @@ class ArchiverService {
     const stored = [];
     for (const artifact of artifacts) {
       const contentHash = sha256(artifact.content);
-      const storagePath = join4(snapshotDir, artifact.name);
+      const storagePath = join5(snapshotDir, artifact.name);
       const sizeBytes = Buffer.byteLength(artifact.content, "utf-8");
       await writeFile(storagePath, artifact.content, { encoding: "utf-8" });
       await chmod(storagePath, 292);
@@ -28602,15 +28746,15 @@ class ArchiverService {
 
 // backend/src/index.ts
 var port = Number(process.env["PORT"]) || Number(process.env["SPEC_LIBRARY_PORT"]) || 3100;
-var dataDir = process.env["SPEC_LIBRARY_DATA_DIR"] || join5(process.cwd(), "data");
-var archiveDir = join5(dataDir, "archive");
+var dataDir = process.env["SPEC_LIBRARY_DATA_DIR"] || join6(process.cwd(), "data");
+var archiveDir = join6(dataDir, "archive");
 console.log("[startup] Kiro Spec Library backend starting...");
 var mcpToken = crypto.randomUUID();
 console.log(`[startup] MCP token generated: ${mcpToken.slice(0, 8)}...`);
 var enforceMcpAuth = process.env["MCP_AUTH_ENFORCE"] === "1";
 mkdirSync2(dataDir, { recursive: true });
 mkdirSync2(archiveDir, { recursive: true });
-var mcpTokenPath = join5(dataDir, "mcp-token");
+var mcpTokenPath = join6(dataDir, "mcp-token");
 writeFileSync2(mcpTokenPath, mcpToken, { mode: 384 });
 chmodSync(mcpTokenPath, 384);
 console.log("[startup] Opening database...");
@@ -28672,6 +28816,7 @@ function shutdown(signal) {
   process.exit(0);
 }
 export {
+  server,
   mcpToken,
   db,
   app

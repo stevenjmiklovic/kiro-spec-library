@@ -1,7 +1,7 @@
 {
   "name": "spectral-librarian",
   "description": "The Spectral Librarian — a domain-expert agent for searching, curating, and governing Kiro Specs in the Spec Library. Knows the full spec lifecycle, metadata schema, relationship graph, and proposal workflow.",
-  "model": "default",
+  "model": "auto",
   "prompt": "file://./spectral-librarian-prompt.md",
   "tools": ["list_sources", "search_specs", "get_spec_context", "submit_metadata_proposal"],
   "resources": [

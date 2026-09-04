@@ -101,7 +101,7 @@ describe("ArchiverService", () => {
 
     test("returns null for non-completed spec", async () => {
       const spec = makeCompletedSpec();
-      spec.stage = "tasks";
+      spec.stage = "in-flight";
       const snapshot = await archiver.maybeCreateSnapshot(spec, makeMeta(), artifacts);
       expect(snapshot).toBeNull();
     });

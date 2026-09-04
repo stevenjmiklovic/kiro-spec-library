@@ -1,14 +1,55 @@
+/**
+ * Turn free-text user input into a safe FTS5 MATCH expression: each
+ * whitespace-separated word becomes a quoted phrase term (implicit AND
+ * between terms), so stray FTS5 query-syntax characters (-, :, *, etc.)
+ * in user input can't cause a MATCH syntax error.
+ */
+function sanitizeFtsQuery(query) {
+    return query
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((word) => `"${word.replace(/"/g, '""')}"`)
+        .join(" ");
+}
+/**
+ * Upsert a spec, preserving its rowid across updates (`ON CONFLICT DO UPDATE`
+ * rather than `INSERT OR REPLACE`, which deletes+reinserts and would change
+ * the rowid). specs_fts is joined to `specs` by matching rowid, so a stable
+ * rowid is required for that join — and for `syncSpecFts` below — to stay
+ * correct across rescans. Returns the row's rowid for the caller to pass to
+ * `syncSpecFts`.
+ */
 export function upsertSpec(db, spec) {
     const stmt = db.prepare(`
-    INSERT OR REPLACE INTO specs (
+    INSERT INTO specs (
       key, source_id, spec_id, type, workflow, title, owner, stage, progress,
       repository, relative_path, branch, commit_hash, is_dirty, remote_url,
-      total_tasks, completed_tasks, content_digest, indexed_at, updated_at
+      total_tasks, completed_tasks, content_digest, indexed_at
     ) VALUES (
       $key, $source_id, $spec_id, $type, $workflow, $title, $owner, $stage, $progress,
       $repository, $relative_path, $branch, $commit_hash, $is_dirty, $remote_url,
-      $total_tasks, $completed_tasks, $content_digest, $indexed_at, $updated_at
+      $total_tasks, $completed_tasks, $content_digest, $indexed_at
     )
+    ON CONFLICT(key) DO UPDATE SET
+      source_id = excluded.source_id,
+      spec_id = excluded.spec_id,
+      type = excluded.type,
+      workflow = excluded.workflow,
+      title = excluded.title,
+      owner = excluded.owner,
+      stage = excluded.stage,
+      progress = excluded.progress,
+      repository = excluded.repository,
+      relative_path = excluded.relative_path,
+      branch = excluded.branch,
+      commit_hash = excluded.commit_hash,
+      is_dirty = excluded.is_dirty,
+      remote_url = excluded.remote_url,
+      total_tasks = excluded.total_tasks,
+      completed_tasks = excluded.completed_tasks,
+      content_digest = excluded.content_digest,
+      indexed_at = excluded.indexed_at
   `);
     stmt.run({
         $key: spec.key,
@@ -30,7 +71,30 @@ export function upsertSpec(db, spec) {
         $completed_tasks: spec.taskCounts.completed,
         $content_digest: spec.contentDigest,
         $indexed_at: spec.indexedAt,
-        $updated_at: spec.indexedAt,
+    });
+    const row = db
+        .prepare("SELECT rowid FROM specs WHERE key = $key")
+        .get({ $key: spec.key });
+    return row.rowid;
+}
+/**
+ * Sync a spec's row into the contentless `specs_fts` table by matching
+ * rowid (delete-then-insert — contentless FTS5 tables don't support UPDATE).
+ * Call after `upsertSpec` with the rowid it returned.
+ */
+export function syncSpecFts(db, rowid, fields) {
+    db.prepare("DELETE FROM specs_fts WHERE rowid = $rowid").run({ $rowid: rowid });
+    db.prepare(`
+    INSERT INTO specs_fts (rowid, title, content, owner, theme, tags, repository)
+    VALUES ($rowid, $title, $content, $owner, $theme, $tags, $repository)
+  `).run({
+        $rowid: rowid,
+        $title: fields.title,
+        $content: fields.content,
+        $owner: fields.owner,
+        $theme: fields.theme,
+        $tags: fields.tags,
+        $repository: fields.repository,
     });
 }
 export function findByKey(db, key) {
@@ -60,28 +124,19 @@ export function listSpecs(db, filters) {
         conditions.push("m.theme = $theme");
         params.$theme = filters.theme;
     }
-    const needsJoin = !!filters.theme;
-    const from = needsJoin
-        ? "specs s LEFT JOIN metadata_overlays m ON s.key = m.spec_key"
-        : "specs s";
+    const ftsQuery = filters.query ? sanitizeFtsQuery(filters.query) : "";
+    if (ftsQuery) {
+        conditions.push("s.key IN (SELECT specs.key FROM specs JOIN specs_fts ON specs_fts.rowid = specs.rowid WHERE specs_fts MATCH $query)");
+        params.$query = ftsQuery;
+    }
+    // Always join to pick up reviewedAt from overlay
+    const from = "specs s LEFT JOIN metadata_overlays m ON s.key = m.spec_key";
     const where = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
     params.$limit = filters.limit;
     params.$offset = filters.offset;
-    const sql = `SELECT s.* FROM ${from} ${where} ORDER BY s.indexed_at DESC LIMIT $limit OFFSET $offset`;
+    const sql = `SELECT s.*, m.reviewed_at FROM ${from} ${where} ORDER BY s.indexed_at DESC LIMIT $limit OFFSET $offset`;
     const stmt = db.prepare(sql);
     return stmt.all(params);
-}
-export function searchSpecs(db, query, limit) {
-    const stmt = db.prepare(`
-    SELECT s.* FROM specs s
-    JOIN specs_fts ON specs_fts.rowid = (
-      SELECT rowid FROM specs WHERE key = s.key
-    )
-    WHERE specs_fts MATCH $query
-    ORDER BY rank
-    LIMIT $limit
-  `);
-    return stmt.all({ $query: query, $limit: limit });
 }
 export function countSpecs(db, filters) {
     const conditions = [];
@@ -105,6 +160,11 @@ export function countSpecs(db, filters) {
     if (filters.theme) {
         conditions.push("m.theme = $theme");
         params.$theme = filters.theme;
+    }
+    const ftsQuery = filters.query ? sanitizeFtsQuery(filters.query) : "";
+    if (ftsQuery) {
+        conditions.push("s.key IN (SELECT specs.key FROM specs JOIN specs_fts ON specs_fts.rowid = specs.rowid WHERE specs_fts MATCH $query)");
+        params.$query = ftsQuery;
     }
     const needsJoin = !!filters.theme;
     const from = needsJoin

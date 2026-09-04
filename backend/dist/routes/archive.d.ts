@@ -32,7 +32,21 @@ export declare function archiveRoutes(deps: ArchiveDeps): Elysia<"/archive", {
             headers: unknown;
             response: {
                 200: {
-                    snapshots: import("../db/queries/snapshots.js").SnapshotRow[];
+                    snapshots: {
+                        supersededBy: {
+                            specKey: string;
+                            title: string;
+                        } | null;
+                        id: string;
+                        spec_key: string;
+                        created_at: string;
+                        content_digest: string;
+                        metadata_projection: string;
+                        provenance: string;
+                        retention_policy: string | null;
+                        purged: number;
+                        purged_at: string | null;
+                    }[];
                     nextCursor: string | null;
                 };
                 422: {

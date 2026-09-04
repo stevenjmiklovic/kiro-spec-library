@@ -1,0 +1,1 @@
+{"version":3,"file":"010-drop-dead-columns.d.ts","sourceRoot":"","sources":["../../../src/db/migrations/010-drop-dead-columns.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,QAAQ,EAAE,MAAM,YAAY,CAAC;AAE3C;;;;;;;GAOG;AACH,eAAO,MAAM,SAAS;;;WAGb,QAAQ,GAAG,IAAI;CAmBvB,CAAC"}

@@ -1,8 +1,50 @@
 {
   "name": "kiro-spec-library",
-  "version": "0.2.0",
-  "private": true,
+  "version": "0.2.1",
+  "description": "Index, browse, and curate Kiro Specs across repositories with relationship mapping and AI-assisted metadata.",
   "type": "module",
+  "license": "Apache-2.0",
+  "author": "Johns Hopkins University Sheridan Libraries",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stevenjmiklovic/kiro-spec-library.git"
+  },
+  "homepage": "https://github.com/stevenjmiklovic/kiro-spec-library#readme",
+  "keywords": [
+    "kiro",
+    "specs",
+    "specification",
+    "library",
+    "graph",
+    "relationship",
+    "developer-tools",
+    "mcp",
+    "kirocrew"
+  ],
+  "bin": {
+    "kiro-spec-library": "./bin/cli.ts"
+  },
+  "files": [
+    "bin/cli.ts",
+    "backend/dist/index.mjs",
+    "shared/dist/index.mjs",
+    "ui/preview.html",
+    "ui/preview.js",
+    "ui/preview.css",
+    "app.json",
+    "agents/",
+    "scripts/start-backend.sh",
+    "assets/icon-256.png",
+    "assets/favicon.ico",
+    "mcp/src/",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "bun": ">=1.1.0"
+  },
+  "os": ["darwin", "linux"],
   "workspaces": ["shared", "backend", "ui", "mcp"],
   "scripts": {
     "build": "bun run --filter '*' build",
@@ -12,6 +54,7 @@
     "start": "./scripts/start-backend.sh",
     "dev": "bun run --filter backend dev",
     "lint": "biome check .",
+    "prepublishOnly": "bun run build",
     "changelog:draft": "bun run scripts/changelog.ts draft",
     "changelog:compile": "bun run scripts/changelog.ts compile"
   },

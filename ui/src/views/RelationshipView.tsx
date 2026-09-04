@@ -79,6 +79,7 @@ function normalizeSpec(record: unknown): GraphSpec {
     stage: str('stage', 'draft'),
     owner: str('owner'),
     theme: str('theme'),
+    project: str('projectName') || str('project') || undefined,
     progress: num('progress', 0),
     reviewed: !!(r['reviewed_at'] || r['reviewedAt']),
     indexedAt: str('indexed_at') || str('indexedAt') || undefined,
@@ -415,9 +416,37 @@ export function RelationshipView(): React.ReactElement {
           </div>
         </div>
       ) : visibleSpecs.length === 0 ? (
-        <div className="graph-shell">
-          <p>No specifications match the current view.</p>
-        </div>
+        allSpecs.length === 0 ? (
+          <div className="graph-shell">
+            <div className="getting-started" role="region" aria-label="Getting started">
+              <GhostIcon size={40} />
+              <h2>Welcome to Spec<span className="title-tral">tral</span> Library</h2>
+              <p>
+                Nothing is indexed yet. Spec Library builds this relationship graph from the{' '}
+                <code>.kiro/specs/</code> directories in the repositories you point it at — it
+                only reads them, never writes.
+              </p>
+              <ol className="getting-started__steps">
+                <li>Add a local repo path or a remote Git URL as a source.</li>
+                <li>Save &amp; rescan — the app indexes every spec it finds.</li>
+                <li>Explore the graph, grouped by project, owner, or theme.</li>
+              </ol>
+              <button
+                type="button"
+                className="getting-started__cta"
+                onClick={() =>
+                  window.dispatchEvent(new CustomEvent('spec-library:open-sources'))
+                }
+              >
+                Add your first source
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="graph-shell">
+            <p>No specifications match the current view. Adjust or clear the filters above.</p>
+          </div>
+        )
       ) : (
         <>
           {/* Graph + detail rail */}

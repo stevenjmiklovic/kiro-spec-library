@@ -1,6 +1,7 @@
 export type ViewMode = 'relationship' | 'archive';
 export type ThemeMode = 'light' | 'dark';
-export type YAxisField = 'theme' | 'owner' | 'repository' | 'type';
+export type YAxisField = 'project' | 'theme' | 'owner' | 'repository' | 'type';
+export type XAxisField = 'status' | 'chronological';
 export interface UrlStateFilters {
     type?: string;
     stage?: string;
@@ -14,6 +15,8 @@ export interface UrlState {
     themeMode: ThemeMode;
     /** Y-axis grouping field for relationship view. */
     yAxis: YAxisField;
+    /** X-axis grouping mode for relationship view. */
+    xAxis: XAxisField;
     selected?: string;
     revision?: string;
     query?: string;

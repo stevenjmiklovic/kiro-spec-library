@@ -16,6 +16,7 @@ export function resolveMetadata(spec, overlay, sidecar) {
         retentionPolicy: overlay?.retentionPolicy ?? sm?.retentionPolicy,
         approvers: overlay?.approvers ?? [],
         implementationRef: overlay?.implementationRef,
+        reviewedAt: overlay?.reviewedAt,
     };
 }
 /**

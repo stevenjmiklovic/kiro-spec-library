@@ -54,6 +54,11 @@ export function listSnapshots(db, filters) {
   `);
     return stmt.all({ $limit: filters.limit });
 }
+/** Every snapshot record (including purged), for full-library export. */
+export function listAllSnapshots(db) {
+    const stmt = db.prepare("SELECT * FROM snapshots ORDER BY created_at ASC");
+    return stmt.all();
+}
 export function insertSnapshotArtifact(db, artifact) {
     const stmt = db.prepare(`
     INSERT INTO snapshot_artifacts (snapshot_id, name, content_hash, size_bytes, storage_path)

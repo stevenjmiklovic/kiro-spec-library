@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Download, Clock, ExternalLink, Moon, RefreshCw, Sun, Users } from 'lucide-react';
+import { Download, Clock, ExternalLink, Moon, RefreshCw, Sun, Users, Package } from 'lucide-react';
 import type { ThemeMode, ViewMode } from '../hooks/useUrlState.js';
 import { useCrew } from '../hooks/useCrewIntegration.js';
 import { BackupPanel } from './BackupPanel.js';
 import { AliasesPanel } from './AliasesPanel.js';
 import { AuditLogPanel } from './AuditLogPanel.js';
+import { SourcesPanel } from './SourcesPanel.js';
 
 interface Props {
   view: ViewMode;
@@ -29,7 +30,16 @@ export function AppChrome({
   const [backupPanelOpen, setBackupPanelOpen] = useState(false);
   const [aliasesPanelOpen, setAliasesPanelOpen] = useState(false);
   const [auditLogPanelOpen, setAuditLogPanelOpen] = useState(false);
+  const [sourcesPanelOpen, setSourcesPanelOpen] = useState(false);
   const [rescanning, setRescanning] = useState(false);
+
+  // The first-run empty state (RelationshipView) opens this panel via an event,
+  // so the CTA there doesn't need to own the panel's state.
+  React.useEffect(() => {
+    const open = (): void => setSourcesPanelOpen(true);
+    window.addEventListener('spec-library:open-sources', open);
+    return () => window.removeEventListener('spec-library:open-sources', open);
+  }, []);
 
   const handleCopyLink = (): void => {
     navigator.clipboard.writeText(window.location.href);
@@ -44,18 +54,85 @@ export function AppChrome({
       if (!sourcesRes.ok) throw new Error(`Failed to load sources: ${sourcesRes.status}`);
       const { sources } = (await sourcesRes.json()) as { sources: unknown[] };
 
+      // A rescan with no configured sources silently scans nothing and looks
+      // like a dead button — tell the user why instead.
+      if (!Array.isArray(sources) || sources.length === 0) {
+        notify.error(
+          'No sources are configured, so there is nothing to scan. Add a repository source in settings first.',
+        );
+        return;
+      }
+
       const syncRes = await api.fetch('/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sources }),
       });
       if (!syncRes.ok) throw new Error(`Rescan failed: ${syncRes.status}`);
-      notify.success('Rescan triggered.');
+      const { runId } = (await syncRes.json()) as { runId?: string };
+      notify.info('Rescan started…');
+
+      // Poll the scan to completion so we can report a real result and refresh
+      // the graph, instead of firing and forgetting.
+      const result = runId ? await pollScan(runId) : null;
+
+      if (result && (result.status === 'completed' || result.status === 'partial_failure')) {
+        const n = result.specsDiscovered ?? 0;
+        const errs = Array.isArray(result.errors) ? result.errors.length : 0;
+        notify.success(
+          errs > 0
+            ? `Rescan complete: ${n} spec${n === 1 ? '' : 's'} indexed, ${errs} source error${errs === 1 ? '' : 's'}.`
+            : `Rescan complete: ${n} spec${n === 1 ? '' : 's'} indexed.`,
+        );
+      } else {
+        notify.success('Rescan triggered.');
+      }
+
+      // Signal open views to refetch their spec data (see useSpecData).
+      window.dispatchEvent(new CustomEvent('spec-library:rescan-complete'));
     } catch (err) {
       notify.error(err instanceof Error ? err.message : 'Rescan failed.');
     } finally {
       setRescanning(false);
     }
+  };
+
+  /** Poll GET /sync/:runId until the scan leaves the "running" state (or times out). */
+  const pollScan = async (
+    runId: string,
+  ): Promise<{ status?: string; specsDiscovered?: number; errors?: unknown[] } | null> => {
+    const MAX_ATTEMPTS = 40; // ~40s at 1s intervals
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt += 1) {
+      try {
+        const res = await api.fetch(`/sync/${encodeURIComponent(runId)}`);
+        if (res.ok) {
+          const scan = (await res.json()) as {
+            status?: string;
+            specsDiscovered?: number;
+            specs_discovered?: number;
+            errors?: unknown;
+          };
+          const status = scan.status;
+          if (status && status !== 'running') {
+            const errors =
+              typeof scan.errors === 'string'
+                ? (JSON.parse(scan.errors) as unknown[])
+                : Array.isArray(scan.errors)
+                  ? scan.errors
+                  : [];
+            return {
+              status,
+              specsDiscovered: scan.specsDiscovered ?? scan.specs_discovered ?? 0,
+              errors,
+            };
+          }
+        }
+      } catch {
+        // transient — keep polling
+      }
+      await new Promise((r) => setTimeout(r, 1000));
+    }
+    return null;
   };
 
   return (
@@ -86,6 +163,17 @@ export function AppChrome({
       </div>
 
       <div className="chrome-actions">
+        <button
+          type="button"
+          className="chrome-icon-btn"
+          onClick={() => setSourcesPanelOpen(true)}
+          aria-label="Manage repository sources"
+          title="Manage repository sources"
+        >
+          <Package size={14} aria-hidden="true" />
+          Sources
+        </button>
+
         <button
           type="button"
           className="chrome-icon-btn"
@@ -157,6 +245,7 @@ export function AppChrome({
       {backupPanelOpen && <BackupPanel onClose={() => setBackupPanelOpen(false)} />}
       {aliasesPanelOpen && <AliasesPanel onClose={() => setAliasesPanelOpen(false)} />}
       {auditLogPanelOpen && <AuditLogPanel onClose={() => setAuditLogPanelOpen(false)} />}
+      {sourcesPanelOpen && <SourcesPanel onClose={() => setSourcesPanelOpen(false)} />}
     </div>
   );
 }

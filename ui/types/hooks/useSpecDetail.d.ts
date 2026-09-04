@@ -17,12 +17,9 @@ export interface SpecDetailMetadata {
         type: string;
         customDate?: string;
     };
-    legalHold?: {
-        active: boolean;
-        reason?: string;
-    };
     approvers: string[];
     implementationRef?: string;
+    reviewedAt?: string;
 }
 export interface SpecDetail {
     key: string;
@@ -39,6 +36,7 @@ export interface SpecDetail {
 /** A pending metadata/relationship suggestion awaiting accept/reject. */
 export interface PendingSuggestion {
     id: string;
+    sourceSpecKey: string;
     targetSpecKey: string;
     type: string;
     confidence: number;
@@ -56,11 +54,8 @@ export interface MetadataPatch {
         type: string;
         customDate?: string;
     };
-    legalHold?: {
-        active: boolean;
-        reason?: string;
-    };
     implementationRef?: string;
+    reviewedAt?: string;
 }
 /** A pending metadata proposal from an agent awaiting human approval. */
 export interface PendingProposal {

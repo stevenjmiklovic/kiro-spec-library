@@ -54,6 +54,29 @@ export function rejectSuggestion(db, id, dataHash) {
         });
     })();
 }
+/** Whether a suggestion between this source/target/type already exists, in any status. */
+export function suggestionExists(db, sourceSpecKey, targetSpecKey, type) {
+    const stmt = db.prepare(`
+    SELECT 1 FROM suggestions
+    WHERE source_spec_key = $source AND target_spec_key = $target AND type = $type
+    LIMIT 1
+  `);
+    return stmt.get({ $source: sourceSpecKey, $target: targetSpecKey, $type: type }) !== null;
+}
+/** Directly record a rejection dedup entry (used by the textual export's apply path). */
+export function createRejection(db, rejection) {
+    db.prepare(`
+    INSERT INTO rejections (id, source_spec_key, target_spec_key, type, data_hash, rejected_at)
+    VALUES ($id, $source, $target, $type, $data_hash, $rejected_at)
+  `).run({
+        $id: crypto.randomUUID(),
+        $source: rejection.sourceSpecKey,
+        $target: rejection.targetSpecKey,
+        $type: rejection.type,
+        $data_hash: rejection.dataHash,
+        $rejected_at: rejection.rejectedAt,
+    });
+}
 export function listPending(db, specKey) {
     if (specKey) {
         const stmt = db.prepare(`
@@ -69,6 +92,27 @@ export function listPending(db, specKey) {
     ORDER BY confidence DESC, created_at DESC
   `);
     return stmt.all();
+}
+/** Every suggestion in the database (any status), for full-library export. */
+export function listAllSuggestions(db) {
+    const stmt = db.prepare("SELECT * FROM suggestions ORDER BY created_at ASC");
+    return stmt.all();
+}
+/** Every dismissed-suggestion dedup record, for full-library export. */
+export function listAllRejections(db) {
+    const stmt = db.prepare("SELECT * FROM rejections ORDER BY rejected_at ASC");
+    return stmt.all();
+}
+/** Bulk-fetch pending suggestions whose source is one of the given spec keys (for graph edge building). */
+export function listPendingBySourceKeys(db, specKeys) {
+    if (specKeys.length === 0)
+        return [];
+    const placeholders = specKeys.map(() => "?").join(", ");
+    const stmt = db.prepare(`
+    SELECT * FROM suggestions
+    WHERE status = 'pending' AND source_spec_key IN (${placeholders})
+  `);
+    return stmt.all(...specKeys);
 }
 export function isRejected(db, sourceKey, targetKey, type, dataHash) {
     const stmt = db.prepare(`

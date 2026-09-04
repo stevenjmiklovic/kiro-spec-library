@@ -12,13 +12,46 @@ import { RevisionConflictError } from "../db/queries/metadata.js";
 import { applyPatch, resolveMetadata, evaluateCompleteness } from "../services/metadata.js";
 import { listBySourceKeys } from "../db/queries/relationships.js";
 import { listPendingBySourceKeys } from "../db/queries/suggestions.js";
+import { listSources } from "../db/queries/sources.js";
 import { recordEvent } from "../services/audit.js";
+
+/**
+ * Derive a friendly, human-readable project name for a spec.
+ *
+ * Specs store `repository` as the absolute filesystem path of the repo, which
+ * is unreadable in the UI ("/Users/.../kiro-spec-library"). Prefer the source's
+ * configured id; otherwise fall back to the basename of the repository path (or
+ * remote URL), which is the repo folder name a human recognizes.
+ */
+function deriveProjectName(
+  spec: SpecRow,
+  sourceById: Map<string, { id: string; path: string | null; url: string | null }>,
+): string {
+  const source = sourceById.get(spec.source_id);
+  if (source?.id) return source.id;
+
+  const basename = (p: string): string => {
+    const trimmed = p.replace(/[/\\]+$/, "");
+    const seg = trimmed.split(/[/\\]/).pop() ?? trimmed;
+    return seg.replace(/\.git$/, "");
+  };
+
+  if (source?.url) return basename(source.url);
+  if (source?.path) return basename(source.path);
+  if (spec.remote_url) return basename(spec.remote_url);
+  if (spec.repository) return basename(spec.repository);
+  return spec.source_id || "Unknown project";
+}
 
 /** Attach each spec's outgoing accepted relationships and pending suggestions (for the graph view). */
 function attachRelationshipData(db: Database, specs: SpecRow[]) {
   const keys = specs.map((spec) => spec.key);
   const relationships = listBySourceKeys(db, keys);
   const suggestions = listPendingBySourceKeys(db, keys);
+
+  const sourceById = new Map(
+    listSources(db).map((s) => [s.id, { id: s.id, path: s.path, url: s.url }]),
+  );
 
   const relsByKey = new Map<string, Array<{ targetKey: string; type: string }>>();
   for (const rel of relationships) {
@@ -36,6 +69,7 @@ function attachRelationshipData(db: Database, specs: SpecRow[]) {
 
   return specs.map((spec) => ({
     ...spec,
+    projectName: deriveProjectName(spec, sourceById),
     relationships: relsByKey.get(spec.key) ?? [],
     suggestions: sugsByKey.get(spec.key) ?? [],
   }));

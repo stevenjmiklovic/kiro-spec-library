@@ -13,8 +13,8 @@ if (typeof document !== 'undefined' && !document.querySelector(`link[href="${css
     document.head.appendChild(link);
 }
 import { AppChrome } from './components/AppChrome.js';
+import { ErrorBoundary } from './components/ErrorBoundary.js';
 import './styles/global.css';
-// Temporarily skip the ErrorBoundary — render AppProvider directly
 function AppProvider({ children, overrides, }) {
     return _jsx(CrewProvider, { overrides: overrides, children: children });
 }
@@ -31,6 +31,6 @@ function AppContent() {
     return (_jsxs("div", { "data-theme": themeMode, className: `app-root theme-${themeMode}`, children: [_jsx(AppChrome, { view: view, themeMode: themeMode, onViewChange: (v) => setUrlState({ view: v }), onThemeChange: (m) => setUrlState({ themeMode: m }) }), view === 'relationship' ? _jsx(RelationshipView, {}) : _jsx(ArchiveView, {})] }));
 }
 export function App({ crewOverrides } = {}) {
-    return (_jsx(AppProvider, { overrides: crewOverrides, children: _jsx(AppContent, {}) }));
+    return (_jsx(ErrorBoundary, { children: _jsx(AppProvider, { overrides: crewOverrides, children: _jsx(AppContent, {}) }) }));
 }
 export default App;

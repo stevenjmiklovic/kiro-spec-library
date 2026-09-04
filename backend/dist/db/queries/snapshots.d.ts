@@ -7,8 +7,6 @@ export interface SnapshotRow {
     metadata_projection: string;
     provenance: string;
     retention_policy: string | null;
-    legal_hold_active: number;
-    legal_hold_reason: string | null;
     purged: number;
     purged_at: string | null;
 }
@@ -29,6 +27,8 @@ export declare function findByDigest(db: Database, specKey: string, contentDiges
 export declare function getSnapshot(db: Database, id: string): SnapshotRow | null;
 export declare function purgeSnapshot(db: Database, id: string): void;
 export declare function listSnapshots(db: Database, filters: SnapshotFilters): SnapshotRow[];
+/** Every snapshot record (including purged), for full-library export. */
+export declare function listAllSnapshots(db: Database): SnapshotRow[];
 export interface SnapshotArtifactRow {
     id: number;
     snapshot_id: string;
