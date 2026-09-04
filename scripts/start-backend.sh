@@ -30,7 +30,7 @@ BUN="${HOME}/.bun/bin/bun"
 if [[ -z "${PORT:-}" && -n "${KIROCREW_BOUND_PORT:-}" ]]; then
   echo "[start-backend] Refusing to start: launched by the gateway (KIROCREW_BOUND_PORT=${KIROCREW_BOUND_PORT}) but no allocated PORT was provided." >&2
   echo "[start-backend] Binding the SPEC_LIBRARY_PORT fallback here would create a flapping stray on an un-proxied port. Exiting." >&2
-  exit 0
+  exit 1
 fi
 
 PORT="${PORT:-${SPEC_LIBRARY_PORT:-3100}}"
