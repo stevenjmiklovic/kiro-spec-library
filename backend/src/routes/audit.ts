@@ -1,21 +1,15 @@
-import { Elysia, t } from "elysia";
 import type { Database } from "bun:sqlite";
 import { AUDIT_OPERATIONS, type AuditOperation } from "@kiro-spec-library/shared";
-import { queryAuditEvents, type AuditFilters } from "../db/queries/audit.js";
+import { Elysia, t } from "elysia";
+import { type AuditFilters, queryAuditEvents } from "../db/queries/audit.js";
 
 export function auditRoutes(deps: { db: Database }) {
   const { db } = deps;
 
-  return new Elysia({ prefix: "" })
-    .get("/audit", ({ query, set }) => {
-      const {
-        specKey,
-        operation,
-        actor,
-        after,
-        before,
-        limit: rawLimit,
-      } = query;
+  return new Elysia({ prefix: "" }).get(
+    "/audit",
+    ({ query, set }) => {
+      const { specKey, operation, actor, after, before, limit: rawLimit } = query;
 
       // Validate operation if provided
       if (operation && !AUDIT_OPERATIONS.includes(operation as AuditOperation)) {
@@ -59,7 +53,8 @@ export function auditRoutes(deps: { db: Database }) {
         events,
         total: events.length,
       };
-    }, {
+    },
+    {
       query: t.Object({
         specKey: t.Optional(t.String()),
         operation: t.Optional(t.String()),
@@ -68,5 +63,6 @@ export function auditRoutes(deps: { db: Database }) {
         before: t.Optional(t.String()),
         limit: t.Optional(t.String()),
       }),
-    });
+    },
+  );
 }

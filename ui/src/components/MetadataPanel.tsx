@@ -1,10 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useCrew } from '../hooks/useCrewIntegration.js';
-import type {
-  MetadataPatch,
-  PendingSuggestion,
-  SpecDetail,
-} from '../hooks/useSpecDetail.js';
+import type React from "react";
+import { useEffect, useRef, useState } from "react";
+import { useCrew } from "../hooks/useCrewIntegration.js";
+import type { MetadataPatch, PendingSuggestion, SpecDetail } from "../hooks/useSpecDetail.js";
 
 interface Props {
   detail: SpecDetail;
@@ -91,7 +88,6 @@ function EditableField({
             <textarea
               value={draft}
               rows={3}
-              autoFocus
               onChange={(e) => setDraft(e.target.value)}
               aria-label={label}
             />
@@ -99,7 +95,6 @@ function EditableField({
             <input
               type="text"
               value={draft}
-              autoFocus
               onChange={(e) => setDraft(e.target.value)}
               aria-label={label}
             />
@@ -114,8 +109,8 @@ function EditableField({
           </div>
         </div>
       ) : (
-        <p className={`meta-field__value${value ? '' : ' meta-field__value--empty'}`}>
-          {value || placeholder || '—'}
+        <p className={`meta-field__value${value ? "" : " meta-field__value--empty"}`}>
+          {value || placeholder || "—"}
         </p>
       )}
     </div>
@@ -138,17 +133,17 @@ export function MetadataPanel({
   const { metadata } = detail;
 
   const [tagsEditing, setTagsEditing] = useState(false);
-  const [tagsDraft, setTagsDraft] = useState(metadata.tags.join(', '));
+  const [tagsDraft, setTagsDraft] = useState(metadata.tags.join(", "));
   const tagsDraftRef = useRef(tagsDraft);
   tagsDraftRef.current = tagsDraft;
 
   const commitTags = (): void => {
     setTagsEditing(false);
     const next = tagsDraft
-      .split(',')
+      .split(",")
       .map((t) => t.trim())
       .filter(Boolean);
-    if (next.join('|') !== metadata.tags.join('|')) {
+    if (next.join("|") !== metadata.tags.join("|")) {
       void onSave({ tags: next });
     }
   };
@@ -163,10 +158,10 @@ export function MetadataPanel({
     if (tagsEditing) {
       setTagsEditing(false);
       const next = tagsDraftRef.current
-        .split(',')
+        .split(",")
         .map((t) => t.trim())
         .filter(Boolean);
-      if (next.join('|') !== metadata.tags.join('|')) {
+      if (next.join("|") !== metadata.tags.join("|")) {
         void onSave({ tags: next });
       }
     }
@@ -189,10 +184,10 @@ export function MetadataPanel({
       },
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], {
-      type: 'application/json',
+      type: "application/json",
     });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
     a.download = `${detail.key}.spec-library.json`;
     a.click();
@@ -211,14 +206,14 @@ export function MetadataPanel({
         if (parsed.metadata) {
           void onSave(parsed.metadata);
         } else {
-          notify.error('No metadata found in the imported file.');
+          notify.error("No metadata found in the imported file.");
         }
       } catch {
-        notify.error('Could not parse the imported file as JSON.');
+        notify.error("Could not parse the imported file as JSON.");
       }
     };
     reader.readAsText(file);
-    e.target.value = '';
+    e.target.value = "";
   };
 
   return (
@@ -250,7 +245,7 @@ export function MetadataPanel({
       />
       <EditableField
         label="Summary"
-        value={metadata.summary ?? ''}
+        value={metadata.summary ?? ""}
         placeholder="No summary yet"
         multiline
         saving={saving}
@@ -267,7 +262,7 @@ export function MetadataPanel({
       />
       <EditableField
         label="Theme"
-        value={metadata.theme ?? ''}
+        value={metadata.theme ?? ""}
         placeholder="No theme"
         saving={saving}
         commitTrigger={detail.key}
@@ -283,7 +278,7 @@ export function MetadataPanel({
               type="button"
               className="meta-field__edit"
               onClick={() => {
-                setTagsDraft(metadata.tags.join(', '));
+                setTagsDraft(metadata.tags.join(", "));
                 setTagsEditing(true);
               }}
               aria-label="Edit tags"
@@ -297,7 +292,6 @@ export function MetadataPanel({
             <input
               type="text"
               value={tagsDraft}
-              autoFocus
               onChange={(e) => setTagsDraft(e.target.value)}
               aria-label="Tags, comma separated"
             />
@@ -328,7 +322,7 @@ export function MetadataPanel({
 
       <EditableField
         label="Target release"
-        value={metadata.targetRelease ?? ''}
+        value={metadata.targetRelease ?? ""}
         placeholder="Unscheduled"
         saving={saving}
         commitTrigger={detail.key}
@@ -342,15 +336,17 @@ export function MetadataPanel({
         <div className="meta-field__head">
           <span className="meta-field__label">Approvers</span>
         </div>
-        <p className={`meta-field__value${metadata.approvers.length > 0 ? '' : ' meta-field__value--empty'}`}>
-          {metadata.approvers.length > 0 ? metadata.approvers.join(', ') : 'None'}
+        <p
+          className={`meta-field__value${metadata.approvers.length > 0 ? "" : " meta-field__value--empty"}`}
+        >
+          {metadata.approvers.length > 0 ? metadata.approvers.join(", ") : "None"}
         </p>
       </div>
 
       {/* Implementation link — editable */}
       <EditableField
         label="Implementation link"
-        value={metadata.implementationRef ?? ''}
+        value={metadata.implementationRef ?? ""}
         placeholder="No link"
         saving={saving}
         commitTrigger={detail.key}
@@ -363,7 +359,7 @@ export function MetadataPanel({
           <span className="meta-field__label">Created</span>
         </div>
         <p className="meta-field__value">
-          {detail.createdAt ? new Date(detail.createdAt).toLocaleDateString() : '—'}
+          {detail.createdAt ? new Date(detail.createdAt).toLocaleDateString() : "—"}
         </p>
       </div>
 
@@ -373,9 +369,7 @@ export function MetadataPanel({
           <div className="meta-field__head">
             <span className="meta-field__label">Completed</span>
           </div>
-          <p className="meta-field__value">
-            {new Date(detail.completedAt).toLocaleDateString()}
-          </p>
+          <p className="meta-field__value">{new Date(detail.completedAt).toLocaleDateString()}</p>
         </div>
       )}
 
@@ -404,9 +398,7 @@ export function MetadataPanel({
       <div className="metadata-panel__relationships">
         <h4>Suggested relationships</h4>
         {suggestions.length === 0 ? (
-          <p className="meta-field__value meta-field__value--empty">
-            No pending suggestions.
-          </p>
+          <p className="meta-field__value meta-field__value--empty">No pending suggestions.</p>
         ) : (
           <ul className="suggestion-list">
             {suggestions.map((s) => {
@@ -415,60 +407,60 @@ export function MetadataPanel({
               const otherKey = isSource ? s.targetSpecKey : s.sourceSpecKey;
               // Extract readable name from key: "repo::.kiro/specs/slug" → "Slug"
               const otherName = otherKey
-                .replace(/^[^:]+::/, '')         // strip repo prefix
-                .replace(/^\.kiro\/specs\//, '') // strip .kiro/specs/
-                .replace(/-/g, ' ')             // hyphens to spaces
+                .replace(/^[^:]+::/, "") // strip repo prefix
+                .replace(/^\.kiro\/specs\//, "") // strip .kiro/specs/
+                .replace(/-/g, " ") // hyphens to spaces
                 .replace(/\b\w/g, (c) => c.toUpperCase()); // title case
-              const directionLabel = isSource ? '→' : '←';
+              const directionLabel = isSource ? "→" : "←";
               const directionTitle = isSource
                 ? `This spec relates to "${otherName}"`
                 : `"${otherName}" relates to this spec`;
 
               return (
-              <li key={s.id} className="suggestion">
-                <div className="suggestion__body">
-                  <span className="suggestion__type">{s.type}</span>
-                  <span className="suggestion__direction" title={directionTitle}>
-                    {directionLabel}
-                  </span>
-                  <strong className="suggestion__target" title={otherKey}>
-                    {otherName}
-                  </strong>
-                  <span className="suggestion__evidence">{s.evidence}</span>
-                  <span className="suggestion__confidence">
-                    {Math.round(s.confidence * 100)}%
-                  </span>
-                </div>
-                <div className="suggestion__actions">
-                  <button
-                    type="button"
-                    className="suggestion__why"
-                    onClick={() => {
-                      chatLauncher.open({
-                        specId: detail.key,
-                        prompt: `Explain this suggested relationship:\n\nSource: ${s.sourceSpecKey}\nTarget: ${s.targetSpecKey}\nType: ${s.type}\nConfidence: ${Math.round(s.confidence * 100)}%\nEvidence: ${s.evidence}\n\nI'm currently viewing "${metadata.title}" (${detail.key}). Show me the relevant content from both specs that supports or contradicts this suggestion.`,
-                      });
-                    }}
-                    title="Open Crew chat to explain this suggestion"
-                  >
-                    Why?
-                  </button>
-                  <button
-                    type="button"
-                    className="suggestion__accept"
-                    onClick={() => onAcceptSuggestion(s.id)}
-                  >
-                    Accept
-                  </button>
-                  <button
-                    type="button"
-                    className="suggestion__reject"
-                    onClick={() => onRejectSuggestion(s.id)}
-                  >
-                    Dismiss
-                  </button>
-                </div>
-              </li>
+                <li key={s.id} className="suggestion">
+                  <div className="suggestion__body">
+                    <span className="suggestion__type">{s.type}</span>
+                    <span className="suggestion__direction" title={directionTitle}>
+                      {directionLabel}
+                    </span>
+                    <strong className="suggestion__target" title={otherKey}>
+                      {otherName}
+                    </strong>
+                    <span className="suggestion__evidence">{s.evidence}</span>
+                    <span className="suggestion__confidence">
+                      {Math.round(s.confidence * 100)}%
+                    </span>
+                  </div>
+                  <div className="suggestion__actions">
+                    <button
+                      type="button"
+                      className="suggestion__why"
+                      onClick={() => {
+                        chatLauncher.open({
+                          specId: detail.key,
+                          prompt: `Explain this suggested relationship:\n\nSource: ${s.sourceSpecKey}\nTarget: ${s.targetSpecKey}\nType: ${s.type}\nConfidence: ${Math.round(s.confidence * 100)}%\nEvidence: ${s.evidence}\n\nI'm currently viewing "${metadata.title}" (${detail.key}). Show me the relevant content from both specs that supports or contradicts this suggestion.`,
+                        });
+                      }}
+                      title="Open Crew chat to explain this suggestion"
+                    >
+                      Why?
+                    </button>
+                    <button
+                      type="button"
+                      className="suggestion__accept"
+                      onClick={() => onAcceptSuggestion(s.id)}
+                    >
+                      Accept
+                    </button>
+                    <button
+                      type="button"
+                      className="suggestion__reject"
+                      onClick={() => onRejectSuggestion(s.id)}
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                </li>
               );
             })}
           </ul>

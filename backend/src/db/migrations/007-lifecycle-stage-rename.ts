@@ -1,8 +1,8 @@
-import type { Database } from 'bun:sqlite';
+import type { Database } from "bun:sqlite";
 
 export const migration = {
   number: 7,
-  name: 'lifecycle-stage-rename',
+  name: "lifecycle-stage-rename",
   up(db: Database): void {
     // SQLite doesn't support ALTER CHECK constraint — recreate the table.
     // Map old values → new: requirements→new, bug_analysis→scoped, design→scoped, tasks→refined/in-flight, completed→done

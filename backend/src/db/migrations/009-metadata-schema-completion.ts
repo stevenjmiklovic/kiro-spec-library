@@ -1,8 +1,8 @@
-import type { Database } from 'bun:sqlite';
+import type { Database } from "bun:sqlite";
 
 export const migration = {
   number: 9,
-  name: 'metadata-schema-completion',
+  name: "metadata-schema-completion",
   up(db: Database): void {
     db.exec(`
       ALTER TABLE metadata_overlays ADD COLUMN approvers TEXT;

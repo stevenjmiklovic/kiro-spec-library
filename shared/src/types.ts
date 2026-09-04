@@ -9,20 +9,10 @@ export type SpecType = "feature" | "bugfix" | "quick" | "unknown";
 export type WorkflowType = "requirements-first" | "design-first" | "unknown";
 
 /** Lifecycle stage */
-export type LifecycleStage =
-  | "new"
-  | "scoped"
-  | "refined"
-  | "in-flight"
-  | "done";
+export type LifecycleStage = "new" | "scoped" | "refined" | "in-flight" | "done";
 
 /** Relationship type between specs */
-export type RelationshipType =
-  | "depends_on"
-  | "blocks"
-  | "supersedes"
-  | "duplicates"
-  | "related";
+export type RelationshipType = "depends_on" | "blocks" | "supersedes" | "duplicates" | "related";
 
 /** Retention policy type */
 export type RetentionPolicyType =
@@ -48,12 +38,7 @@ export type AuditOperation =
   | "text_export_applied";
 
 /** Scan error category */
-export type ScanErrorCategory =
-  | "auth"
-  | "network"
-  | "timeout"
-  | "validation"
-  | "io";
+export type ScanErrorCategory = "auth" | "network" | "timeout" | "validation" | "io";
 
 /** Suggestion reason */
 export type SuggestionReason =
@@ -76,8 +61,6 @@ export interface RetentionPolicy {
   /** ISO 8601 date, only for custom_date type */
   customDate?: string;
 }
-
-
 
 // ─── Source Configuration ────────────────────────────────────────────────────
 

@@ -1,6 +1,6 @@
 import { Elysia } from "elysia";
-import { buildTextExportZip, applyTextExportZip } from "../services/text-export.js";
 import { recordEvent } from "../services/audit.js";
+import { applyTextExportZip, buildTextExportZip } from "../services/text-export.js";
 export function textExportRoutes(deps) {
     const { db } = deps;
     return new Elysia({ prefix: "" })
@@ -39,7 +39,9 @@ export function textExportRoutes(deps) {
             set.status = 400;
             return {
                 code: "INVALID_EXPORT_FILE",
-                message: err instanceof Error ? err.message : "Uploaded file could not be read as a text export archive.",
+                message: err instanceof Error
+                    ? err.message
+                    : "Uploaded file could not be read as a text export archive.",
             };
         }
         recordEvent(db, "text_export_applied");

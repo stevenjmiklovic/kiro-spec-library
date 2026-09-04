@@ -1,20 +1,15 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import type React from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { useArchiveData } from '../hooks/useSpecData.js';
-import { useUrlState } from '../hooks/useUrlState.js';
-import { GhostIcon } from '../components/GhostIcon.js';
 import {
   ArchiveFilterBar,
-  type ArchiveFilters,
   type ArchiveFilterOptions,
-} from '../components/ArchiveFilterBar.js';
-import { DetailPanel } from '../components/DetailPanel.js';
+  type ArchiveFilters,
+} from "../components/ArchiveFilterBar.js";
+import { DetailPanel } from "../components/DetailPanel.js";
+import { GhostIcon } from "../components/GhostIcon.js";
+import { useArchiveData } from "../hooks/useSpecData.js";
+import { useUrlState } from "../hooks/useUrlState.js";
 
 // ---------------------------------------------------------------------------
 // View model
@@ -50,12 +45,32 @@ export interface ArchiveSnapshot {
 }
 
 const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 const SHORT_MONTHS = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
 ];
 
 const NARROW_BREAKPOINT = 1024;
@@ -64,24 +79,23 @@ const NARROW_BREAKPOINT = 1024;
 // Normalization
 // ---------------------------------------------------------------------------
 
-function str(v: unknown, fallback = ''): string {
-  return typeof v === 'string' ? v : fallback;
+function str(v: unknown, fallback = ""): string {
+  return typeof v === "string" ? v : fallback;
 }
 
 function retentionLabel(policy: unknown, metadataComplete: boolean): string {
-  if (!metadataComplete) return 'Needs metadata';
+  if (!metadataComplete) return "Needs metadata";
   const p = policy as Record<string, unknown> | null | undefined;
-  const type = p && typeof p === 'object' ? str(p['type']) : '';
+  const type = p && typeof p === "object" ? str(p["type"]) : "";
   switch (type) {
-    case '3_months':
-      return 'Review: 3 mo';
-    case '6_months':
-      return 'Review: 6 mo';
-    case 'annually':
-      return 'Review: annual';
-    case 'none':
+    case "3_months":
+      return "Review: 3 mo";
+    case "6_months":
+      return "Review: 6 mo";
+    case "annually":
+      return "Review: annual";
     default:
-      return 'No review scheduled';
+      return "No review scheduled";
   }
 }
 
@@ -91,13 +105,11 @@ function normalizeSnapshot(record: unknown): ArchiveSnapshot {
 
   // metadata_projection and provenance arrive as JSON strings (or objects).
   const parse = (val: unknown): Record<string, unknown> => {
-    if (val && typeof val === 'object') return val as Record<string, unknown>;
-    if (typeof val === 'string') {
+    if (val && typeof val === "object") return val as Record<string, unknown>;
+    if (typeof val === "string") {
       try {
         const parsed: unknown = JSON.parse(val);
-        return parsed && typeof parsed === 'object'
-          ? (parsed as Record<string, unknown>)
-          : {};
+        return parsed && typeof parsed === "object" ? (parsed as Record<string, unknown>) : {};
       } catch {
         return {};
       }
@@ -105,60 +117,58 @@ function normalizeSnapshot(record: unknown): ArchiveSnapshot {
     return {};
   };
 
-  const metadata = parse(r['metadata_projection'] ?? r['metadata']);
-  const provenance = parse(r['provenance']);
+  const metadata = parse(r["metadata_projection"] ?? r["metadata"]);
+  const provenance = parse(r["provenance"]);
 
-  const createdAt = str(r['created_at'] ?? r['createdAt']) || new Date(0).toISOString();
+  const createdAt = str(r["created_at"] ?? r["createdAt"]) || new Date(0).toISOString();
   const date = new Date(createdAt);
   const valid = !Number.isNaN(date.getTime());
-  const monthLabel = valid
-    ? `${MONTHS[date.getUTCMonth()]} ${date.getUTCFullYear()}`
-    : 'Unknown';
+  const monthLabel = valid ? `${MONTHS[date.getUTCMonth()]} ${date.getUTCFullYear()}` : "Unknown";
   const dateLabel = valid
     ? `${SHORT_MONTHS[date.getUTCMonth()]} ${date.getUTCDate()}, ${date.getUTCFullYear()}`
-    : '—';
+    : "—";
 
-  const tags = Array.isArray(metadata['tags'])
-    ? (metadata['tags'] as unknown[]).filter((t): t is string => typeof t === 'string')
+  const tags = Array.isArray(metadata["tags"])
+    ? (metadata["tags"] as unknown[]).filter((t): t is string => typeof t === "string")
     : [];
 
   const metadataComplete =
-    r['metadataComplete'] === true ||
-    (str(metadata['title']) !== '' &&
-      str(metadata['owner']) !== '' &&
-      str(metadata['theme']) !== '' &&
+    r["metadataComplete"] === true ||
+    (str(metadata["title"]) !== "" &&
+      str(metadata["owner"]) !== "" &&
+      str(metadata["theme"]) !== "" &&
       tags.length > 0);
 
-  const supersededByRaw = r['supersededBy'] as Record<string, unknown> | null | undefined;
+  const supersededByRaw = r["supersededBy"] as Record<string, unknown> | null | undefined;
   const supersededBy =
-    supersededByRaw && typeof supersededByRaw === 'object'
-      ? { specKey: str(supersededByRaw['specKey']), title: str(supersededByRaw['title']) }
+    supersededByRaw && typeof supersededByRaw === "object"
+      ? { specKey: str(supersededByRaw["specKey"]), title: str(supersededByRaw["title"]) }
       : undefined;
 
   return {
-    id: str(r['id']) || str(r['spec_key']) || crypto.randomUUID(),
-    specKey: str(r['spec_key'] ?? r['specKey']),
-    title: str(metadata['title']) || str(r['spec_key']) || 'Untitled',
-    type: str(metadata['type'], 'spec'),
-    theme: str(metadata['theme'], '—'),
-    owner: str(metadata['owner'], '—'),
-    repository: str(provenance['repository'], '—'),
+    id: str(r["id"]) || str(r["spec_key"]) || crypto.randomUUID(),
+    specKey: str(r["spec_key"] ?? r["specKey"]),
+    title: str(metadata["title"]) || str(r["spec_key"]) || "Untitled",
+    type: str(metadata["type"], "spec"),
+    theme: str(metadata["theme"], "—"),
+    owner: str(metadata["owner"], "—"),
+    repository: str(provenance["repository"], "—"),
     tags,
     createdAt,
     monthLabel,
     dateLabel,
     retentionLabel: retentionLabel(
-      r['retention_policy'] ?? metadata['retentionPolicy'],
+      r["retention_policy"] ?? metadata["retentionPolicy"],
       metadataComplete,
     ),
     supersededBy,
     metadataComplete,
-    contentDigest: str(r['content_digest'] ?? r['contentDigest']),
+    contentDigest: str(r["content_digest"] ?? r["contentDigest"]),
     provenance: {
-      repository: str(provenance['repository'], '—'),
-      relativePath: str(provenance['relativePath'], '—'),
-      branch: str(provenance['branch'], 'main'),
-      commitHash: str(provenance['commitHash'], '—'),
+      repository: str(provenance["repository"], "—"),
+      relativePath: str(provenance["relativePath"], "—"),
+      branch: str(provenance["branch"], "main"),
+      commitHash: str(provenance["commitHash"], "—"),
     },
   };
 }
@@ -167,14 +177,12 @@ function normalizeSnapshot(record: unknown): ArchiveSnapshot {
 // Filtering
 // ---------------------------------------------------------------------------
 
-function applyFilters(
-  snapshots: ArchiveSnapshot[],
-  filters: ArchiveFilters,
-): ArchiveSnapshot[] {
-  const query = (filters.query ?? '').trim().toLowerCase();
+function applyFilters(snapshots: ArchiveSnapshot[], filters: ArchiveFilters): ArchiveSnapshot[] {
+  const query = (filters.query ?? "").trim().toLowerCase();
   return snapshots.filter((s) => {
     if (query.length >= 2) {
-      const haystack = `${s.title} ${s.theme} ${s.owner} ${s.repository} ${s.tags.join(' ')}`.toLowerCase();
+      const haystack =
+        `${s.title} ${s.theme} ${s.owner} ${s.repository} ${s.tags.join(" ")}`.toLowerCase();
       if (!haystack.includes(query)) return false;
     }
     if (filters.type && s.type !== filters.type) return false;
@@ -205,8 +213,8 @@ function groupByMonth(
       rows: [...rows].sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
     }))
     .sort((a, b) => {
-      const da = a.rows[0]?.createdAt ?? '';
-      const db = b.rows[0]?.createdAt ?? '';
+      const da = a.rows[0]?.createdAt ?? "";
+      const db = b.rows[0]?.createdAt ?? "";
       return db.localeCompare(da);
     });
 }
@@ -217,8 +225,13 @@ function groupByMonth(
 
 export function ArchiveView(): React.ReactElement {
   const [urlState, setUrlState] = useUrlState();
-  const { snapshots: rawSnapshots, nextCursor, loadMore, loading, error } =
-    useArchiveData({ limit: 50 });
+  const {
+    snapshots: rawSnapshots,
+    nextCursor,
+    loadMore,
+    loading,
+    error,
+  } = useArchiveData({ limit: 50 });
 
   const [filters, setFilters] = useState<ArchiveFilters>(() => ({
     query: urlState.query,
@@ -228,12 +241,9 @@ export function ArchiveView(): React.ReactElement {
     owner: urlState.filters.owner,
   }));
 
-  const [selectedId, setSelectedId] = useState<string | undefined>(
-    urlState.selected,
-  );
+  const [selectedId, setSelectedId] = useState<string | undefined>(urlState.selected);
   const [isNarrow, setIsNarrow] = useState(
-    () =>
-      typeof window !== 'undefined' && window.innerWidth < NARROW_BREAKPOINT,
+    () => typeof window !== "undefined" && window.innerWidth < NARROW_BREAKPOINT,
   );
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -243,21 +253,20 @@ export function ArchiveView(): React.ReactElement {
 
   // Track viewport width for responsive drawer vs inline detail.
   useEffect(() => {
-    if (typeof window === 'undefined') return undefined;
-    const onResize = (): void =>
-      setIsNarrow(window.innerWidth < NARROW_BREAKPOINT);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    if (typeof window === "undefined") return undefined;
+    const onResize = (): void => setIsNarrow(window.innerWidth < NARROW_BREAKPOINT);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
   // Escape-to-close for the archive drawer
   useEffect(() => {
     if (!drawerOpen) return undefined;
     const handleKey = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape') setDrawerOpen(false);
+      if (e.key === "Escape") setDrawerOpen(false);
     };
-    document.addEventListener('keydown', handleKey);
-    return () => document.removeEventListener('keydown', handleKey);
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
   }, [drawerOpen]);
 
   // Focus trap: move focus into drawer when opened, restore on close
@@ -282,10 +291,7 @@ export function ArchiveView(): React.ReactElement {
     [rawSnapshots],
   );
 
-  const filtered = useMemo(
-    () => applyFilters(allSnapshots, filters),
-    [allSnapshots, filters],
-  );
+  const filtered = useMemo(() => applyFilters(allSnapshots, filters), [allSnapshots, filters]);
 
   const groups = useMemo(() => groupByMonth(filtered), [filtered]);
 
@@ -295,9 +301,9 @@ export function ArchiveView(): React.ReactElement {
     const repositories = new Set<string>();
     const types = new Set<string>();
     for (const s of allSnapshots) {
-      if (s.theme && s.theme !== '—') themes.add(s.theme);
-      if (s.owner && s.owner !== '—') owners.add(s.owner);
-      if (s.repository && s.repository !== '—') repositories.add(s.repository);
+      if (s.theme && s.theme !== "—") themes.add(s.theme);
+      if (s.owner && s.owner !== "—") owners.add(s.owner);
+      if (s.repository && s.repository !== "—") repositories.add(s.repository);
       if (s.type) types.add(s.type);
     }
     return {
@@ -310,7 +316,7 @@ export function ArchiveView(): React.ReactElement {
 
   // Month index entries (short labels) derived from the visible groups.
   const monthIndex = useMemo(
-    () => groups.map((g) => ({ label: g.month, short: g.month.split(' ')[0] })),
+    () => groups.map((g) => ({ label: g.month, short: g.month.split(" ")[0] })),
     [groups],
   );
 
@@ -363,10 +369,10 @@ export function ArchiveView(): React.ReactElement {
         const visible = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-        const first = visible[0]?.target.getAttribute('data-month');
+        const first = visible[0]?.target.getAttribute("data-month");
         if (first) setActiveMonth(first);
       },
-      { root, threshold: 0.1, rootMargin: '0px 0px -60% 0px' },
+      { root, threshold: 0.1, rootMargin: "0px 0px -60% 0px" },
     );
 
     for (const el of monthRefs.current.values()) observer.observe(el);
@@ -375,15 +381,14 @@ export function ArchiveView(): React.ReactElement {
 
   const scrollToMonth = useCallback((month: string) => {
     const el = monthRefs.current.get(month);
-    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    el?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
 
   // --- Infinite scroll: load next page near the bottom (no duplicate fetch) ---
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el || loading || !nextCursor) return;
-    const nearBottom =
-      el.scrollTop + el.clientHeight >= el.scrollHeight - 240;
+    const nearBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 240;
     if (nearBottom) loadMore();
   }, [loading, nextCursor, loadMore]);
 
@@ -393,7 +398,9 @@ export function ArchiveView(): React.ReactElement {
       <div className="archive-view" role="alert">
         <header className="archive-header">
           <div>
-            <h1><GhostIcon size={28} /> Spec<span className="title-tral">tral</span> Library</h1>
+            <h1>
+              <GhostIcon size={28} /> Spec<span className="title-tral">tral</span> Library
+            </h1>
             <p>Browse, retrieve, and curate completed Kiro Specs.</p>
           </div>
         </header>
@@ -407,18 +414,18 @@ export function ArchiveView(): React.ReactElement {
   const detail = selected ? <SnapshotDetail snapshot={selected} /> : null;
 
   return (
-    <div
-      className={`archive-view${isNarrow ? ' archive-view--narrow' : ''}`}
-    >
+    <div className={`archive-view${isNarrow ? " archive-view--narrow" : ""}`}>
       <header className="archive-header">
         <div>
-          <h1><GhostIcon size={28} /> Spec<span className="title-tral">tral</span> Library</h1>
+          <h1>
+            <GhostIcon size={28} /> Spec<span className="title-tral">tral</span> Library
+          </h1>
           <p>Browse, retrieve, and curate completed Kiro Specs.</p>
         </div>
         <span aria-live="polite">
           {loading
-            ? 'Loading…'
-            : `${filtered.length} archived spec${filtered.length === 1 ? '' : 's'}`}
+            ? "Loading…"
+            : `${filtered.length} archived spec${filtered.length === 1 ? "" : "s"}`}
         </span>
       </header>
 
@@ -459,7 +466,7 @@ export function ArchiveView(): React.ReactElement {
               {group.rows.map((row) => (
                 <button
                   type="button"
-                  className={`archive-row${selected?.id === row.id ? ' is-selected' : ''}`}
+                  className={`archive-row${selected?.id === row.id ? " is-selected" : ""}`}
                   key={row.id}
                   onClick={(e) => handleSelect(row.id, e.currentTarget)}
                   aria-pressed={selected?.id === row.id}
@@ -478,7 +485,12 @@ export function ArchiveView(): React.ReactElement {
           ))}
 
           {loading && (
-            <div className="archive-loading" role="status" aria-live="polite" aria-label="Loading more specs">
+            <div
+              className="archive-loading"
+              role="status"
+              aria-live="polite"
+              aria-label="Loading more specs"
+            >
               <div className="skeleton-row" />
               <div className="skeleton-row" />
               <div className="skeleton-row" />
@@ -490,8 +502,8 @@ export function ArchiveView(): React.ReactElement {
 
           {!loading && filtered.length === 0 && (
             <div className="archive-empty">
-              No archived specs match your filters. Filters have been retained so
-              you can adjust them.
+              No archived specs match your filters. Filters have been retained so you can adjust
+              them.
             </div>
           )}
         </section>
@@ -503,9 +515,9 @@ export function ArchiveView(): React.ReactElement {
               <button
                 type="button"
                 key={m.label}
-                className={activeMonth === m.label ? 'active' : undefined}
+                className={activeMonth === m.label ? "active" : undefined}
                 onClick={() => scrollToMonth(m.label)}
-                aria-current={activeMonth === m.label ? 'true' : undefined}
+                aria-current={activeMonth === m.label ? "true" : undefined}
               >
                 {m.short}
               </button>
@@ -518,9 +530,7 @@ export function ArchiveView(): React.ReactElement {
       {!isNarrow && selected && (
         <div className="archive-detail-region">
           {detail}
-          {selected.specKey && (
-            <DetailPanel specKey={selected.specKey} variant="drawer" />
-          )}
+          {selected.specKey && <DetailPanel specKey={selected.specKey} variant="drawer" />}
         </div>
       )}
 
@@ -547,9 +557,7 @@ export function ArchiveView(): React.ReactElement {
               ✕
             </button>
             {detail}
-            {selected.specKey && (
-              <DetailPanel specKey={selected.specKey} variant="drawer" />
-            )}
+            {selected.specKey && <DetailPanel specKey={selected.specKey} variant="drawer" />}
           </aside>
         </div>
       )}
@@ -591,7 +599,7 @@ function SnapshotDetail({
           <h3>Artifact completeness</h3>
           <div className="archive-fact">
             <span>Metadata</span>
-            <strong>{snapshot.metadataComplete ? 'Complete' : 'Incomplete'}</strong>
+            <strong>{snapshot.metadataComplete ? "Complete" : "Incomplete"}</strong>
             <progress max={100} value={completenessPct} />
           </div>
         </section>
@@ -612,7 +620,7 @@ function SnapshotDetail({
           </div>
           <div className="archive-fact">
             <span>Commit</span>
-            <strong>{snapshot.provenance.commitHash.slice(0, 12) || '—'}</strong>
+            <strong>{snapshot.provenance.commitHash.slice(0, 12) || "—"}</strong>
           </div>
         </section>
 
@@ -628,11 +636,11 @@ function SnapshotDetail({
           </div>
           <div className="archive-fact">
             <span>Spec key</span>
-            <strong>{snapshot.specKey || '—'}</strong>
+            <strong>{snapshot.specKey || "—"}</strong>
           </div>
           <div className="archive-fact">
             <span>Content digest</span>
-            <strong>{snapshot.contentDigest.slice(0, 12) || '—'}</strong>
+            <strong>{snapshot.contentDigest.slice(0, 12) || "—"}</strong>
           </div>
         </section>
 
@@ -640,7 +648,7 @@ function SnapshotDetail({
           <h3>Disposition</h3>
           <div className="archive-fact">
             <span>Status</span>
-            <strong>{snapshot.supersededBy ? 'Superseded' : 'Active'}</strong>
+            <strong>{snapshot.supersededBy ? "Superseded" : "Active"}</strong>
           </div>
           {snapshot.supersededBy && (
             <div className="archive-fact">

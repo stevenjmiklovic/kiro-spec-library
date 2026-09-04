@@ -65,10 +65,7 @@ export interface SupersessionRow {
  * derive the Archive view's "Disposition" (Active vs. Superseded) per
  * ADR-005, which replaced the legal-hold columns with this relationship.
  */
-export function listSupersessionsByTargetKeys(
-  db: Database,
-  specKeys: string[],
-): SupersessionRow[] {
+export function listSupersessionsByTargetKeys(db: Database, specKeys: string[]): SupersessionRow[] {
   if (specKeys.length === 0) return [];
   const placeholders = specKeys.map((_, i) => `$k${i}`).join(", ");
   const params: Record<string, string> = {};

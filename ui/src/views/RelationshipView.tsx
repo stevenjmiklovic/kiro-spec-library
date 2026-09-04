@@ -1,19 +1,20 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type React from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { useSpecData } from '../hooks/useSpecData.js';
-import { useUrlState } from '../hooks/useUrlState.js';
-import { GhostIcon } from '../components/GhostIcon.js';
+import { DetailPanel } from "../components/DetailPanel.js";
 import {
   FilterBar,
   type FilterOptions,
   type RelationshipFilters,
-} from '../components/FilterBar.js';
-import GraphCanvas from '../components/GraphCanvas.js';
-import type { GraphSpec } from '../components/GraphCanvas.js';
-import { Y_AXIS_OPTIONS, type YAxisField } from '../components/GraphCanvas.js';
-import { X_AXIS_OPTIONS, type XAxisField } from '../components/GraphCanvas.js';
-import { DetailPanel } from '../components/DetailPanel.js';
-import { getLocalAliases } from '../hooks/useLocalAliases.js';
+} from "../components/FilterBar.js";
+import { GhostIcon } from "../components/GhostIcon.js";
+import GraphCanvas from "../components/GraphCanvas.js";
+import type { GraphSpec } from "../components/GraphCanvas.js";
+import { type YAxisField, Y_AXIS_OPTIONS } from "../components/GraphCanvas.js";
+import { type XAxisField, X_AXIS_OPTIONS } from "../components/GraphCanvas.js";
+import { getLocalAliases } from "../hooks/useLocalAliases.js";
+import { useSpecData } from "../hooks/useSpecData.js";
+import { useUrlState } from "../hooks/useUrlState.js";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -24,67 +25,61 @@ const MAX_VISIBLE_NODES = 250;
 /** Cautiously normalize an unknown backend record into a GraphSpec. */
 function normalizeSpec(record: unknown): GraphSpec {
   const r = record as Record<string, unknown> | null | undefined;
-  if (!r || typeof r !== 'object') {
+  if (!r || typeof r !== "object") {
     return {
       key: crypto.randomUUID(),
-      title: 'Unknown',
-      type: 'unknown',
-      stage: 'draft',
-      owner: '',
-      theme: '',
+      title: "Unknown",
+      type: "unknown",
+      stage: "draft",
+      owner: "",
+      theme: "",
       progress: 0,
       relationships: [],
       suggestions: [],
     };
   }
 
-  const str = (field: string, fallback = ''): string => {
+  const str = (field: string, fallback = ""): string => {
     const v = r[field];
-    return typeof v === 'string' ? v : fallback;
+    return typeof v === "string" ? v : fallback;
   };
 
   const num = (field: string, fallback = 0): number => {
     const v = r[field];
-    return typeof v === 'number' && Number.isFinite(v) ? v : fallback;
+    return typeof v === "number" && Number.isFinite(v) ? v : fallback;
   };
 
-  const parseRelArray = (
-    field: string,
-  ): Array<{ targetKey: string; type: string }> => {
+  const parseRelArray = (field: string): Array<{ targetKey: string; type: string }> => {
     const arr = r[field];
     if (!Array.isArray(arr)) return [];
     return arr
-      .filter(
-        (item): item is Record<string, unknown> =>
-          item !== null && typeof item === 'object',
-      )
+      .filter((item): item is Record<string, unknown> => item !== null && typeof item === "object")
       .map((item) => ({
-        targetKey: typeof item['targetKey'] === 'string' ? item['targetKey'] : '',
-        type: typeof item['type'] === 'string' ? item['type'] : 'related',
+        targetKey: typeof item["targetKey"] === "string" ? item["targetKey"] : "",
+        type: typeof item["type"] === "string" ? item["type"] : "related",
       }))
-      .filter((rel) => rel.targetKey !== '');
+      .filter((rel) => rel.targetKey !== "");
   };
 
-  const key = str('key') || str('id') || str('slug') || crypto.randomUUID();
-  const title = str('title') || str('name') || 'Untitled';
-  const rawType = str('type', 'unknown');
-  const type = rawType === 'feature' || rawType === 'bugfix' || rawType === 'quick'
-    ? rawType
-    : 'unknown';
+  const key = str("key") || str("id") || str("slug") || crypto.randomUUID();
+  const title = str("title") || str("name") || "Untitled";
+  const rawType = str("type", "unknown");
+  const type =
+    rawType === "feature" || rawType === "bugfix" || rawType === "quick" ? rawType : "unknown";
 
   return {
     key,
     title,
     type,
-    stage: str('stage', 'draft'),
-    owner: str('owner'),
-    theme: str('theme'),
-    project: str('projectName') || str('project') || undefined,
-    progress: num('progress', 0),
-    reviewed: !!(r['reviewed_at'] || r['reviewedAt']),
-    indexedAt: str('indexed_at') || str('indexedAt') || undefined,
-    relationships: parseRelArray('relationships'),
-    suggestions: parseRelArray('suggestions'),
+    stage: str("stage", "draft"),
+    owner: str("owner"),
+    theme: str("theme"),
+    project: str("projectName") || str("project") || undefined,
+    progress: num("progress", 0),
+    reviewed: !!(r["reviewed_at"] || r["reviewedAt"]),
+    indexedAt: str("indexed_at") || str("indexedAt") || undefined,
+    relationships: parseRelArray("relationships"),
+    suggestions: parseRelArray("suggestions"),
   };
 }
 
@@ -98,15 +93,14 @@ function normalizeSpecExtended(record: unknown): NormalizedSpec {
   const base = normalizeSpec(record);
   const r = record as Record<string, unknown> | null | undefined;
   const repository =
-    r && typeof r === 'object'
-      ? typeof r['repository'] === 'string'
-        ? r['repository']
-        : typeof r['repo'] === 'string'
-          ? r['repo']
-          : ''
-      : '';
-  const metadataComplete =
-    r && typeof r === 'object' ? r['metadataComplete'] === true : false;
+    r && typeof r === "object"
+      ? typeof r["repository"] === "string"
+        ? r["repository"]
+        : typeof r["repo"] === "string"
+          ? r["repo"]
+          : ""
+      : "";
+  const metadataComplete = r && typeof r === "object" ? r["metadataComplete"] === true : false;
 
   return { ...base, repository, metadataComplete };
 }
@@ -143,7 +137,7 @@ export function RelationshipView(): React.ReactElement {
 
   // Local filter state: combines URL filters with scope/metadata not in URL
   const [filters, setFilters] = useState<RelationshipFilters>(() => ({
-    scope: 'team',
+    scope: "team",
     theme: urlState.filters.theme,
     type: urlState.filters.type,
     stage: urlState.filters.stage,
@@ -153,7 +147,11 @@ export function RelationshipView(): React.ReactElement {
   }));
 
   // Fetch data
-  const { specs: rawSpecs, loading, error } = useSpecData({
+  const {
+    specs: rawSpecs,
+    loading,
+    error,
+  } = useSpecData({
     query: filters.query,
     filters: {
       type: filters.type,
@@ -175,13 +173,11 @@ export function RelationshipView(): React.ReactElement {
     let result = allSpecs;
 
     // Scope: "mine" — filter to localStorage aliases (client-only, not auth)
-    if (filters.scope === 'mine') {
+    if (filters.scope === "mine") {
       const aliases = getLocalAliases();
       if (aliases.length > 0) {
         const aliasSet = new Set(aliases.map((a) => a.toLowerCase()));
-        result = result.filter(
-          (s) => s.owner !== '' && aliasSet.has(s.owner.toLowerCase()),
-        );
+        result = result.filter((s) => s.owner !== "" && aliasSet.has(s.owner.toLowerCase()));
       }
     }
 
@@ -192,9 +188,7 @@ export function RelationshipView(): React.ReactElement {
 
     // Metadata completeness
     if (filters.metadataComplete !== undefined) {
-      result = result.filter(
-        (s) => s.metadataComplete === filters.metadataComplete,
-      );
+      result = result.filter((s) => s.metadataComplete === filters.metadataComplete);
     }
 
     return result;
@@ -214,8 +208,7 @@ export function RelationshipView(): React.ReactElement {
 
   // GraphSpec[] for the canvas (strip extended fields)
   const graphSpecs = useMemo<GraphSpec[]>(
-    () =>
-      visibleSpecs.map(({ metadataComplete: _m, ...spec }) => spec),
+    () => visibleSpecs.map(({ metadataComplete: _m, ...spec }) => spec),
     [visibleSpecs],
   );
 
@@ -223,9 +216,7 @@ export function RelationshipView(): React.ReactElement {
   const filterOptions = useMemo(() => deriveFilterOptions(allSpecs), [allSpecs]);
 
   // --- Selection state (synced to URL) ---
-  const [selectedKey, setSelectedKey] = useState<string | undefined>(
-    urlState.selected,
-  );
+  const [selectedKey, setSelectedKey] = useState<string | undefined>(urlState.selected);
 
   const selectSpec = useCallback(
     (key: string | undefined) => {
@@ -244,8 +235,7 @@ export function RelationshipView(): React.ReactElement {
 
   // Selected spec detail
   const selectedSpec = useMemo<NormalizedSpec | undefined>(
-    () =>
-      selectedKey ? visibleSpecs.find((s) => s.key === selectedKey) : undefined,
+    () => (selectedKey ? visibleSpecs.find((s) => s.key === selectedKey) : undefined),
     [selectedKey, visibleSpecs],
   );
 
@@ -263,23 +253,21 @@ export function RelationshipView(): React.ReactElement {
       let nextIndex = focusIndex;
 
       switch (e.key) {
-        case 'ArrowDown':
-        case 'ArrowRight':
+        case "ArrowDown":
+        case "ArrowRight":
           e.preventDefault();
-          nextIndex =
-            focusIndex < visibleSpecs.length - 1 ? focusIndex + 1 : 0;
+          nextIndex = focusIndex < visibleSpecs.length - 1 ? focusIndex + 1 : 0;
           break;
-        case 'ArrowUp':
-        case 'ArrowLeft':
+        case "ArrowUp":
+        case "ArrowLeft":
           e.preventDefault();
-          nextIndex =
-            focusIndex > 0 ? focusIndex - 1 : visibleSpecs.length - 1;
+          nextIndex = focusIndex > 0 ? focusIndex - 1 : visibleSpecs.length - 1;
           break;
-        case 'Home':
+        case "Home":
           e.preventDefault();
           nextIndex = 0;
           break;
-        case 'End':
+        case "End":
           e.preventDefault();
           nextIndex = visibleSpecs.length - 1;
           break;
@@ -294,8 +282,8 @@ export function RelationshipView(): React.ReactElement {
       }
     };
 
-    el.addEventListener('keydown', handleKeyDown);
-    return () => el.removeEventListener('keydown', handleKeyDown);
+    el.addEventListener("keydown", handleKeyDown);
+    return () => el.removeEventListener("keydown", handleKeyDown);
   }, [focusIndex, visibleSpecs, selectSpec]);
 
   // Sync URL selection changes back to local state
@@ -325,10 +313,10 @@ export function RelationshipView(): React.ReactElement {
 
   // Status text for assistive tech
   const statusText = useMemo(() => {
-    if (loading) return 'Loading specifications…';
+    if (loading) return "Loading specifications…";
     if (error) return `Error: ${error}`;
-    if (visibleSpecs.length === 0) return 'No specifications to display.';
-    const sel = selectedSpec ? ` Selected: ${selectedSpec.title}.` : '';
+    if (visibleSpecs.length === 0) return "No specifications to display.";
+    const sel = selectedSpec ? ` Selected: ${selectedSpec.title}.` : "";
     return `Showing ${visibleSpecs.length} of ${filteredSpecs.length} specifications.${sel}`;
   }, [loading, error, visibleSpecs.length, filteredSpecs.length, selectedSpec]);
 
@@ -345,14 +333,12 @@ export function RelationshipView(): React.ReactElement {
 
   if (error) {
     return (
-      <div
-        className="relationship-view"
-        role="alert"
-        aria-live="assertive"
-      >
+      <div className="relationship-view" role="alert" aria-live="assertive">
         <header className="relationship-header">
           <p className="eyebrow">Relationship observatory</p>
-          <h1><GhostIcon size={28} /> Spec<span className="title-tral">tral</span> Library</h1>
+          <h1>
+            <GhostIcon size={28} /> Spec<span className="title-tral">tral</span> Library
+          </h1>
         </header>
         <div className="graph-shell">
           <p>Failed to load specifications: {error}</p>
@@ -366,7 +352,6 @@ export function RelationshipView(): React.ReactElement {
     <div
       ref={containerRef}
       className="relationship-view"
-      tabIndex={0}
       aria-label="Specification relationship graph view"
       role="application"
       onFocus={handleContainerFocus}
@@ -374,7 +359,9 @@ export function RelationshipView(): React.ReactElement {
       {/* Header */}
       <header className="relationship-header">
         <p className="eyebrow">Relationship observatory</p>
-        <h1><GhostIcon size={28} /> Spec<span className="title-tral">tral</span> Library</h1>
+        <h1>
+          <GhostIcon size={28} /> Spec<span className="title-tral">tral</span> Library
+        </h1>
       </header>
 
       {/* FilterBar */}
@@ -387,14 +374,10 @@ export function RelationshipView(): React.ReactElement {
 
       {/* Truncation warning — accessible refinement prompt */}
       {isTruncated && (
-        <div
-          role="status"
-          aria-live="polite"
-          className="truncation-prompt"
-        >
+        <div role="status" aria-live="polite" className="truncation-prompt">
           <p>
-            Showing {MAX_VISIBLE_NODES} of {filteredSpecs.length} specifications.
-            Refine your filters to narrow the results.
+            Showing {MAX_VISIBLE_NODES} of {filteredSpecs.length} specifications. Refine your
+            filters to narrow the results.
           </p>
         </div>
       )}
@@ -420,11 +403,13 @@ export function RelationshipView(): React.ReactElement {
           <div className="graph-shell">
             <div className="getting-started" role="region" aria-label="Getting started">
               <GhostIcon size={40} />
-              <h2>Welcome to Spec<span className="title-tral">tral</span> Library</h2>
+              <h2>
+                Welcome to Spec<span className="title-tral">tral</span> Library
+              </h2>
               <p>
-                Nothing is indexed yet. Spec Library builds this relationship graph from the{' '}
-                <code>.kiro/specs/</code> directories in the repositories you point it at — it
-                only reads them, never writes.
+                Nothing is indexed yet. Spec Library builds this relationship graph from the{" "}
+                <code>.kiro/specs/</code> directories in the repositories you point it at — it only
+                reads them, never writes.
               </p>
               <ol className="getting-started__steps">
                 <li>Add a local repo path or a remote Git URL as a source.</li>
@@ -434,9 +419,7 @@ export function RelationshipView(): React.ReactElement {
               <button
                 type="button"
                 className="getting-started__cta"
-                onClick={() =>
-                  window.dispatchEvent(new CustomEvent('spec-library:open-sources'))
-                }
+                onClick={() => window.dispatchEvent(new CustomEvent("spec-library:open-sources"))}
               >
                 Add your first source
               </button>
@@ -461,7 +444,9 @@ export function RelationshipView(): React.ReactElement {
                     aria-label="X-axis grouping"
                   >
                     {X_AXIS_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
                     ))}
                   </select>
                 </label>
@@ -473,7 +458,9 @@ export function RelationshipView(): React.ReactElement {
                     aria-label="Y-axis grouping"
                   >
                     {Y_AXIS_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
                     ))}
                   </select>
                 </label>
@@ -491,9 +478,7 @@ export function RelationshipView(): React.ReactElement {
 
               {/* Keyboard navigation hint */}
               {hintVisible && (
-                <p className="keyboard-hint">
-                  ↑↓ navigate · Enter select · Home/End jump
-                </p>
+                <p className="keyboard-hint">↑↓ navigate · Enter select · Home/End jump</p>
               )}
             </div>
 

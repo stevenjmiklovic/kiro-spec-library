@@ -65,11 +65,7 @@ export function buildFetchCommand(clonePath: string, branch: string): string[] {
 /**
  * Build a safe git clone command array for a URL and destination.
  */
-export function buildCloneCommand(
-  url: string,
-  destination: string,
-  branch: string,
-): string[] {
+export function buildCloneCommand(url: string, destination: string, branch: string): string[] {
   // Validate inputs
   const argsCheck = validateArgs([url, destination, branch]);
   if (!argsCheck.valid) {

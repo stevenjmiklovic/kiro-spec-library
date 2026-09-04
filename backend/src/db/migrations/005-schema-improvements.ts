@@ -1,8 +1,8 @@
-import type { Database } from 'bun:sqlite';
+import type { Database } from "bun:sqlite";
 
 export const migration = {
   number: 5,
-  name: 'schema-improvements',
+  name: "schema-improvements",
   up(db: Database): void {
     db.exec(`
       -- 1. Add updated_at to specs table

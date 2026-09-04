@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useCrewApi } from './useCrewIntegration.js';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCrewApi } from "./useCrewIntegration.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -55,28 +55,26 @@ export function buildSpecsQuery(options: UseSpecDataOptions): string {
   const params = new URLSearchParams();
 
   if (options.query && options.query.length >= MIN_QUERY_LENGTH) {
-    params.set('q', options.query);
+    params.set("q", options.query);
   }
-  if (options.limit) params.set('limit', String(options.limit));
-  if (options.offset) params.set('offset', String(options.offset));
+  if (options.limit) params.set("limit", String(options.limit));
+  if (options.offset) params.set("offset", String(options.offset));
 
   if (options.filters) {
     // Sort filter keys so equal values always yield an identical string,
     // independent of the order the caller assembled the object.
-    const entries = Object.entries(options.filters).sort(([a], [b]) =>
-      a.localeCompare(b),
-    );
+    const entries = Object.entries(options.filters).sort(([a], [b]) => a.localeCompare(b));
     for (const [key, val] of entries) {
       if (val) {
         // Map 'repository' → 'repo' for the API param
-        const apiKey = key === 'repository' ? 'repo' : key;
+        const apiKey = key === "repository" ? "repo" : key;
         params.set(apiKey, val);
       }
     }
   }
 
   const qs = params.toString();
-  return qs ? `/specs?${qs}` : '/specs';
+  return qs ? `/specs?${qs}` : "/specs";
 }
 
 // ---------------------------------------------------------------------------
@@ -159,9 +157,7 @@ export function useSpecData(options: UseSpecDataOptions): UseSpecDataResult {
       const res = await api.fetch(path);
       if (!res.ok) {
         const body = await res.json().catch(() => null);
-        const msg =
-          (body as { message?: string })?.message ??
-          `Request failed: ${res.status}`;
+        const msg = (body as { message?: string })?.message ?? `Request failed: ${res.status}`;
         throw new Error(msg);
       }
 
@@ -197,9 +193,8 @@ export function useSpecData(options: UseSpecDataOptions): UseSpecDataResult {
     const onRescanComplete = (): void => {
       void fetchSpecs();
     };
-    window.addEventListener('spec-library:rescan-complete', onRescanComplete);
-    return () =>
-      window.removeEventListener('spec-library:rescan-complete', onRescanComplete);
+    window.addEventListener("spec-library:rescan-complete", onRescanComplete);
+    return () => window.removeEventListener("spec-library:rescan-complete", onRescanComplete);
   }, [fetchSpecs]);
 
   return { specs, total, loading, error, refetch: fetchSpecs };
@@ -217,9 +212,7 @@ export interface UseArchiveDataOptions {
  * Fetches archive snapshots with cursor-based pagination.
  * Call `loadMore()` to fetch the next page; results accumulate.
  */
-export function useArchiveData(
-  options: UseArchiveDataOptions = {},
-): UseArchiveDataResult {
+export function useArchiveData(options: UseArchiveDataOptions = {}): UseArchiveDataResult {
   const api = useCrewApi();
   const limit = options.limit ?? DEFAULT_LIMIT;
 
@@ -237,16 +230,14 @@ export function useArchiveData(
       setError(null);
 
       const params = new URLSearchParams();
-      params.set('limit', String(limit));
-      if (cursor) params.set('cursor', cursor);
+      params.set("limit", String(limit));
+      if (cursor) params.set("cursor", cursor);
 
       try {
         const res = await api.fetch(`/archive?${params.toString()}`);
         if (!res.ok) {
           const body = await res.json().catch(() => null);
-          const msg =
-            (body as { message?: string })?.message ??
-            `Request failed: ${res.status}`;
+          const msg = (body as { message?: string })?.message ?? `Request failed: ${res.status}`;
           throw new Error(msg);
         }
 

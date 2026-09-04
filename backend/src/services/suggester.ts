@@ -1,10 +1,6 @@
 // Suggestion engine — TF-IDF, cosine similarity, cross-spec link detection
 import { createHash } from "node:crypto";
-import type {
-  NormalizedSpec,
-  RelationshipType,
-  Suggestion,
-} from "@kiro-spec-library/shared";
+import type { NormalizedSpec, RelationshipType, Suggestion } from "@kiro-spec-library/shared";
 import {
   CONFIDENCE_WEIGHTS,
   MAX_SUGGESTIONS_PER_SPEC,
@@ -31,11 +27,53 @@ interface RejectionRecord {
 // ─── Text Processing ─────────────────────────────────────────────────────────
 
 const STOP_WORDS = new Set([
-  "the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for",
-  "of", "with", "by", "from", "is", "are", "was", "were", "be", "been",
-  "being", "have", "has", "had", "do", "does", "did", "will", "would",
-  "could", "should", "may", "might", "shall", "can", "this", "that",
-  "these", "those", "it", "its", "not", "no", "if", "then", "else",
+  "the",
+  "a",
+  "an",
+  "and",
+  "or",
+  "but",
+  "in",
+  "on",
+  "at",
+  "to",
+  "for",
+  "of",
+  "with",
+  "by",
+  "from",
+  "is",
+  "are",
+  "was",
+  "were",
+  "be",
+  "been",
+  "being",
+  "have",
+  "has",
+  "had",
+  "do",
+  "does",
+  "did",
+  "will",
+  "would",
+  "could",
+  "should",
+  "may",
+  "might",
+  "shall",
+  "can",
+  "this",
+  "that",
+  "these",
+  "those",
+  "it",
+  "its",
+  "not",
+  "no",
+  "if",
+  "then",
+  "else",
 ]);
 
 function tokenize(text: string): string[] {
@@ -51,9 +89,7 @@ function tokenize(text: string): string[] {
 /**
  * Build TF-IDF vectors for a corpus of documents.
  */
-export function buildTfIdfVectors(
-  documents: Map<string, string>,
-): Map<string, TfIdfVector> {
+export function buildTfIdfVectors(documents: Map<string, string>): Map<string, TfIdfVector> {
   const N = documents.size;
   if (N === 0) return new Map();
 
@@ -180,10 +216,7 @@ export function extractMarkdownLinks(
 /**
  * Check whether two specs are proximate (same repo or adjacent directories).
  */
-export function isProximate(
-  a: NormalizedSpec,
-  b: NormalizedSpec,
-): boolean {
+export function isProximate(a: NormalizedSpec, b: NormalizedSpec): boolean {
   // Same repository
   if (a.provenance.repository !== b.provenance.repository) return false;
 
@@ -252,12 +285,7 @@ export function generateAll(
   for (const spec of specs) {
     const meta = metadataMap.get(spec.key);
     const rawContent = contentMap.get(spec.key) ?? "";
-    const doc = [
-      spec.title,
-      meta?.theme ?? "",
-      (meta?.tags ?? []).join(" "),
-      rawContent,
-    ].join(" ");
+    const doc = [spec.title, meta?.theme ?? "", (meta?.tags ?? []).join(" "), rawContent].join(" ");
     documents.set(spec.key, doc);
   }
 

@@ -1,6 +1,6 @@
+import { API_PREFIX } from "@kiro-spec-library/shared";
 // MCP tool implementations — search_specs, get_spec_context, submit_metadata_proposal
 import { sanitizeJsonResponse } from "./redactor.js";
-import { API_PREFIX } from "@kiro-spec-library/shared";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -150,14 +150,10 @@ export async function submitMetadataProposal(
     source: "agent",
   };
 
-  const response = await backendFetch(
-    client,
-    `/specs/${encodeURIComponent(specId)}/proposals`,
-    {
-      method: "POST",
-      body: JSON.stringify(body),
-    },
-  );
+  const response = await backendFetch(client, `/specs/${encodeURIComponent(specId)}/proposals`, {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
 
   if (!response.ok) {
     const error = await response.json();

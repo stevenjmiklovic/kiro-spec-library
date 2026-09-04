@@ -1,3 +1,4 @@
+import type { Database } from "bun:sqlite";
 /**
  * REST API integration tests (Task 21.2)
  *
@@ -5,22 +6,21 @@
  * Uses a temp SQLite database per suite; no network server is started.
  */
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { mkdtempSync, rmSync, mkdirSync, existsSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { unzipSync } from "fflate";
-import type { Database } from "bun:sqlite";
 import { createDatabase } from "../../backend/src/db/connection.js";
 import { runMigrations } from "../../backend/src/db/migrator.js";
-import { createRouter } from "../../backend/src/router.js";
-import { specRoutes } from "../../backend/src/routes/specs.js";
-import { relationshipRoutes } from "../../backend/src/routes/relationships.js";
-import { archiveRoutes } from "../../backend/src/routes/archive.js";
-import { ScannerService } from "../../backend/src/services/scanner.js";
-import { ArchiverService } from "../../backend/src/services/archiver.js";
-import { upsertSpec, syncSpecFts } from "../../backend/src/db/queries/specs.js";
 import { putSource } from "../../backend/src/db/queries/sources.js";
+import { syncSpecFts, upsertSpec } from "../../backend/src/db/queries/specs.js";
 import { createSuggestion } from "../../backend/src/db/queries/suggestions.js";
+import { createRouter } from "../../backend/src/router.js";
+import { archiveRoutes } from "../../backend/src/routes/archive.js";
+import { relationshipRoutes } from "../../backend/src/routes/relationships.js";
+import { specRoutes } from "../../backend/src/routes/specs.js";
+import { ArchiverService } from "../../backend/src/services/archiver.js";
+import { ScannerService } from "../../backend/src/services/scanner.js";
 import type { NormalizedSpec } from "../../shared/src/types.js";
 
 // ─── Test Setup ──────────────────────────────────────────────────────────────
@@ -117,11 +117,14 @@ beforeAll(async () => {
   });
 
   // Seed a second spec for relationship tests
-  const targetRowid = upsertSpec(db, makeSpec({
-    key: "test-source::target-spec",
-    specId: "target-spec",
-    title: "Target Spec",
-  }));
+  const targetRowid = upsertSpec(
+    db,
+    makeSpec({
+      key: "test-source::target-spec",
+      specId: "target-spec",
+      title: "Target Spec",
+    }),
+  );
   syncSpecFts(db, targetRowid, {
     title: "Target Spec",
     content: "Usage anomaly alerts for the platform dashboard.",
@@ -162,11 +165,7 @@ afterAll(() => {
 
 // ─── Helper ──────────────────────────────────────────────────────────────────
 
-async function handleRequest(
-  method: string,
-  path: string,
-  body?: unknown,
-): Promise<Response> {
+async function handleRequest(method: string, path: string, body?: unknown): Promise<Response> {
   const opts: RequestInit = { method };
   if (body !== undefined) {
     opts.headers = { "Content-Type": "application/json" };
@@ -184,7 +183,7 @@ describe("REST API integration tests", () => {
       const res = await handleRequest("GET", "/specs");
       expect(res.status).toBe(200);
 
-      const data = await res.json() as { specs: unknown[]; total: number };
+      const data = (await res.json()) as { specs: unknown[]; total: number };
       expect(data.total).toBeGreaterThanOrEqual(2);
 
       const keys = (data.specs as Array<{ key: string }>).map((s) => s.key);
@@ -196,7 +195,7 @@ describe("REST API integration tests", () => {
       const res = await handleRequest("GET", "/specs");
       expect(res.status).toBe(200);
 
-      const data = await res.json() as {
+      const data = (await res.json()) as {
         specs: Array<{
           key: string;
           relationships: Array<{ targetKey: string; type: string }>;
@@ -226,7 +225,7 @@ describe("REST API integration tests", () => {
       const res = await handleRequest("GET", "/specs?type=feature");
       expect(res.status).toBe(200);
 
-      const data = await res.json() as { specs: unknown[]; total: number };
+      const data = (await res.json()) as { specs: unknown[]; total: number };
       expect(data.total).toBeGreaterThanOrEqual(1);
     });
 
@@ -234,14 +233,14 @@ describe("REST API integration tests", () => {
       const res = await handleRequest("GET", "/specs?q=Persistent%20memory");
       expect(res.status).toBe(200);
 
-      const data = await res.json() as { specs: Array<{ key: string }>; total: number };
+      const data = (await res.json()) as { specs: Array<{ key: string }>; total: number };
       const keys = data.specs.map((s) => s.key);
       expect(keys).toContain("test-source::test-spec");
       expect(keys).not.toContain("test-source::target-spec");
     });
 
     test("q search with FTS5-special characters does not 500", async () => {
-      const res = await handleRequest("GET", `/specs?q=${encodeURIComponent("foo-bar:\"baz")}`);
+      const res = await handleRequest("GET", `/specs?q=${encodeURIComponent('foo-bar:"baz')}`);
       expect(res.status).toBe(200);
     });
   });
@@ -252,7 +251,7 @@ describe("REST API integration tests", () => {
       const res = await handleRequest("GET", "/specs/test-source::test-spec");
       expect(res.status).toBe(200);
 
-      const data = await res.json() as {
+      const data = (await res.json()) as {
         spec: { key: string; title: string };
         metadata: { title: string; owner: string };
         revision: number;
@@ -268,7 +267,7 @@ describe("REST API integration tests", () => {
       const res = await handleRequest("GET", "/specs/nonexistent::key");
       expect(res.status).toBe(404);
 
-      const data = await res.json() as { code: string };
+      const data = (await res.json()) as { code: string };
       expect(data.code).toBe("NOT_FOUND");
     });
   });
@@ -276,33 +275,25 @@ describe("REST API integration tests", () => {
   // ─── (c) PATCH /specs/:id/metadata — optimistic concurrency success ───
   describe("PATCH /specs/:id/metadata", () => {
     test("succeeds with correct expectedRevision and bumps revision", async () => {
-      const res = await handleRequest(
-        "PATCH",
-        "/specs/test-source::test-spec/metadata",
-        {
-          expectedRevision: 0,
-          patch: { theme: "platform", tags: ["infra", "core"] },
-        },
-      );
+      const res = await handleRequest("PATCH", "/specs/test-source::test-spec/metadata", {
+        expectedRevision: 0,
+        patch: { theme: "platform", tags: ["infra", "core"] },
+      });
       expect(res.status).toBe(200);
 
-      const data = await res.json() as { revision: number; updatedAt: string };
+      const data = (await res.json()) as { revision: number; updatedAt: string };
       expect(data.revision).toBe(1);
       expect(data.updatedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
     });
 
     test("subsequent patch with revision 1 succeeds", async () => {
-      const res = await handleRequest(
-        "PATCH",
-        "/specs/test-source::test-spec/metadata",
-        {
-          expectedRevision: 1,
-          patch: { summary: "Updated summary" },
-        },
-      );
+      const res = await handleRequest("PATCH", "/specs/test-source::test-spec/metadata", {
+        expectedRevision: 1,
+        patch: { summary: "Updated summary" },
+      });
       expect(res.status).toBe(200);
 
-      const data = await res.json() as { revision: number };
+      const data = (await res.json()) as { revision: number };
       expect(data.revision).toBe(2);
     });
   });
@@ -310,17 +301,13 @@ describe("REST API integration tests", () => {
   // ─── (d) PATCH with stale expectedRevision — 409 REVISION_CONFLICT ────
   describe("PATCH /specs/:id/metadata — conflict", () => {
     test("returns 409 REVISION_CONFLICT with stale revision", async () => {
-      const res = await handleRequest(
-        "PATCH",
-        "/specs/test-source::test-spec/metadata",
-        {
-          expectedRevision: 0, // stale — actual is now 2
-          patch: { theme: "stale-update" },
-        },
-      );
+      const res = await handleRequest("PATCH", "/specs/test-source::test-spec/metadata", {
+        expectedRevision: 0, // stale — actual is now 2
+        patch: { theme: "stale-update" },
+      });
       expect(res.status).toBe(409);
 
-      const data = await res.json() as {
+      const data = (await res.json()) as {
         code: string;
         message: string;
         expected: number;
@@ -335,33 +322,25 @@ describe("REST API integration tests", () => {
   // ─── (e) Relationships: create, list (via GET spec), duplicate → 409 ──
   describe("POST /specs/:id/relationships", () => {
     test("creates a relationship and returns 201", async () => {
-      const res = await handleRequest(
-        "POST",
-        "/specs/test-source::test-spec/relationships",
-        {
-          targetSpecKey: "test-source::target-spec",
-          type: "depends_on",
-        },
-      );
+      const res = await handleRequest("POST", "/specs/test-source::test-spec/relationships", {
+        targetSpecKey: "test-source::target-spec",
+        type: "depends_on",
+      });
       expect(res.status).toBe(201);
 
-      const data = await res.json() as { id: string; createdAt: string };
+      const data = (await res.json()) as { id: string; createdAt: string };
       expect(data.id).toBeDefined();
       expect(data.createdAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
     });
 
     test("duplicate relationship returns 409", async () => {
-      const res = await handleRequest(
-        "POST",
-        "/specs/test-source::test-spec/relationships",
-        {
-          targetSpecKey: "test-source::target-spec",
-          type: "depends_on",
-        },
-      );
+      const res = await handleRequest("POST", "/specs/test-source::test-spec/relationships", {
+        targetSpecKey: "test-source::target-spec",
+        type: "depends_on",
+      });
       expect(res.status).toBe(409);
 
-      const data = await res.json() as { code: string; message: string };
+      const data = (await res.json()) as { code: string; message: string };
       expect(data.code).toBe("DUPLICATE");
     });
   });
@@ -372,7 +351,7 @@ describe("REST API integration tests", () => {
       const res = await handleRequest("POST", "/suggestions/suggestion-1/accept");
       expect(res.status).toBe(200);
 
-      const data = await res.json() as { relationshipId: string };
+      const data = (await res.json()) as { relationshipId: string };
       expect(data.relationshipId).toBeDefined();
     });
 
@@ -380,7 +359,7 @@ describe("REST API integration tests", () => {
       const res = await handleRequest("POST", "/suggestions/suggestion-2/reject");
       expect(res.status).toBe(200);
 
-      const data = await res.json() as { status: string };
+      const data = (await res.json()) as { status: string };
       expect(data.status).toBe("rejected");
     });
 
@@ -388,7 +367,7 @@ describe("REST API integration tests", () => {
       const res = await handleRequest("POST", "/suggestions/nonexistent/accept");
       expect(res.status).toBe(200); // route returns 200 with code NOT_FOUND in body
 
-      const data = await res.json() as { code: string };
+      const data = (await res.json()) as { code: string };
       expect(data.code).toBe("NOT_FOUND");
     });
   });
@@ -396,46 +375,34 @@ describe("REST API integration tests", () => {
   // ─── (g) Validation failure returns 400/422 with error envelope ────────
   describe("Validation errors", () => {
     test("PATCH with missing expectedRevision returns 400", async () => {
-      const res = await handleRequest(
-        "PATCH",
-        "/specs/test-source::test-spec/metadata",
-        {
-          // missing expectedRevision
-          patch: { theme: "no-revision" },
-        },
-      );
+      const res = await handleRequest("PATCH", "/specs/test-source::test-spec/metadata", {
+        // missing expectedRevision
+        patch: { theme: "no-revision" },
+      });
       // Elysia returns 400 for schema validation failures
       expect(res.status).toBe(400);
 
-      const data = await res.json() as { type?: string; code?: string; message?: string };
+      const data = (await res.json()) as { type?: string; code?: string; message?: string };
       // Elysia's validation error includes type or code
       expect(data.type ?? data.code).toBeDefined();
     });
 
     test("PATCH with invalid type value in body returns 400", async () => {
-      const res = await handleRequest(
-        "PATCH",
-        "/specs/test-source::test-spec/metadata",
-        {
-          expectedRevision: "not-a-number", // wrong type
-          patch: { theme: "test" },
-        },
-      );
+      const res = await handleRequest("PATCH", "/specs/test-source::test-spec/metadata", {
+        expectedRevision: "not-a-number", // wrong type
+        patch: { theme: "test" },
+      });
       expect(res.status).toBe(400);
     });
 
     test("POST relationship with invalid type returns 400", async () => {
-      const res = await handleRequest(
-        "POST",
-        "/specs/test-source::test-spec/relationships",
-        {
-          targetSpecKey: "test-source::target-spec",
-          type: "invalid_type", // not in the union
-        },
-      );
+      const res = await handleRequest("POST", "/specs/test-source::test-spec/relationships", {
+        targetSpecKey: "test-source::target-spec",
+        type: "invalid_type", // not in the union
+      });
       expect(res.status).toBe(400);
 
-      const data = await res.json() as { type?: string; code?: string; message?: string };
+      const data = (await res.json()) as { type?: string; code?: string; message?: string };
       expect(data.type ?? data.code).toBeDefined();
     });
   });
@@ -446,7 +413,7 @@ describe("REST API integration tests", () => {
       const res = await handleRequest("GET", "/health");
       expect(res.status).toBe(200);
 
-      const data = await res.json() as { status: string };
+      const data = (await res.json()) as { status: string };
       expect(data.status).toBe("ok");
     });
 
@@ -454,7 +421,7 @@ describe("REST API integration tests", () => {
       const res = await handleRequest("GET", "/bootstrap");
       expect(res.status).toBe(200);
 
-      const data = await res.json() as {
+      const data = (await res.json()) as {
         specCount: number;
         archiveCount: number;
         lastSyncAt: string | null;
@@ -484,7 +451,7 @@ describe("REST API integration tests", () => {
       const res = await handleRequest("GET", "/archive");
       expect(res.status).toBe(200);
 
-      const data = await res.json() as { snapshots: unknown[]; nextCursor: unknown };
+      const data = (await res.json()) as { snapshots: unknown[]; nextCursor: unknown };
       expect(data.snapshots).toBeInstanceOf(Array);
       expect(data.nextCursor).toBeNull();
     });

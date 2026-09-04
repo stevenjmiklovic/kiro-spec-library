@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it } from "bun:test";
 import { cleanup, render, waitFor } from "@testing-library/react";
-import { useEffect, useState, type ReactElement } from "react";
+import { type ReactElement, useEffect, useState } from "react";
 
-import { CrewProvider, type CrewIntegration } from "../../ui/src/hooks/useCrewIntegration.js";
+import { type CrewIntegration, CrewProvider } from "../../ui/src/hooks/useCrewIntegration.js";
 import { buildSpecsQuery, useSpecData } from "../../ui/src/hooks/useSpecData.js";
 
 afterEach(() => {
@@ -30,6 +30,12 @@ describe("buildSpecsQuery", () => {
     const a = buildSpecsQuery({ filters: { type: "feature" } });
     const b = buildSpecsQuery({ filters: { type: "bugfix" } });
     expect(a).not.toBe(b);
+  });
+
+  it("maps the `repository` filter to the `repo` API param", () => {
+    const q = buildSpecsQuery({ filters: { repository: "counter-table" } });
+    expect(q).toContain("repo=counter-table");
+    expect(q).not.toContain("repository=");
   });
 });
 

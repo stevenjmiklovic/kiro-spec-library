@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { sanitizeResponse, sanitizeJsonResponse } from "../../mcp/src/redactor.js";
+import { sanitizeJsonResponse, sanitizeResponse } from "../../mcp/src/redactor.js";
 
 describe("MCP redactor", () => {
   describe("credential redaction", () => {

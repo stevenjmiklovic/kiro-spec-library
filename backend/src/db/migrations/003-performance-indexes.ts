@@ -1,8 +1,8 @@
-import type { Database } from 'bun:sqlite';
+import type { Database } from "bun:sqlite";
 
 export const migration = {
   number: 3,
-  name: 'performance-indexes',
+  name: "performance-indexes",
   up(db: Database): void {
     db.exec(`
       CREATE INDEX idx_specs_source ON specs(source_id);

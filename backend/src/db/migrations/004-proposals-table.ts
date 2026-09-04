@@ -1,8 +1,8 @@
-import type { Database } from 'bun:sqlite';
+import type { Database } from "bun:sqlite";
 
 export const migration = {
   number: 4,
-  name: 'proposals-table',
+  name: "proposals-table",
   up(db: Database): void {
     db.exec(`
       CREATE TABLE proposals (

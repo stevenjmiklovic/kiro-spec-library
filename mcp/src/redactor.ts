@@ -4,8 +4,7 @@ import { redact } from "@kiro-spec-library/shared";
 /** Maximum response size in bytes (64 KB) */
 const MAX_RESPONSE_BYTES = 64 * 1024;
 
-const TRUNCATION_NOTICE =
-  "\n\n[Content truncated — response exceeded 64 KB limit]";
+const TRUNCATION_NOTICE = "\n\n[Content truncated — response exceeded 64 KB limit]";
 
 /**
  * Redact credentials and enforce size limit on MCP tool responses.

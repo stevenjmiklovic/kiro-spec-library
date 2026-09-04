@@ -1,6 +1,6 @@
-import React from 'react';
-import { useCrew } from '../hooks/useCrewIntegration.js';
-import type { SpecDetail } from '../hooks/useSpecDetail.js';
+import type React from "react";
+import { useCrew } from "../hooks/useCrewIntegration.js";
+import type { SpecDetail } from "../hooks/useSpecDetail.js";
 
 interface Props {
   detail: SpecDetail;
@@ -23,12 +23,12 @@ export function buildPermalink(detail: SpecDetail): string | null {
   else if (ssh) base = `https://${ssh[1]}/${ssh[2]}`;
   if (!base) return null;
 
-  const host = base.replace(/^https:\/\//, '').split('/')[0] ?? '';
-  const ref = commitHash || branch || 'main';
-  const path = relativePath.replace(/^\/+/, '');
+  const host = base.replace(/^https:\/\//, "").split("/")[0] ?? "";
+  const ref = commitHash || branch || "main";
+  const path = relativePath.replace(/^\/+/, "");
 
   // GitHub / Gitea style: /tree/<ref>/<path>; GitLab: /-/tree/<ref>/<path>.
-  if (host.includes('gitlab')) return `${base}/-/tree/${ref}/${path}`;
+  if (host.includes("gitlab")) return `${base}/-/tree/${ref}/${path}`;
   return `${base}/tree/${ref}/${path}`;
 }
 
@@ -47,17 +47,13 @@ export function SpecActions({ detail }: Props): React.ReactElement {
       specId: detail.specId || detail.key,
       revisionId: commitHash || undefined,
       prompt,
-      agent: 'spectral-librarian',
+      agent: "spectral-librarian",
     });
   };
 
   return (
     <div className="spec-actions" role="group" aria-label="Spec actions">
-      <button
-        type="button"
-        className="spec-actions__primary"
-        onClick={openInChat}
-      >
+      <button type="button" className="spec-actions__primary" onClick={openInChat}>
         Open in Crew chat
       </button>
 

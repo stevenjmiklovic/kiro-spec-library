@@ -1,7 +1,7 @@
-import { Elysia } from "elysia";
 import type { Database } from "bun:sqlite";
-import { buildTextExportZip, applyTextExportZip } from "../services/text-export.js";
+import { Elysia } from "elysia";
 import { recordEvent } from "../services/audit.js";
+import { applyTextExportZip, buildTextExportZip } from "../services/text-export.js";
 
 export function textExportRoutes(deps: { db: Database }) {
   const { db } = deps;
@@ -37,14 +37,17 @@ export function textExportRoutes(deps: { db: Database }) {
 
       const zipBytes = new Uint8Array(await file.arrayBuffer());
 
-      let result;
+      let result: ReturnType<typeof applyTextExportZip>;
       try {
         result = applyTextExportZip(db, zipBytes);
       } catch (err) {
         set.status = 400;
         return {
           code: "INVALID_EXPORT_FILE",
-          message: err instanceof Error ? err.message : "Uploaded file could not be read as a text export archive.",
+          message:
+            err instanceof Error
+              ? err.message
+              : "Uploaded file could not be read as a text export archive.",
         };
       }
 

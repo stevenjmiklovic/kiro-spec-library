@@ -1,7 +1,7 @@
-import { Elysia } from "elysia";
 import type { Database } from "bun:sqlite";
-import { createBackupBuffer, restoreFromBackup, InvalidBackupError } from "../services/backup.js";
+import { Elysia } from "elysia";
 import { recordEvent } from "../services/audit.js";
+import { InvalidBackupError, createBackupBuffer, restoreFromBackup } from "../services/backup.js";
 
 const RESTORE_CONFIRMATION = "RESTORE";
 
@@ -55,7 +55,8 @@ export function backupRoutes(deps: { db: Database; dataDir: string }) {
         return {
           restored: true,
           requiresRestart: true,
-          message: "Backup restored to disk. Restart the Spec Library backend for the restored data to take effect.",
+          message:
+            "Backup restored to disk. Restart the Spec Library backend for the restored data to take effect.",
           safetyBackupPath,
         };
       } catch (err) {

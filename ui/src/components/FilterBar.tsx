@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 
 export interface RelationshipFilters {
   scope: "team" | "mine";
@@ -60,12 +60,12 @@ export function FilterBar({ filters, options, onChange, resultCount }: Props): R
     onChange({ ...filters, scope });
   };
 
-  const handleSelectChange = (
-    field: keyof Pick<RelationshipFilters, "theme" | "type" | "stage" | "owner" | "repository">
-  ) => (e: React.ChangeEvent<HTMLSelectElement>): void => {
-    const value = e.target.value || undefined;
-    onChange({ ...filters, [field]: value });
-  };
+  const handleSelectChange =
+    (field: keyof Pick<RelationshipFilters, "theme" | "type" | "stage" | "owner" | "repository">) =>
+    (e: React.ChangeEvent<HTMLSelectElement>): void => {
+      const value = e.target.value || undefined;
+      onChange({ ...filters, [field]: value });
+    };
 
   const handleMetaCompleteChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     const value = e.target.value;
@@ -97,9 +97,7 @@ export function FilterBar({ filters, options, onChange, resultCount }: Props): R
           />
         </label>
         <span className="filter-help" aria-live="polite" aria-atomic="true">
-          {filters.query && filters.query.length < 2
-            ? "Search activates at 2 characters"
-            : null}
+          {filters.query && filters.query.length < 2 ? "Search activates at 2 characters" : null}
         </span>
       </div>
 
@@ -238,7 +236,9 @@ export function FilterBar({ filters, options, onChange, resultCount }: Props): R
                 type="button"
                 aria-label={`Remove theme filter: ${filters.theme}`}
                 onClick={() => onChange({ ...filters, theme: undefined })}
-              >✕</button>
+              >
+                ✕
+              </button>
             </span>
           )}
           {filters.type && (
@@ -248,7 +248,9 @@ export function FilterBar({ filters, options, onChange, resultCount }: Props): R
                 type="button"
                 aria-label={`Remove type filter: ${filters.type}`}
                 onClick={() => onChange({ ...filters, type: undefined })}
-              >✕</button>
+              >
+                ✕
+              </button>
             </span>
           )}
           {filters.stage && (
@@ -258,7 +260,9 @@ export function FilterBar({ filters, options, onChange, resultCount }: Props): R
                 type="button"
                 aria-label={`Remove stage filter: ${filters.stage}`}
                 onClick={() => onChange({ ...filters, stage: undefined })}
-              >✕</button>
+              >
+                ✕
+              </button>
             </span>
           )}
           {filters.owner && (
@@ -268,7 +272,9 @@ export function FilterBar({ filters, options, onChange, resultCount }: Props): R
                 type="button"
                 aria-label={`Remove owner filter: ${filters.owner}`}
                 onClick={() => onChange({ ...filters, owner: undefined })}
-              >✕</button>
+              >
+                ✕
+              </button>
             </span>
           )}
           {filters.repository && (
@@ -278,7 +284,9 @@ export function FilterBar({ filters, options, onChange, resultCount }: Props): R
                 type="button"
                 aria-label={`Remove repository filter: ${filters.repository}`}
                 onClick={() => onChange({ ...filters, repository: undefined })}
-              >✕</button>
+              >
+                ✕
+              </button>
             </span>
           )}
           {filters.query && (
@@ -288,7 +296,9 @@ export function FilterBar({ filters, options, onChange, resultCount }: Props): R
                 type="button"
                 aria-label="Remove search filter"
                 onClick={() => onChange({ ...filters, query: undefined })}
-              >✕</button>
+              >
+                ✕
+              </button>
             </span>
           )}
         </div>
@@ -296,8 +306,7 @@ export function FilterBar({ filters, options, onChange, resultCount }: Props): R
 
       {resultCount === 0 && (
         <p role="status" aria-live="polite">
-          No results match the current filters. Filters have been retained so you
-          can adjust them.
+          No results match the current filters. Filters have been retained so you can adjust them.
         </p>
       )}
     </div>

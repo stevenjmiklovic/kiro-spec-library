@@ -1,22 +1,22 @@
-import { describe, expect, test, beforeAll, afterAll } from "bun:test";
+import type { Database } from "bun:sqlite";
+import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
-import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { ArchiverService } from "../../backend/src/services/archiver.js";
+import { join } from "node:path";
 import { createDatabase } from "../../backend/src/db/connection.js";
 import { runMigrations } from "../../backend/src/db/migrator.js";
 import { putSource } from "../../backend/src/db/queries/sources.js";
 import { upsertSpec } from "../../backend/src/db/queries/specs.js";
-import type { NormalizedSpec } from "../../shared/src/types.js";
+import { ArchiverService } from "../../backend/src/services/archiver.js";
 import type { ResolvedMetadata } from "../../backend/src/services/metadata.js";
-import type { Database } from "bun:sqlite";
+import type { NormalizedSpec } from "../../shared/src/types.js";
 
 let testDir: string;
 let archiveDir: string;
 let db: Database;
 let archiver: ArchiverService;
 
-function makeCompletedSpec(key: string = "src1::my-spec"): NormalizedSpec {
+function makeCompletedSpec(key = "src1::my-spec"): NormalizedSpec {
   return {
     key,
     sourceId: "src1",
@@ -109,11 +109,9 @@ describe("ArchiverService", () => {
     test("hash verification on write", async () => {
       const spec = makeCompletedSpec("src1::hash-test");
       upsertSpec(db, { ...makeCompletedSpec(), key: "src1::hash-test", specId: "hash-test" });
-      const snapshot = await archiver.maybeCreateSnapshot(
-        spec,
-        makeMeta(),
-        [{ name: "requirements.md", content: "unique content for hash test" }],
-      );
+      const snapshot = await archiver.maybeCreateSnapshot(spec, makeMeta(), [
+        { name: "requirements.md", content: "unique content for hash test" },
+      ]);
       expect(snapshot).not.toBeNull();
       // Each stored artifact should have a valid hash
       for (const a of snapshot!.artifacts) {
@@ -201,9 +199,9 @@ describe("ArchiverService", () => {
       );
       expect(snapshot).not.toBeNull();
 
-      await expect(
-        archiver.purge(snapshot!.id, "WRONG TEXT"),
-      ).rejects.toThrow("Invalid confirmation text");
+      await expect(archiver.purge(snapshot!.id, "WRONG TEXT")).rejects.toThrow(
+        "Invalid confirmation text",
+      );
     });
 
     test("succeeds with correct confirmation and eligible snapshot", async () => {

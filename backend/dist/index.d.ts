@@ -429,8 +429,8 @@ declare const app: import("elysia").default<"/api", {
                         url?: string | undefined;
                         branch?: string | undefined;
                         webUrlTemplate?: string | undefined;
-                        id: string;
                         type: "local" | "remote";
+                        id: string;
                         addedAt: string;
                     }[];
                 };
@@ -556,8 +556,8 @@ declare const app: import("elysia").default<"/api", {
                         branch?: string | undefined;
                         webUrlTemplate?: string | undefined;
                         addedAt?: string | undefined;
-                        id: string;
                         type: "local" | "remote";
+                        id: string;
                     }[];
                     params: {};
                     query: unknown;
@@ -1238,6 +1238,5 @@ declare const app: import("elysia").default<"/api", {
     standaloneSchema: {};
     response: {};
 }>;
-declare const server: Bun.Server;
-export { app, db, server, mcpToken };
+export { app, db, mcpToken };
 //# sourceMappingURL=index.d.ts.map

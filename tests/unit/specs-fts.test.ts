@@ -1,12 +1,17 @@
-import { describe, expect, test, beforeAll, afterAll } from "bun:test";
-import { mkdtempSync, rmSync } from "node:fs";
-import { join } from "node:path";
-import { tmpdir } from "node:os";
 import type { Database } from "bun:sqlite";
+import { afterAll, beforeAll, describe, expect, test } from "bun:test";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { createDatabase } from "../../backend/src/db/connection.js";
 import { runMigrations } from "../../backend/src/db/migrator.js";
 import { putSource } from "../../backend/src/db/queries/sources.js";
-import { upsertSpec, syncSpecFts, listSpecs, countSpecs } from "../../backend/src/db/queries/specs.js";
+import {
+  countSpecs,
+  listSpecs,
+  syncSpecFts,
+  upsertSpec,
+} from "../../backend/src/db/queries/specs.js";
 import type { NormalizedSpec } from "../../shared/src/types.js";
 
 let testDir: string;
@@ -42,7 +47,12 @@ beforeAll(async () => {
   testDir = mkdtempSync(join(tmpdir(), "specs-fts-test-"));
   db = createDatabase(testDir);
   await runMigrations(db);
-  putSource(db, { id: "src1", type: "local", path: "/repos/test", addedAt: new Date().toISOString() });
+  putSource(db, {
+    id: "src1",
+    type: "local",
+    path: "/repos/test",
+    addedAt: new Date().toISOString(),
+  });
 });
 
 afterAll(() => {
@@ -124,10 +134,20 @@ describe("specs_fts sync and search", () => {
       repository: "test-repo",
     });
 
-    const matchingType = listSpecs(db, { query: "combo-only-term", type: "bugfix", limit: 10, offset: 0 });
+    const matchingType = listSpecs(db, {
+      query: "combo-only-term",
+      type: "bugfix",
+      limit: 10,
+      offset: 0,
+    });
     expect(matchingType.map((s) => s.key)).toContain("src1::fts-combo");
 
-    const wrongType = listSpecs(db, { query: "combo-only-term", type: "feature", limit: 10, offset: 0 });
+    const wrongType = listSpecs(db, {
+      query: "combo-only-term",
+      type: "feature",
+      limit: 10,
+      offset: 0,
+    });
     expect(wrongType.map((s) => s.key)).not.toContain("src1::fts-combo");
   });
 });

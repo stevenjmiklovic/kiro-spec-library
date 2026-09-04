@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it } from "bun:test";
-import { cleanup, render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 
-import { CrewProvider, type CrewIntegration } from "../../ui/src/hooks/useCrewIntegration.js";
 import { AuditLogPanel } from "../../ui/src/components/AuditLogPanel.js";
+import { type CrewIntegration, CrewProvider } from "../../ui/src/hooks/useCrewIntegration.js";
 
 afterEach(() => {
   cleanup();

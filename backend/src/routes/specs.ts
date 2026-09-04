@@ -1,19 +1,19 @@
-import { Elysia, t } from "elysia";
 import type { Database } from "bun:sqlite";
-import {
-  listSpecs,
-  countSpecs,
-  findByKey,
-  type SpecFilters,
-  type SpecRow,
-} from "../db/queries/specs.js";
+import { Elysia, t } from "elysia";
 import { getOverlay, overlayRowToMetadataOverlay } from "../db/queries/metadata.js";
 import { RevisionConflictError } from "../db/queries/metadata.js";
-import { applyPatch, resolveMetadata, evaluateCompleteness } from "../services/metadata.js";
 import { listBySourceKeys } from "../db/queries/relationships.js";
-import { listPendingBySourceKeys } from "../db/queries/suggestions.js";
 import { listSources } from "../db/queries/sources.js";
+import {
+  type SpecFilters,
+  type SpecRow,
+  countSpecs,
+  findByKey,
+  listSpecs,
+} from "../db/queries/specs.js";
+import { listPendingBySourceKeys } from "../db/queries/suggestions.js";
 import { recordEvent } from "../services/audit.js";
+import { applyPatch, evaluateCompleteness, resolveMetadata } from "../services/metadata.js";
 
 /**
  * Derive a friendly, human-readable project name for a spec.

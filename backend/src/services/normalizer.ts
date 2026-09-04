@@ -1,4 +1,4 @@
-import { createHash } from 'node:crypto';
+import { createHash } from "node:crypto";
 import type {
   ArtifactManifest,
   ConfigKiro,
@@ -9,7 +9,7 @@ import type {
   SpecType,
   TaskCounts,
   WorkflowType,
-} from '@kiro-spec-library/shared';
+} from "@kiro-spec-library/shared";
 
 export interface RawSpecArtifacts {
   slug: string;
@@ -27,26 +27,26 @@ export function deriveKey(sourceId: string, specId: string | null, relativePath:
 }
 
 export function classifyType(artifacts: ArtifactManifest, config: ConfigKiro | null): SpecType {
-  if (config?.specType === 'bugfix' || (artifacts['bugfix.md'] && !artifacts['requirements.md'])) {
-    return 'bugfix';
+  if (config?.specType === "bugfix" || (artifacts["bugfix.md"] && !artifacts["requirements.md"])) {
+    return "bugfix";
   }
-  if (artifacts['requirements.md'] && artifacts['design.md']) {
-    return 'feature';
+  if (artifacts["requirements.md"] && artifacts["design.md"]) {
+    return "feature";
   }
-  if (artifacts['tasks.md'] && !artifacts['design.md'] && !artifacts['requirements.md']) {
-    return 'quick';
+  if (artifacts["tasks.md"] && !artifacts["design.md"] && !artifacts["requirements.md"]) {
+    return "quick";
   }
-  return 'unknown';
+  return "unknown";
 }
 
 export function classifyWorkflow(artifacts: ArtifactManifest): WorkflowType {
-  if (artifacts['requirements.md']) {
-    return 'requirements-first';
+  if (artifacts["requirements.md"]) {
+    return "requirements-first";
   }
-  if (artifacts['design.md'] && !artifacts['requirements.md']) {
-    return 'design-first';
+  if (artifacts["design.md"] && !artifacts["requirements.md"]) {
+    return "design-first";
   }
-  return 'unknown';
+  return "unknown";
 }
 
 export function extractTitle(content: string | undefined, fallbackSlug: string): string {
@@ -57,25 +57,28 @@ export function extractTitle(content: string | undefined, fallbackSlug: string):
     }
   }
   return fallbackSlug
-    .split('-')
+    .split("-")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+    .join(" ");
 }
 
-export function calculateStage(artifacts: ArtifactManifest, taskCounts: TaskCounts): LifecycleStage {
-  if (artifacts['tasks.md'] && taskCounts.total > 0 && taskCounts.completed === taskCounts.total) {
-    return 'done';
+export function calculateStage(
+  artifacts: ArtifactManifest,
+  taskCounts: TaskCounts,
+): LifecycleStage {
+  if (artifacts["tasks.md"] && taskCounts.total > 0 && taskCounts.completed === taskCounts.total) {
+    return "done";
   }
-  if (artifacts['tasks.md'] && taskCounts.total > 0 && taskCounts.completed > 0) {
-    return 'in-flight';
+  if (artifacts["tasks.md"] && taskCounts.total > 0 && taskCounts.completed > 0) {
+    return "in-flight";
   }
-  if (artifacts['tasks.md']) {
-    return 'refined';
+  if (artifacts["tasks.md"]) {
+    return "refined";
   }
-  if (artifacts['design.md'] || (artifacts['bugfix.md'] && !artifacts['requirements.md'])) {
-    return 'scoped';
+  if (artifacts["design.md"] || (artifacts["bugfix.md"] && !artifacts["requirements.md"])) {
+    return "scoped";
   }
-  return 'new';
+  return "new";
 }
 
 export function calculateProgress(artifacts: ArtifactManifest, taskCounts: TaskCounts): number {
@@ -102,7 +105,7 @@ export function countTasks(tasksContent: string | undefined): TaskCounts {
 
   const matches = [...tasksContent.matchAll(/^\s*-\s*\[([x ~])\]/gm)];
   const total = matches.length;
-  const completed = matches.filter((m) => m[1] === 'x').length;
+  const completed = matches.filter((m) => m[1] === "x").length;
 
   return { total, completed };
 }
@@ -129,15 +132,13 @@ export function normalize(raw: RawSpecArtifacts, source: Source): NormalizedSpec
   const progress = calculateProgress(artifacts, taskCounts);
 
   const titleSource =
-    raw.contents["requirements.md"] ??
-    raw.contents["bugfix.md"] ??
-    raw.contents["design.md"];
+    raw.contents["requirements.md"] ?? raw.contents["bugfix.md"] ?? raw.contents["design.md"];
   // Prefer the spec folder name (slug) as the title — it's the spec's identity.
   // Only use the content heading if the folder name is a UUID or otherwise uninformative.
   const slugTitle = raw.slug
-    .split('-')
+    .split("-")
     .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+    .join(" ");
   const isUuidSlug = /^[0-9a-f]{8}-[0-9a-f]{4}-/.test(raw.slug);
   const title = isUuidSlug ? extractTitle(titleSource, raw.slug) : slugTitle;
 

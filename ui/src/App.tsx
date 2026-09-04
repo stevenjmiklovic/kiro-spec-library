@@ -1,20 +1,20 @@
-import { type ReactNode } from 'react';
-import { CrewProvider, useCrew, type CrewIntegration } from './hooks/useCrewIntegration.js';
-import { useUrlState } from './hooks/useUrlState.js';
-import { RelationshipView } from './views/RelationshipView.js';
-import { ArchiveView } from './views/ArchiveView.js';
+import type { ReactNode } from "react";
+import { type CrewIntegration, CrewProvider, useCrew } from "./hooks/useCrewIntegration.js";
+import { useUrlState } from "./hooks/useUrlState.js";
+import { ArchiveView } from "./views/ArchiveView.js";
+import { RelationshipView } from "./views/RelationshipView.js";
 
 // Self-inject CSS — gateway provides no CSS loading
-const cssUrl = new URL('./index.css', import.meta.url).href;
-if (typeof document !== 'undefined' && !document.querySelector(`link[href="${cssUrl}"]`)) {
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
+const cssUrl = new URL("./index.css", import.meta.url).href;
+if (typeof document !== "undefined" && !document.querySelector(`link[href="${cssUrl}"]`)) {
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
   link.href = cssUrl;
   document.head.appendChild(link);
 }
-import { AppChrome } from './components/AppChrome.js';
-import { ErrorBoundary } from './components/ErrorBoundary.js';
-import './styles/global.css';
+import { AppChrome } from "./components/AppChrome.js";
+import { ErrorBoundary } from "./components/ErrorBoundary.js";
+import "./styles/global.css";
 
 function AppProvider({
   children,
@@ -57,7 +57,7 @@ function AppContent() {
         onViewChange={(v) => setUrlState({ view: v })}
         onThemeChange={(m) => setUrlState({ themeMode: m })}
       />
-      {view === 'relationship' ? <RelationshipView /> : <ArchiveView />}
+      {view === "relationship" ? <RelationshipView /> : <ArchiveView />}
     </div>
   );
 }

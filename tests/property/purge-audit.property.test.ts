@@ -1,3 +1,4 @@
+import type { Database } from "bun:sqlite";
 /**
  * Property-based tests — Properties 14 & 15
  *
@@ -8,20 +9,19 @@
  *   Recorded audit events contain NO artifact content or metadata VALUES —
  *   only ids/types/counts.
  */
-import { describe, expect, test, beforeAll, afterAll } from "bun:test";
-import fc from "fast-check";
+import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
-import { join } from "node:path";
 import { tmpdir } from "node:os";
+import { join } from "node:path";
+import fc from "fast-check";
 import { createDatabase } from "../../backend/src/db/connection.js";
 import { runMigrations } from "../../backend/src/db/migrator.js";
-import { ArchiverService } from "../../backend/src/services/archiver.js";
 import { insertAuditEvent, queryAuditEvents } from "../../backend/src/db/queries/audit.js";
 import { putSource } from "../../backend/src/db/queries/sources.js";
 import { upsertSpec } from "../../backend/src/db/queries/specs.js";
-import type { Database } from "bun:sqlite";
-import type { NormalizedSpec, AuditOperation } from "../../shared/src/types.js";
+import { ArchiverService } from "../../backend/src/services/archiver.js";
 import { AUDIT_OPERATIONS } from "../../shared/src/constants.js";
+import type { AuditOperation, NormalizedSpec } from "../../shared/src/types.js";
 
 // ─── Test Infrastructure ─────────────────────────────────────────────────────
 
@@ -114,27 +114,22 @@ describe("Property 14: Purge Confirmation Exactness", () => {
 
   test("any string other than exact `PURGE <id>` is rejected (100+ generated cases)", async () => {
     await fc.assert(
-      fc.asyncProperty(
-        fc.string({ minLength: 0, maxLength: 200 }),
-        async (randomText) => {
-          const snapshotId = await createPurgeableSnapshot();
-          const expectedConfirmation = `PURGE ${snapshotId}`;
+      fc.asyncProperty(fc.string({ minLength: 0, maxLength: 200 }), async (randomText) => {
+        const snapshotId = await createPurgeableSnapshot();
+        const expectedConfirmation = `PURGE ${snapshotId}`;
 
-          // Skip if the random string happens to be the exact correct one
-          if (randomText === expectedConfirmation) return;
+        // Skip if the random string happens to be the exact correct one
+        if (randomText === expectedConfirmation) return;
 
-          try {
-            await archiver.purge(snapshotId, randomText);
-            // If it didn't throw, the property is violated
-            throw new Error(
-              `Expected rejection but purge succeeded with: "${randomText}"`,
-            );
-          } catch (err) {
-            const error = err as Error;
-            expect(error.message).toContain("Invalid confirmation text");
-          }
-        },
-      ),
+        try {
+          await archiver.purge(snapshotId, randomText);
+          // If it didn't throw, the property is violated
+          throw new Error(`Expected rejection but purge succeeded with: "${randomText}"`);
+        } catch (err) {
+          const error = err as Error;
+          expect(error.message).toContain("Invalid confirmation text");
+        }
+      }),
       { numRuns: 100 },
     );
   });
@@ -149,13 +144,17 @@ describe("Property 14: Purge Confirmation Exactness", () => {
       // Missing space
       fc.constant("PURGE"),
       // Trailing chars
-      fc.tuple(fc.constant("PURGE "), fc.string({ minLength: 1, maxLength: 50 }))
+      fc
+        .tuple(fc.constant("PURGE "), fc.string({ minLength: 1, maxLength: 50 }))
         .map(([prefix, suffix]) => prefix + suffix),
       // Leading chars
-      fc.tuple(fc.string({ minLength: 1, maxLength: 10 }), fc.constant("PURGE "))
+      fc
+        .tuple(fc.string({ minLength: 1, maxLength: 10 }), fc.constant("PURGE "))
         .map(([prefix, suffix]) => prefix + suffix),
       // Correct prefix with wrong ID
-      fc.uuid().map((uuid) => `PURGE ${uuid}`),
+      fc
+        .uuid()
+        .map((uuid) => `PURGE ${uuid}`),
       // Tab instead of space
       fc.constant("PURGE\t"),
       // Unicode variations
@@ -172,9 +171,7 @@ describe("Property 14: Purge Confirmation Exactness", () => {
 
         try {
           await archiver.purge(snapshotId, badConfirmation);
-          throw new Error(
-            `Expected rejection but purge succeeded with: "${badConfirmation}"`,
-          );
+          throw new Error(`Expected rejection but purge succeeded with: "${badConfirmation}"`);
         } catch (err) {
           const error = err as Error;
           expect(error.message).toContain("Invalid confirmation text");
@@ -194,20 +191,41 @@ describe("Property 15: Audit Event Content-Free Guarantee", () => {
       specKey: fc.option(fc.uuid(), { nil: undefined }),
       snapshotId: fc.option(fc.uuid(), { nil: undefined }),
       actor: fc.option(
-        fc.stringOf(fc.constantFrom(...'abcdefghijklmnopqrstuvwxyz'.split('')), { minLength: 1, maxLength: 20 }),
+        fc.stringOf(fc.constantFrom(..."abcdefghijklmnopqrstuvwxyz".split("")), {
+          minLength: 1,
+          maxLength: 20,
+        }),
         { nil: undefined },
       ),
       operation: fc.constantFrom(...AUDIT_OPERATIONS),
-      // These are "content" values that should never be stored
+      // These are "content" values that should never be stored. They are
+      // prefixed with a sentinel below so an assertion failure means genuine
+      // leakage, not a coincidental collision with a structural field
+      // (actor is an arbitrary lowercase string, so a bare fake value like
+      // "apply" could equal it and fail the not.toContain check spuriously).
       fakeSummary: fc.string({ minLength: 5, maxLength: 200 }),
       fakeTitle: fc.string({ minLength: 5, maxLength: 100 }),
-      fakeTags: fc.array(fc.string({ minLength: 3, maxLength: 30 }), { minLength: 1, maxLength: 5 }),
+      fakeTags: fc.array(fc.string({ minLength: 3, maxLength: 30 }), {
+        minLength: 1,
+        maxLength: 5,
+      }),
       fakeOwner: fc.string({ minLength: 3, maxLength: 50 }),
       fakeContent: fc.string({ minLength: 10, maxLength: 500 }),
     });
 
     await fc.assert(
-      fc.asyncProperty(contentArbitrary, async (input) => {
+      fc.asyncProperty(contentArbitrary, async (rawInput) => {
+        // Sentinel-prefix every "content" value so it cannot coincidentally
+        // substring-match a structural audit field (actor/operation/UUID/ts).
+        const sentinel = `Z9LEAK${crypto.randomUUID().slice(0, 8)}Z9`;
+        const input = {
+          ...rawInput,
+          fakeSummary: `${sentinel}sum${rawInput.fakeSummary}`,
+          fakeTitle: `${sentinel}ttl${rawInput.fakeTitle}`,
+          fakeTags: rawInput.fakeTags.map((t, i) => `${sentinel}tag${i}${t}`),
+          fakeOwner: `${sentinel}own${rawInput.fakeOwner}`,
+          fakeContent: `${sentinel}cnt${rawInput.fakeContent}`,
+        };
         const eventId = crypto.randomUUID();
         const timestamp = new Date().toISOString();
         const actor = input.actor ?? "system";
@@ -285,10 +303,21 @@ describe("Property 15: Audit Event Content-Free Guarantee", () => {
     await fc.assert(
       fc.asyncProperty(
         fc.string({ minLength: 20, maxLength: 500 }), // artifact content
-        fc.string({ minLength: 5, maxLength: 100 }),  // title
-        fc.string({ minLength: 5, maxLength: 200 }),  // summary
-        async (content, title, summary) => {
+        fc.string({ minLength: 5, maxLength: 100 }), // title
+        fc.string({ minLength: 5, maxLength: 200 }), // summary
+        async (rawContent, rawTitle, rawSummary) => {
           auditCounter++;
+          // Prefix each generated value with a unique sentinel so the
+          // "content-free" assertions test genuine leakage, not a coincidental
+          // substring collision: fast-check can generate a title like "apply"
+          // or a whitespace-only string that is trivially a substring of a
+          // structural audit field (actor="apply", operation, spec_key,
+          // timestamps). The sentinel cannot appear in any structural field, so
+          // a match means the value really leaked.
+          const sentinel = `Z9LEAK${auditCounter}Z9`;
+          const content = `${sentinel}-content-${rawContent}`;
+          const title = `${sentinel}-title-${rawTitle}`;
+          const summary = `${sentinel}-summary-${rawSummary}`;
           const specKey = `src1::audit-content-${auditCounter}`;
           const spec = makeCompletedSpec(specKey);
           upsertSpec(db, spec);
@@ -319,18 +348,11 @@ describe("Property 15: Audit Event Content-Free Guarantee", () => {
           for (const event of events) {
             const allValues = Object.values(event).map(String).join(" ");
 
-            // Content must never appear
-            if (content.length > 10) {
-              expect(allValues).not.toContain(content);
-            }
-            // Title must never appear (metadata value)
-            if (title.length > 5) {
-              expect(allValues).not.toContain(title);
-            }
-            // Summary must never appear (metadata value)
-            if (summary.length > 5) {
-              expect(allValues).not.toContain(summary);
-            }
+            // None of the spec's content/metadata values may leak into an
+            // audit event — they are content-free by design.
+            expect(allValues).not.toContain(content);
+            expect(allValues).not.toContain(title);
+            expect(allValues).not.toContain(summary);
           }
         },
       ),

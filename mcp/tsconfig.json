@@ -6,8 +6,6 @@
     "composite": true,
     "types": ["@types/bun"]
   },
-  "references": [
-    { "path": "../shared" }
-  ],
+  "references": [{ "path": "../shared" }],
   "include": ["src/**/*.ts"]
 }

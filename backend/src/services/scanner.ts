@@ -1,20 +1,24 @@
-import type { Database } from 'bun:sqlite';
-import type { Source, ScanResult, ScanError, NormalizedSpec } from '@kiro-spec-library/shared';
-import { REMOTE_TIMEOUT_SECONDS, SPEC_ARTIFACTS } from '@kiro-spec-library/shared';
-import { validatePath } from '../security/path-validator.js';
-import { validateArgs, buildFetchCommand, buildCloneCommand } from '../security/git-validator.js';
-import { normalize, type RawSpecArtifacts } from './normalizer.js';
-import { autoPopulate } from './auto-metadata.js';
-import { getOverlay, upsertOverlay, overlayRowToMetadataOverlay } from '../db/queries/metadata.js';
-import { resolveMetadata, type ResolvedMetadata } from './metadata.js';
-import { generateAll } from './suggester.js';
-import type { ArchiverService } from './archiver.js';
-import { ConfigKiroSchema } from '@kiro-spec-library/shared';
-import { insertScan, updateScan } from '../db/queries/scan-history.js';
-import { upsertSpec, syncSpecFts } from '../db/queries/specs.js';
-import { suggestionExists, createSuggestion, listAllRejections } from '../db/queries/suggestions.js';
-import { join, relative } from 'node:path';
-import { readdirSync, existsSync } from 'node:fs';
+import type { Database } from "bun:sqlite";
+import { existsSync, readdirSync } from "node:fs";
+import { join, relative } from "node:path";
+import type { NormalizedSpec, ScanError, ScanResult, Source } from "@kiro-spec-library/shared";
+import { REMOTE_TIMEOUT_SECONDS, SPEC_ARTIFACTS } from "@kiro-spec-library/shared";
+import { ConfigKiroSchema } from "@kiro-spec-library/shared";
+import { getOverlay, overlayRowToMetadataOverlay, upsertOverlay } from "../db/queries/metadata.js";
+import { insertScan, updateScan } from "../db/queries/scan-history.js";
+import { syncSpecFts, upsertSpec } from "../db/queries/specs.js";
+import {
+  createSuggestion,
+  listAllRejections,
+  suggestionExists,
+} from "../db/queries/suggestions.js";
+import { buildCloneCommand, buildFetchCommand, validateArgs } from "../security/git-validator.js";
+import { validatePath } from "../security/path-validator.js";
+import type { ArchiverService } from "./archiver.js";
+import { autoPopulate } from "./auto-metadata.js";
+import { type ResolvedMetadata, resolveMetadata } from "./metadata.js";
+import { type RawSpecArtifacts, normalize } from "./normalizer.js";
+import { generateAll } from "./suggester.js";
 
 export interface SpecDirectory {
   slug: string;
@@ -59,7 +63,7 @@ export class ScannerService {
     const allSpecs: NormalizedSpec[] = [];
     const contentMap = new Map<string, string>();
 
-    insertScan(this.db, { runId, startedAt, status: 'running' });
+    insertScan(this.db, { runId, startedAt, status: "running" });
 
     for (const source of sources) {
       try {
@@ -85,18 +89,19 @@ export class ScannerService {
         this.generateSuggestions(allSpecs, contentMap);
       } catch (err: unknown) {
         console.warn(
-          '[scanner] Suggestion generation failed:',
+          "[scanner] Suggestion generation failed:",
           err instanceof Error ? err.message : err,
         );
       }
     }
 
     const completedAt = new Date().toISOString();
-    const status = errors.length === 0
-      ? 'completed'
-      : errors.length < sources.length
-        ? 'partial_failure'
-        : 'partial_failure';
+    const status =
+      errors.length === 0
+        ? "completed"
+        : errors.length < sources.length
+          ? "partial_failure"
+          : "partial_failure";
 
     updateScan(this.db, runId, {
       completedAt,
@@ -154,13 +159,12 @@ export class ScannerService {
     source: Source,
     contentMap: Map<string, string>,
   ): Promise<NormalizedSpec[]> {
-    if (source.type === 'remote') {
+    if (source.type === "remote") {
       await this.refreshRemote(source);
     }
 
-    const repoPath = source.type === 'local'
-      ? source.path!
-      : join(this.dataDir, 'clones', source.id);
+    const repoPath =
+      source.type === "local" ? source.path! : join(this.dataDir, "clones", source.id);
 
     const specDirs = this.discoverSpecDirs(repoPath, source.id);
     const results: NormalizedSpec[] = [];
@@ -183,8 +187,10 @@ export class ScannerService {
             const autoFields = await autoPopulate(raw, repoPath, normalized.owner);
             // Build a patch from non-empty auto-populated fields
             const patch: Record<string, unknown> = {};
-            if (autoFields.approvers && autoFields.approvers.length > 0) patch.approvers = autoFields.approvers;
-            if (autoFields.implementationRef) patch.implementationRef = autoFields.implementationRef;
+            if (autoFields.approvers && autoFields.approvers.length > 0)
+              patch.approvers = autoFields.approvers;
+            if (autoFields.implementationRef)
+              patch.implementationRef = autoFields.implementationRef;
             if (autoFields.summary) patch.summary = autoFields.summary;
             if (autoFields.tags && autoFields.tags.length > 0) patch.tags = autoFields.tags;
 
@@ -219,7 +225,7 @@ export class ScannerService {
           );
         }
 
-        const contentText = Object.values(raw.contents).join('\n');
+        const contentText = Object.values(raw.contents).join("\n");
         contentMap.set(normalized.key, contentText);
 
         let resolved: ResolvedMetadata | undefined;
@@ -234,8 +240,8 @@ export class ScannerService {
             title: normalized.title,
             content: contentText,
             owner: normalized.owner,
-            theme: resolved.theme ?? '',
-            tags: resolved.tags.join(' '),
+            theme: resolved.theme ?? "",
+            tags: resolved.tags.join(" "),
             repository: normalized.provenance.repository,
           });
         } catch (ftsErr: unknown) {
@@ -246,7 +252,7 @@ export class ScannerService {
           );
         }
 
-        if (normalized.stage === 'done' && resolved) {
+        if (normalized.stage === "done" && resolved) {
           try {
             const artifactContents = Object.entries(raw.contents).map(([name, content]) => ({
               name,
@@ -275,8 +281,8 @@ export class ScannerService {
   }
 
   private async refreshRemote(source: Source): Promise<void> {
-    const clonePath = join(this.dataDir, 'clones', source.id);
-    const branch = source.branch ?? 'main';
+    const clonePath = join(this.dataDir, "clones", source.id);
+    const branch = source.branch ?? "main";
 
     if (!existsSync(clonePath)) {
       // Clone
@@ -287,10 +293,7 @@ export class ScannerService {
       const fetchCmd = buildFetchCommand(clonePath, branch);
       await this.execGit(fetchCmd);
 
-      const resetCmd = [
-        'git', '-C', clonePath,
-        'reset', '--hard', `origin/${branch}`,
-      ];
+      const resetCmd = ["git", "-C", clonePath, "reset", "--hard", `origin/${branch}`];
       const resetValidation = validateArgs(resetCmd.slice(1));
       if (!resetValidation.valid) {
         throw new Error(`Invalid reset arguments: ${resetValidation.reason}`);
@@ -300,7 +303,7 @@ export class ScannerService {
   }
 
   private discoverSpecDirs(repoPath: string, sourceId: string): SpecDirectory[] {
-    const specsRoot = join(repoPath, '.kiro', 'specs');
+    const specsRoot = join(repoPath, ".kiro", "specs");
 
     if (!existsSync(specsRoot)) {
       return [];
@@ -326,12 +329,11 @@ export class ScannerService {
   }
 
   private async readArtifacts(specDir: SpecDirectory, source: Source): Promise<RawSpecArtifacts> {
-    const repoPath = source.type === 'local'
-      ? source.path!
-      : join(this.dataDir, 'clones', source.id);
+    const repoPath =
+      source.type === "local" ? source.path! : join(this.dataDir, "clones", source.id);
 
     const contents: Record<string, string> = {};
-    let config: ReturnType<typeof ConfigKiroSchema.safeParse>['data'] | null = null;
+    let config: ReturnType<typeof ConfigKiroSchema.safeParse>["data"] | null = null;
 
     const artifactNames: string[] = Object.values(SPEC_ARTIFACTS);
 
@@ -342,9 +344,7 @@ export class ScannerService {
       // Validate path before reading
       const validation = await validatePath(relFromRepo, repoPath);
       if (!validation.valid) {
-        console.warn(
-          `[scanner] Skipping invalid path ${relFromRepo}: ${validation.reason}`,
-        );
+        console.warn(`[scanner] Skipping invalid path ${relFromRepo}: ${validation.reason}`);
         continue;
       }
 
@@ -391,38 +391,38 @@ export class ScannerService {
   private async getProvenance(
     repoPath: string,
     relativePath: string,
-  ): Promise<RawSpecArtifacts['provenance']> {
+  ): Promise<RawSpecArtifacts["provenance"]> {
     const defaultProvenance = {
       repository: repoPath,
       relativePath,
-      branch: 'unknown',
-      commitHash: 'unknown',
+      branch: "unknown",
+      commitHash: "unknown",
       isDirty: false,
     };
 
     try {
       // Get current branch
-      const branchProc = Bun.spawn(
-        ['git', '-C', repoPath, 'rev-parse', '--abbrev-ref', 'HEAD'],
-        { stdout: 'pipe', stderr: 'pipe' },
-      );
+      const branchProc = Bun.spawn(["git", "-C", repoPath, "rev-parse", "--abbrev-ref", "HEAD"], {
+        stdout: "pipe",
+        stderr: "pipe",
+      });
       const branchOutput = await new Response(branchProc.stdout).text();
       await branchProc.exited;
-      const branch = branchOutput.trim() || 'unknown';
+      const branch = branchOutput.trim() || "unknown";
 
       // Get current commit hash
-      const hashProc = Bun.spawn(
-        ['git', '-C', repoPath, 'rev-parse', 'HEAD'],
-        { stdout: 'pipe', stderr: 'pipe' },
-      );
+      const hashProc = Bun.spawn(["git", "-C", repoPath, "rev-parse", "HEAD"], {
+        stdout: "pipe",
+        stderr: "pipe",
+      });
       const hashOutput = await new Response(hashProc.stdout).text();
       await hashProc.exited;
-      const commitHash = hashOutput.trim() || 'unknown';
+      const commitHash = hashOutput.trim() || "unknown";
 
       // Check dirty state
       const dirtyProc = Bun.spawn(
-        ['git', '-C', repoPath, 'status', '--porcelain', '--', relativePath],
-        { stdout: 'pipe', stderr: 'pipe' },
+        ["git", "-C", repoPath, "status", "--porcelain", "--", relativePath],
+        { stdout: "pipe", stderr: "pipe" },
       );
       const dirtyOutput = await new Response(dirtyProc.stdout).text();
       await dirtyProc.exited;
@@ -442,8 +442,8 @@ export class ScannerService {
 
   private async execGit(cmd: string[]): Promise<string> {
     const proc = Bun.spawn(cmd, {
-      stdout: 'pipe',
-      stderr: 'pipe',
+      stdout: "pipe",
+      stderr: "pipe",
     });
 
     // Enforce timeout
@@ -460,9 +460,7 @@ export class ScannerService {
       const exitCode = await proc.exited;
 
       if (exitCode !== 0) {
-        throw new Error(
-          `Git command failed (exit ${exitCode}): ${cmd.join(' ')}\n${stderr}`,
-        );
+        throw new Error(`Git command failed (exit ${exitCode}): ${cmd.join(" ")}\n${stderr}`);
       }
 
       return stdout;
@@ -471,15 +469,28 @@ export class ScannerService {
     }
   }
 
-  private categorizeError(err: unknown): ScanError['category'] {
-    if (!(err instanceof Error)) return 'io';
+  private categorizeError(err: unknown): ScanError["category"] {
+    if (!(err instanceof Error)) return "io";
     const msg = err.message.toLowerCase();
 
-    if (msg.includes('timeout') || msg.includes('timed out')) return 'timeout';
-    if (msg.includes('auth') || msg.includes('permission') || msg.includes('403') || msg.includes('401')) return 'auth';
-    if (msg.includes('network') || msg.includes('econnrefused') || msg.includes('enotfound') || msg.includes('fetch')) return 'network';
-    if (msg.includes('valid') || msg.includes('parse') || msg.includes('schema')) return 'validation';
+    if (msg.includes("timeout") || msg.includes("timed out")) return "timeout";
+    if (
+      msg.includes("auth") ||
+      msg.includes("permission") ||
+      msg.includes("403") ||
+      msg.includes("401")
+    )
+      return "auth";
+    if (
+      msg.includes("network") ||
+      msg.includes("econnrefused") ||
+      msg.includes("enotfound") ||
+      msg.includes("fetch")
+    )
+      return "network";
+    if (msg.includes("valid") || msg.includes("parse") || msg.includes("schema"))
+      return "validation";
 
-    return 'io';
+    return "io";
   }
 }

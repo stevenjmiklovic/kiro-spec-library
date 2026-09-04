@@ -1,8 +1,8 @@
-import { Elysia, t } from "elysia";
 import type { Database } from "bun:sqlite";
-import type { ArchiverService } from "../services/archiver.js";
-import { listSnapshots, type SnapshotRow } from "../db/queries/snapshots.js";
+import { Elysia, t } from "elysia";
 import { listSupersessionsByTargetKeys } from "../db/queries/relationships.js";
+import { type SnapshotRow, listSnapshots } from "../db/queries/snapshots.js";
+import type { ArchiverService } from "../services/archiver.js";
 
 /** Attach `supersededBy` (successor spec key/title) per ADR-005's replacement for legal-hold. */
 function attachSupersessionData(db: Database, snapshots: SnapshotRow[]) {

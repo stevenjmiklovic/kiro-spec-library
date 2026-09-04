@@ -1,9 +1,9 @@
 import {
   BaseEdge,
-  EdgeLabelRenderer,
-  getBezierPath,
   type Edge,
+  EdgeLabelRenderer,
   type EdgeProps,
+  getBezierPath,
 } from "@xyflow/react";
 import type { ReactElement } from "react";
 

@@ -1,3 +1,4 @@
+import { Database } from "bun:sqlite";
 /**
  * Property-based tests — Property 2: Preservation
  *
@@ -9,9 +10,8 @@
  * (empty or non-empty array), the function returns the correct set of rows,
  * preserving the filtering semantics, row shape, and empty-array short-circuit.
  */
-import { describe, test, expect, beforeAll, afterAll } from "bun:test";
+import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import fc from "fast-check";
-import { Database } from "bun:sqlite";
 import { listBySourceKeys } from "../../backend/src/db/queries/relationships.js";
 import { listPendingBySourceKeys } from "../../backend/src/db/queries/suggestions.js";
 
@@ -34,11 +34,7 @@ const SEEDED_SPEC_KEYS = [
 ];
 
 /** Spec keys used as targets for relationships/suggestions (never as source). */
-const TARGET_SPEC_KEYS = [
-  "src1::target-one",
-  "src1::target-two",
-  "src1::target-three",
-];
+const TARGET_SPEC_KEYS = ["src1::target-one", "src1::target-two", "src1::target-three"];
 
 /** All spec keys that exist in the database. */
 const ALL_SPEC_KEYS = [...SEEDED_SPEC_KEYS, ...TARGET_SPEC_KEYS];
@@ -208,13 +204,24 @@ function seedData(database: Database): void {
       evidence: `Evidence for suggestion ${sugCounter}`,
       status,
       created_at: `2026-02-${String(sugCounter + 1).padStart(2, "0")}T00:00:00Z`,
-      resolved_at: status !== "pending" ? `2026-02-${String(sugCounter + 10).padStart(2, "0")}T00:00:00Z` : null,
+      resolved_at:
+        status !== "pending"
+          ? `2026-02-${String(sugCounter + 10).padStart(2, "0")}T00:00:00Z`
+          : null,
       data_hash: `hash-${sugCounter}`,
     };
     insertSuggestion.run(
-      sug.id, sug.source_spec_key, sug.target_spec_key, sug.type,
-      sug.confidence, sug.reason, sug.evidence, sug.status,
-      sug.created_at, sug.resolved_at, sug.data_hash,
+      sug.id,
+      sug.source_spec_key,
+      sug.target_spec_key,
+      sug.type,
+      sug.confidence,
+      sug.reason,
+      sug.evidence,
+      sug.status,
+      sug.created_at,
+      sug.resolved_at,
+      sug.data_hash,
     );
     if (status === "pending") {
       SEEDED_PENDING_SUGGESTIONS.push(sug);
@@ -246,33 +253,31 @@ describe("Property 2: Preservation — Query Results Unchanged", () => {
    */
   test("listBySourceKeys returns exactly matching relationship rows for any non-empty subset of keys", () => {
     fc.assert(
-      fc.property(
-        fc.shuffledSubarray(SEEDED_SPEC_KEYS, { minLength: 1 }),
-        (selectedKeys) => {
-          const result = listBySourceKeys(db, selectedKeys);
+      fc.property(fc.shuffledSubarray(SEEDED_SPEC_KEYS, { minLength: 1 }), (selectedKeys) => {
+        const result = listBySourceKeys(db, selectedKeys);
 
-          // Compute expected: all relationships whose source is in selectedKeys
-          const expectedIds = SEEDED_RELATIONSHIPS
-            .filter((r) => selectedKeys.includes(r.source_spec_key))
-            .map((r) => r.id)
-            .sort();
+        // Compute expected: all relationships whose source is in selectedKeys
+        const expectedIds = SEEDED_RELATIONSHIPS.filter((r) =>
+          selectedKeys.includes(r.source_spec_key),
+        )
+          .map((r) => r.id)
+          .sort();
 
-          const actualIds = result.map((r) => r.id).sort();
+        const actualIds = result.map((r) => r.id).sort();
 
-          expect(actualIds).toEqual(expectedIds);
+        expect(actualIds).toEqual(expectedIds);
 
-          // Verify row shape: every returned row has the expected properties
-          for (const row of result) {
-            expect(row).toHaveProperty("id");
-            expect(row).toHaveProperty("source_spec_key");
-            expect(row).toHaveProperty("target_spec_key");
-            expect(row).toHaveProperty("type");
-            expect(row).toHaveProperty("created_at");
-            // Verify all returned rows have their source_spec_key in the input
-            expect(selectedKeys).toContain(row.source_spec_key);
-          }
-        },
-      ),
+        // Verify row shape: every returned row has the expected properties
+        for (const row of result) {
+          expect(row).toHaveProperty("id");
+          expect(row).toHaveProperty("source_spec_key");
+          expect(row).toHaveProperty("target_spec_key");
+          expect(row).toHaveProperty("type");
+          expect(row).toHaveProperty("created_at");
+          // Verify all returned rows have their source_spec_key in the input
+          expect(selectedKeys).toContain(row.source_spec_key);
+        }
+      }),
       { numRuns: 100 },
     );
   });
@@ -285,38 +290,36 @@ describe("Property 2: Preservation — Query Results Unchanged", () => {
    */
   test("listPendingBySourceKeys returns exactly matching pending suggestion rows for any non-empty subset of keys", () => {
     fc.assert(
-      fc.property(
-        fc.shuffledSubarray(SEEDED_SPEC_KEYS, { minLength: 1 }),
-        (selectedKeys) => {
-          const result = listPendingBySourceKeys(db, selectedKeys);
+      fc.property(fc.shuffledSubarray(SEEDED_SPEC_KEYS, { minLength: 1 }), (selectedKeys) => {
+        const result = listPendingBySourceKeys(db, selectedKeys);
 
-          // Compute expected: all pending suggestions whose source is in selectedKeys
-          const expectedIds = SEEDED_PENDING_SUGGESTIONS
-            .filter((s) => selectedKeys.includes(s.source_spec_key))
-            .map((s) => s.id)
-            .sort();
+        // Compute expected: all pending suggestions whose source is in selectedKeys
+        const expectedIds = SEEDED_PENDING_SUGGESTIONS.filter((s) =>
+          selectedKeys.includes(s.source_spec_key),
+        )
+          .map((s) => s.id)
+          .sort();
 
-          const actualIds = result.map((s) => s.id).sort();
+        const actualIds = result.map((s) => s.id).sort();
 
-          expect(actualIds).toEqual(expectedIds);
+        expect(actualIds).toEqual(expectedIds);
 
-          // Verify row shape and status filter
-          for (const row of result) {
-            expect(row).toHaveProperty("id");
-            expect(row).toHaveProperty("source_spec_key");
-            expect(row).toHaveProperty("target_spec_key");
-            expect(row).toHaveProperty("type");
-            expect(row).toHaveProperty("confidence");
-            expect(row).toHaveProperty("reason");
-            expect(row).toHaveProperty("evidence");
-            expect(row).toHaveProperty("status");
-            expect(row).toHaveProperty("created_at");
-            expect(row).toHaveProperty("data_hash");
-            expect(row.status).toBe("pending");
-            expect(selectedKeys).toContain(row.source_spec_key);
-          }
-        },
-      ),
+        // Verify row shape and status filter
+        for (const row of result) {
+          expect(row).toHaveProperty("id");
+          expect(row).toHaveProperty("source_spec_key");
+          expect(row).toHaveProperty("target_spec_key");
+          expect(row).toHaveProperty("type");
+          expect(row).toHaveProperty("confidence");
+          expect(row).toHaveProperty("reason");
+          expect(row).toHaveProperty("evidence");
+          expect(row).toHaveProperty("status");
+          expect(row).toHaveProperty("created_at");
+          expect(row).toHaveProperty("data_hash");
+          expect(row.status).toBe("pending");
+          expect(selectedKeys).toContain(row.source_spec_key);
+        }
+      }),
       { numRuns: 100 },
     );
   });
@@ -328,16 +331,13 @@ describe("Property 2: Preservation — Query Results Unchanged", () => {
    */
   test("both functions return empty array for empty input", () => {
     fc.assert(
-      fc.property(
-        fc.constant([]),
-        (emptyArray: string[]) => {
-          const relationships = listBySourceKeys(db, emptyArray);
-          expect(relationships).toEqual([]);
+      fc.property(fc.constant([]), (emptyArray: string[]) => {
+        const relationships = listBySourceKeys(db, emptyArray);
+        expect(relationships).toEqual([]);
 
-          const suggestions = listPendingBySourceKeys(db, emptyArray);
-          expect(suggestions).toEqual([]);
-        },
-      ),
+        const suggestions = listPendingBySourceKeys(db, emptyArray);
+        expect(suggestions).toEqual([]);
+      }),
       { numRuns: 10 },
     );
   });
@@ -350,24 +350,23 @@ describe("Property 2: Preservation — Query Results Unchanged", () => {
    */
   test("keys containing SQL metacharacters are handled safely", () => {
     // Arbitrary for keys with SQL metacharacters
-    const sqlMetacharArbitrary = fc.tuple(
-      fc.constantFrom("'", '"', ";", "--", "' OR '1'='1", "'; DROP TABLE", "/*", "*/"),
-      fc.string({ minLength: 0, maxLength: 10 }),
-    ).map(([meta, suffix]) => `key-${meta}${suffix}`);
+    const sqlMetacharArbitrary = fc
+      .tuple(
+        fc.constantFrom("'", '"', ";", "--", "' OR '1'='1", "'; DROP TABLE", "/*", "*/"),
+        fc.string({ minLength: 0, maxLength: 10 }),
+      )
+      .map(([meta, suffix]) => `key-${meta}${suffix}`);
 
     fc.assert(
-      fc.property(
-        fc.array(sqlMetacharArbitrary, { minLength: 1, maxLength: 10 }),
-        (metaKeys) => {
-          // These keys don't exist in the database, so both functions should
-          // return empty arrays without errors (no SQL injection)
-          const relationships = listBySourceKeys(db, metaKeys);
-          expect(relationships).toEqual([]);
+      fc.property(fc.array(sqlMetacharArbitrary, { minLength: 1, maxLength: 10 }), (metaKeys) => {
+        // These keys don't exist in the database, so both functions should
+        // return empty arrays without errors (no SQL injection)
+        const relationships = listBySourceKeys(db, metaKeys);
+        expect(relationships).toEqual([]);
 
-          const suggestions = listPendingBySourceKeys(db, metaKeys);
-          expect(suggestions).toEqual([]);
-        },
-      ),
+        const suggestions = listPendingBySourceKeys(db, metaKeys);
+        expect(suggestions).toEqual([]);
+      }),
       { numRuns: 100 },
     );
   });
@@ -389,15 +388,17 @@ describe("Property 2: Preservation — Query Results Unchanged", () => {
           const mixedKeys = [...validKeys, ...fakeKeys];
 
           const relationships = listBySourceKeys(db, mixedKeys);
-          const expectedRelIds = SEEDED_RELATIONSHIPS
-            .filter((r) => validKeys.includes(r.source_spec_key))
+          const expectedRelIds = SEEDED_RELATIONSHIPS.filter((r) =>
+            validKeys.includes(r.source_spec_key),
+          )
             .map((r) => r.id)
             .sort();
           expect(relationships.map((r) => r.id).sort()).toEqual(expectedRelIds);
 
           const suggestions = listPendingBySourceKeys(db, mixedKeys);
-          const expectedSugIds = SEEDED_PENDING_SUGGESTIONS
-            .filter((s) => validKeys.includes(s.source_spec_key))
+          const expectedSugIds = SEEDED_PENDING_SUGGESTIONS.filter((s) =>
+            validKeys.includes(s.source_spec_key),
+          )
             .map((s) => s.id)
             .sort();
           expect(suggestions.map((s) => s.id).sort()).toEqual(expectedSugIds);

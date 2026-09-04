@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { X, Trash2, Plus, Package, RefreshCw, Search, ArrowUp, Home } from 'lucide-react';
-import { useCrew } from '../hooks/useCrewIntegration.js';
+import { ArrowUp, Home, Package, Plus, RefreshCw, Search, Trash2, X } from "lucide-react";
+import type React from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useCrew } from "../hooks/useCrewIntegration.js";
 
 interface Props {
   onClose: () => void;
@@ -9,7 +10,7 @@ interface Props {
 /** A source as stored/returned by the backend (`GET /settings/sources`). */
 interface Source {
   id: string;
-  type: 'local' | 'remote';
+  type: "local" | "remote";
   path?: string | null;
   url?: string | null;
   branch?: string | null;
@@ -19,12 +20,16 @@ interface Source {
 
 /** Derive a stable, human-friendly id from a path or URL (repo folder name). */
 function deriveId(value: string): string {
-  const trimmed = value.replace(/[/\\]+$/, '').replace(/\.git$/, '');
-  const seg = trimmed.split(/[/\\:]/).filter(Boolean).pop() ?? trimmed;
+  const trimmed = value.replace(/[/\\]+$/, "").replace(/\.git$/, "");
+  const seg =
+    trimmed
+      .split(/[/\\:]/)
+      .filter(Boolean)
+      .pop() ?? trimmed;
   const slug = seg
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
   return slug || `source-${Date.now()}`;
 }
 
@@ -44,10 +49,10 @@ export function SourcesPanel({ onClose }: Props): React.ReactElement {
   const [saving, setSaving] = useState(false);
 
   // Add-form state
-  const [newType, setNewType] = useState<'local' | 'remote'>('local');
-  const [newPath, setNewPath] = useState('');
-  const [newUrl, setNewUrl] = useState('');
-  const [newBranch, setNewBranch] = useState('main');
+  const [newType, setNewType] = useState<"local" | "remote">("local");
+  const [newPath, setNewPath] = useState("");
+  const [newUrl, setNewUrl] = useState("");
+  const [newBranch, setNewBranch] = useState("main");
 
   // Directory-browser state
   interface BrowseDir {
@@ -71,7 +76,7 @@ export function SourcesPanel({ onClose }: Props): React.ReactElement {
     async (path?: string) => {
       setBrowseLoading(true);
       try {
-        const qs = path ? `?path=${encodeURIComponent(path)}` : '';
+        const qs = path ? `?path=${encodeURIComponent(path)}` : "";
         const res = await api.fetch(`/settings/browse${qs}`);
         if (!res.ok) {
           const body = (await res.json().catch(() => null)) as { message?: string } | null;
@@ -79,7 +84,7 @@ export function SourcesPanel({ onClose }: Props): React.ReactElement {
         }
         setBrowse((await res.json()) as BrowseResult);
       } catch (err) {
-        notify.error(err instanceof Error ? err.message : 'Browse failed.');
+        notify.error(err instanceof Error ? err.message : "Browse failed.");
       } finally {
         setBrowseLoading(false);
       }
@@ -100,21 +105,21 @@ export function SourcesPanel({ onClose }: Props): React.ReactElement {
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === "Escape") onClose();
     };
-    document.addEventListener('keydown', handleKey);
-    return () => document.removeEventListener('keydown', handleKey);
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
   }, [onClose]);
 
   const loadSources = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.fetch('/settings/sources');
+      const res = await api.fetch("/settings/sources");
       if (!res.ok) throw new Error(`Failed to load sources: ${res.status}`);
       const data = (await res.json()) as { sources: Source[] };
       setSources(Array.isArray(data.sources) ? data.sources : []);
     } catch (err) {
-      notify.error(err instanceof Error ? err.message : 'Failed to load sources.');
+      notify.error(err instanceof Error ? err.message : "Failed to load sources.");
     } finally {
       setLoading(false);
     }
@@ -125,10 +130,10 @@ export function SourcesPanel({ onClose }: Props): React.ReactElement {
   }, [loadSources]);
 
   const handleAdd = (): void => {
-    if (newType === 'local') {
+    if (newType === "local") {
       const path = newPath.trim();
       if (!path) {
-        notify.error('Enter a local repository path.');
+        notify.error("Enter a local repository path.");
         return;
       }
       const id = deriveId(path);
@@ -138,13 +143,13 @@ export function SourcesPanel({ onClose }: Props): React.ReactElement {
       }
       setSources((prev) => [
         ...prev,
-        { id, type: 'local', path, addedAt: new Date().toISOString() },
+        { id, type: "local", path, addedAt: new Date().toISOString() },
       ]);
-      setNewPath('');
+      setNewPath("");
     } else {
       const url = newUrl.trim();
       if (!url) {
-        notify.error('Enter a remote Git URL.');
+        notify.error("Enter a remote Git URL.");
         return;
       }
       const id = deriveId(url);
@@ -156,14 +161,14 @@ export function SourcesPanel({ onClose }: Props): React.ReactElement {
         ...prev,
         {
           id,
-          type: 'remote',
+          type: "remote",
           url,
-          branch: newBranch.trim() || 'main',
+          branch: newBranch.trim() || "main",
           addedAt: new Date().toISOString(),
         },
       ]);
-      setNewUrl('');
-      setNewBranch('main');
+      setNewUrl("");
+      setNewBranch("main");
     }
   };
 
@@ -185,9 +190,9 @@ export function SourcesPanel({ onClose }: Props): React.ReactElement {
     setScanningId(source.id);
     try {
       // Ensure the full set (including this source) is persisted first.
-      const putRes = await api.fetch('/settings/sources', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      const putRes = await api.fetch("/settings/sources", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(sources),
       });
       if (!putRes.ok) {
@@ -196,9 +201,9 @@ export function SourcesPanel({ onClose }: Props): React.ReactElement {
       }
 
       // Scan ONLY this source.
-      const syncRes = await api.fetch('/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const syncRes = await api.fetch("/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sources: [source] }),
       });
       if (!syncRes.ok) throw new Error(`Scan failed: ${syncRes.status}`);
@@ -211,13 +216,13 @@ export function SourcesPanel({ onClose }: Props): React.ReactElement {
         const errs = Array.isArray(result.errors) ? result.errors.length : 0;
         notify.success(
           errs > 0
-            ? `${source.id}: ${n} spec${n === 1 ? '' : 's'} indexed, ${errs} error${errs === 1 ? '' : 's'}.`
-            : `${source.id}: ${n} spec${n === 1 ? '' : 's'} indexed.`,
+            ? `${source.id}: ${n} spec${n === 1 ? "" : "s"} indexed, ${errs} error${errs === 1 ? "" : "s"}.`
+            : `${source.id}: ${n} spec${n === 1 ? "" : "s"} indexed.`,
         );
       } else {
         notify.success(`Scan of ${source.id} triggered.`);
       }
-      window.dispatchEvent(new CustomEvent('spec-library:rescan-complete'));
+      window.dispatchEvent(new CustomEvent("spec-library:rescan-complete"));
     } catch (err) {
       notify.error(err instanceof Error ? err.message : `Scan of ${source.id} failed.`);
     } finally {
@@ -227,7 +232,9 @@ export function SourcesPanel({ onClose }: Props): React.ReactElement {
 
   /** Poll GET /sync/:runId until the scan leaves "running". */
   const pollScan = useCallback(
-    async (runId: string): Promise<{ status?: string; specsDiscovered?: number; errors?: unknown[] } | null> => {
+    async (
+      runId: string,
+    ): Promise<{ status?: string; specsDiscovered?: number; errors?: unknown[] } | null> => {
       for (let attempt = 0; attempt < 40; attempt += 1) {
         try {
           const res = await api.fetch(`/sync/${encodeURIComponent(runId)}`);
@@ -238,9 +245,9 @@ export function SourcesPanel({ onClose }: Props): React.ReactElement {
               specs_discovered?: number;
               errors?: unknown;
             };
-            if (scan.status && scan.status !== 'running') {
+            if (scan.status && scan.status !== "running") {
               const errors =
-                typeof scan.errors === 'string'
+                typeof scan.errors === "string"
                   ? (JSON.parse(scan.errors) as unknown[])
                   : Array.isArray(scan.errors)
                     ? scan.errors
@@ -266,9 +273,9 @@ export function SourcesPanel({ onClose }: Props): React.ReactElement {
     setSaving(true);
     try {
       // Persist the full set (PUT replaces the source list).
-      const putRes = await api.fetch('/settings/sources', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      const putRes = await api.fetch("/settings/sources", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(sources),
       });
       if (!putRes.ok) {
@@ -279,20 +286,20 @@ export function SourcesPanel({ onClose }: Props): React.ReactElement {
       setSources(Array.isArray(saved.sources) ? saved.sources : sources);
 
       if (sources.length === 0) {
-        notify.success('Sources cleared.');
-        window.dispatchEvent(new CustomEvent('spec-library:rescan-complete'));
+        notify.success("Sources cleared.");
+        window.dispatchEvent(new CustomEvent("spec-library:rescan-complete"));
         return;
       }
 
       // Trigger a scan and poll to completion.
-      const syncRes = await api.fetch('/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const syncRes = await api.fetch("/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sources: saved.sources }),
       });
       if (!syncRes.ok) throw new Error(`Rescan failed: ${syncRes.status}`);
       const { runId } = (await syncRes.json()) as { runId?: string };
-      notify.info('Scanning sources…');
+      notify.info("Scanning sources…");
 
       const result = runId ? await pollScan(runId) : null;
       if (result) {
@@ -300,17 +307,17 @@ export function SourcesPanel({ onClose }: Props): React.ReactElement {
         const errs = Array.isArray(result.errors) ? result.errors.length : 0;
         notify.success(
           errs > 0
-            ? `Scan complete: ${n} spec${n === 1 ? '' : 's'} indexed, ${errs} source error${errs === 1 ? '' : 's'}.`
-            : `Scan complete: ${n} spec${n === 1 ? '' : 's'} indexed.`,
+            ? `Scan complete: ${n} spec${n === 1 ? "" : "s"} indexed, ${errs} source error${errs === 1 ? "" : "s"}.`
+            : `Scan complete: ${n} spec${n === 1 ? "" : "s"} indexed.`,
         );
       } else {
-        notify.success('Sources saved. Scan triggered.');
+        notify.success("Sources saved. Scan triggered.");
       }
 
       // Refresh the graph.
-      window.dispatchEvent(new CustomEvent('spec-library:rescan-complete'));
+      window.dispatchEvent(new CustomEvent("spec-library:rescan-complete"));
     } catch (err) {
-      notify.error(err instanceof Error ? err.message : 'Save failed.');
+      notify.error(err instanceof Error ? err.message : "Save failed.");
     } finally {
       setSaving(false);
     }
@@ -327,15 +334,20 @@ export function SourcesPanel({ onClose }: Props): React.ReactElement {
       >
         <header className="backup-panel__header">
           <h2>Sources</h2>
-          <button type="button" className="backup-panel__close" onClick={onClose} aria-label="Close">
+          <button
+            type="button"
+            className="backup-panel__close"
+            onClick={onClose}
+            aria-label="Close"
+          >
             <X size={16} />
           </button>
         </header>
 
         <section className="backup-panel__section">
           <p>
-            Spec Library indexes <code>.kiro/specs/</code> directories from the repositories you
-            add here. Add a local repository path or a remote Git URL, then{' '}
+            Spec Library indexes <code>.kiro/specs/</code> directories from the repositories you add
+            here. Add a local repository path or a remote Git URL, then{" "}
             <strong>Save &amp; rescan</strong> to populate the graph. The app never writes to your
             repositories.
           </p>
@@ -356,7 +368,7 @@ export function SourcesPanel({ onClose }: Props): React.ReactElement {
                   <span className="sources-panel__item-body">
                     <span className="sources-panel__item-id">{s.id}</span>
                     <span className="sources-panel__item-detail">
-                      {s.type === 'local' ? s.path : `${s.url}${s.branch ? ` @ ${s.branch}` : ''}`}
+                      {s.type === "local" ? s.path : `${s.url}${s.branch ? ` @ ${s.branch}` : ""}`}
                     </span>
                   </span>
                   <button
@@ -370,9 +382,9 @@ export function SourcesPanel({ onClose }: Props): React.ReactElement {
                     <RefreshCw
                       size={13}
                       aria-hidden="true"
-                      className={scanningId === s.id ? 'is-spinning' : undefined}
+                      className={scanningId === s.id ? "is-spinning" : undefined}
                     />
-                    {scanningId === s.id ? 'Scanning…' : 'Scan'}
+                    {scanningId === s.id ? "Scanning…" : "Scan"}
                   </button>
                   <button
                     type="button"
@@ -395,21 +407,21 @@ export function SourcesPanel({ onClose }: Props): React.ReactElement {
           <div className="sources-panel__type-toggle" role="group" aria-label="Source type">
             <button
               type="button"
-              aria-pressed={newType === 'local'}
-              onClick={() => setNewType('local')}
+              aria-pressed={newType === "local"}
+              onClick={() => setNewType("local")}
             >
               Local path
             </button>
             <button
               type="button"
-              aria-pressed={newType === 'remote'}
-              onClick={() => setNewType('remote')}
+              aria-pressed={newType === "remote"}
+              onClick={() => setNewType("remote")}
             >
               Remote Git URL
             </button>
           </div>
 
-          {newType === 'local' ? (
+          {newType === "local" ? (
             <>
               <label className="sources-panel__field">
                 <span>Repository path</span>
@@ -447,7 +459,7 @@ export function SourcesPanel({ onClose }: Props): React.ReactElement {
                       <ArrowUp size={13} aria-hidden="true" />
                     </button>
                     <span className="dir-browser__cwd" title={browse?.path}>
-                      {browse?.path ?? '…'}
+                      {browse?.path ?? "…"}
                     </span>
                     <button
                       type="button"
@@ -462,7 +474,9 @@ export function SourcesPanel({ onClose }: Props): React.ReactElement {
 
                   <ul className="dir-browser__list">
                     {browseLoading ? (
-                      <li className="dir-browser__loading" role="status">Loading…</li>
+                      <li className="dir-browser__loading" role="status">
+                        Loading…
+                      </li>
                     ) : browse && browse.directories.length === 0 ? (
                       <li className="dir-browser__empty">No subfolders here.</li>
                     ) : (
@@ -490,8 +504,8 @@ export function SourcesPanel({ onClose }: Props): React.ReactElement {
                   <div className="dir-browser__actions">
                     <span className="dir-browser__hint">
                       {browse?.hasSpecs
-                        ? 'This folder contains .kiro/specs — good to index.'
-                        : 'Pick the repo root (the folder that contains .kiro/specs).'}
+                        ? "This folder contains .kiro/specs — good to index."
+                        : "Pick the repo root (the folder that contains .kiro/specs)."}
                     </span>
                     <div className="dir-browser__buttons">
                       <button
@@ -551,8 +565,12 @@ export function SourcesPanel({ onClose }: Props): React.ReactElement {
             onClick={handleSaveAndRescan}
             disabled={saving}
           >
-            <RefreshCw size={14} aria-hidden="true" className={saving ? 'is-spinning' : undefined} />
-            {saving ? 'Saving & scanning…' : 'Save & rescan'}
+            <RefreshCw
+              size={14}
+              aria-hidden="true"
+              className={saving ? "is-spinning" : undefined}
+            />
+            {saving ? "Saving & scanning…" : "Save & rescan"}
           </button>
           <p className="sources-panel__hint">
             Saving replaces the entire source list with what is shown above, then scans it.

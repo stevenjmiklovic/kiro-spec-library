@@ -4,17 +4,17 @@
  * Property 5: Sidecar Round-Trip Equivalence
  *   export (JSON.stringify sorted) -> parse -> export again => identical output
  */
-import { describe, test, expect } from 'bun:test';
-import * as fc from 'fast-check';
-import { SpecLibrarySidecarV1Schema } from '../../shared/src/schemas.js';
-import type { SpecLibrarySidecarV1 } from '../../shared/src/schemas.js';
+import { describe, expect, test } from "bun:test";
+import * as fc from "fast-check";
+import { SpecLibrarySidecarV1Schema } from "../../shared/src/schemas.js";
+import type { SpecLibrarySidecarV1 } from "../../shared/src/schemas.js";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /** Deterministic JSON serialization with sorted keys */
 function sortedStringify(obj: unknown): string {
   return JSON.stringify(obj, (_key, value) => {
-    if (value && typeof value === 'object' && !Array.isArray(value)) {
+    if (value && typeof value === "object" && !Array.isArray(value)) {
       const sorted: Record<string, unknown> = {};
       for (const k of Object.keys(value).sort()) {
         sorted[k] = (value as Record<string, unknown>)[k];
@@ -27,14 +27,20 @@ function sortedStringify(obj: unknown): string {
 
 // ─── Arbitraries ─────────────────────────────────────────────────────────────
 
-const RELATIONSHIP_TYPES = ['depends_on', 'blocks', 'supersedes', 'duplicates', 'related'] as const;
+const RELATIONSHIP_TYPES = ["depends_on", "blocks", "supersedes", "duplicates", "related"] as const;
 const arbRetentionPolicy = fc.oneof(
   fc.record({
-    type: fc.constantFrom('permanent' as const, 'project_lifetime' as const, 'active_plus_2_years' as const),
+    type: fc.constantFrom(
+      "permanent" as const,
+      "project_lifetime" as const,
+      "active_plus_2_years" as const,
+    ),
   }),
   fc.record({
-    type: fc.constant('custom_date' as const),
-    customDate: fc.date({ min: new Date('2020-01-01'), max: new Date('2030-12-31') }).map((d) => d.toISOString()),
+    type: fc.constant("custom_date" as const),
+    customDate: fc
+      .date({ min: new Date("2020-01-01"), max: new Date("2030-12-31") })
+      .map((d) => d.toISOString()),
   }),
 );
 
@@ -43,7 +49,7 @@ const arbEmail: fc.Arbitrary<string> = fc
   .tuple(
     fc.stringMatching(/^[a-z][a-z0-9]{1,8}$/),
     fc.stringMatching(/^[a-z][a-z0-9]{1,6}$/),
-    fc.constantFrom('com', 'org', 'edu', 'io', 'net'),
+    fc.constantFrom("com", "org", "edu", "io", "net"),
   )
   .map(([local, domain, tld]) => `${local}@${domain}.${tld}`);
 
@@ -56,9 +62,12 @@ const arbMetadata = fc.record({
   displayTitle: fc.option(fc.string({ minLength: 1, maxLength: 100 }), { nil: undefined }),
   summary: fc.option(fc.string({ minLength: 1, maxLength: 200 }), { nil: undefined }),
   theme: fc.option(fc.string({ minLength: 1, maxLength: 50 }), { nil: undefined }),
-  tags: fc.option(fc.array(fc.string({ minLength: 1, maxLength: 50 }), { minLength: 0, maxLength: 10 }), {
-    nil: undefined,
-  }),
+  tags: fc.option(
+    fc.array(fc.string({ minLength: 1, maxLength: 50 }), { minLength: 0, maxLength: 10 }),
+    {
+      nil: undefined,
+    },
+  ),
   owner: fc.option(arbOwner, { nil: undefined }),
   targetRelease: fc.option(fc.string({ minLength: 1, maxLength: 50 }), { nil: undefined }),
   retentionPolicy: fc.option(arbRetentionPolicy, { nil: undefined }),
@@ -75,13 +84,15 @@ const arbSidecar: fc.Arbitrary<SpecLibrarySidecarV1> = fc.record({
   schemaVersion: fc.constant(1 as const),
   specId: fc.string({ minLength: 1, maxLength: 50 }),
   metadata: arbMetadata,
-  relationships: fc.option(fc.array(arbRelationship, { minLength: 0, maxLength: 10 }), { nil: undefined }),
+  relationships: fc.option(fc.array(arbRelationship, { minLength: 0, maxLength: 10 }), {
+    nil: undefined,
+  }),
 });
 
 // ─── Property 5: Sidecar Round-Trip Equivalence ──────────────────────────────
 
-describe('Property 5: Sidecar Round-Trip Equivalence', () => {
-  test('export -> import -> export yields identical sorted JSON', () => {
+describe("Property 5: Sidecar Round-Trip Equivalence", () => {
+  test("export -> import -> export yields identical sorted JSON", () => {
     fc.assert(
       fc.property(arbSidecar, (sidecar) => {
         // Step 1: Export (serialize to sorted JSON)
@@ -101,7 +112,7 @@ describe('Property 5: Sidecar Round-Trip Equivalence', () => {
     );
   });
 
-  test('generated sidecars always pass schema validation', () => {
+  test("generated sidecars always pass schema validation", () => {
     fc.assert(
       fc.property(arbSidecar, (sidecar) => {
         const result = SpecLibrarySidecarV1Schema.safeParse(sidecar);
@@ -111,7 +122,7 @@ describe('Property 5: Sidecar Round-Trip Equivalence', () => {
     );
   });
 
-  test('round-trip preserves all fields (no data loss)', () => {
+  test("round-trip preserves all fields (no data loss)", () => {
     fc.assert(
       fc.property(arbSidecar, (sidecar) => {
         const json = JSON.stringify(sidecar);

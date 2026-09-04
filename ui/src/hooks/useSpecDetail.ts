@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useCrew } from './useCrewIntegration.js';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCrew } from "./useCrewIntegration.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -68,7 +68,7 @@ export interface PendingProposal {
   id: string;
   specKey: string;
   patch: Record<string, unknown>;
-  status: 'pending' | 'accepted' | 'rejected';
+  status: "pending" | "accepted" | "rejected";
   submittedAt: string;
   rationale?: string;
   source?: string;
@@ -94,106 +94,106 @@ export interface UseSpecDetailResult {
 // Normalization
 // ---------------------------------------------------------------------------
 
-function str(v: unknown, fallback = ''): string {
-  return typeof v === 'string' ? v : fallback;
+function str(v: unknown, fallback = ""): string {
+  return typeof v === "string" ? v : fallback;
 }
 function num(v: unknown, fallback = 0): number {
-  return typeof v === 'number' && Number.isFinite(v) ? v : fallback;
+  return typeof v === "number" && Number.isFinite(v) ? v : fallback;
 }
 
 function normalizeDetail(raw: unknown): SpecDetail | null {
   const r = raw as Record<string, unknown> | null;
-  if (!r || typeof r !== 'object') return null;
+  if (!r || typeof r !== "object") return null;
 
-  const spec = (r['spec'] ?? {}) as Record<string, unknown>;
-  const meta = (r['metadata'] ?? {}) as Record<string, unknown>;
+  const spec = (r["spec"] ?? {}) as Record<string, unknown>;
+  const meta = (r["metadata"] ?? {}) as Record<string, unknown>;
 
-  const tags = Array.isArray(meta['tags'])
-    ? (meta['tags'] as unknown[]).filter((t): t is string => typeof t === 'string')
+  const tags = Array.isArray(meta["tags"])
+    ? (meta["tags"] as unknown[]).filter((t): t is string => typeof t === "string")
     : [];
 
-  const approvers = Array.isArray(meta['approvers'])
-    ? (meta['approvers'] as unknown[]).filter((a): a is string => typeof a === 'string')
+  const approvers = Array.isArray(meta["approvers"])
+    ? (meta["approvers"] as unknown[]).filter((a): a is string => typeof a === "string")
     : [];
 
-  const retention = meta['retentionPolicy'] as
-    | { type?: unknown; customDate?: unknown }
-    | undefined;
+  const retention = meta["retentionPolicy"] as { type?: unknown; customDate?: unknown } | undefined;
 
-  const stage = str(spec['stage'], 'draft');
-  const indexedAt = str(spec['indexed_at'] ?? spec['indexedAt']);
+  const stage = str(spec["stage"], "draft");
+  const indexedAt = str(spec["indexed_at"] ?? spec["indexedAt"]);
 
   return {
-    key: str(spec['key']),
-    specId: str(spec['spec_id']) || str(spec['specId']),
-    type: str(spec['type'], 'unknown'),
+    key: str(spec["key"]),
+    specId: str(spec["spec_id"]) || str(spec["specId"]),
+    type: str(spec["type"], "unknown"),
     stage,
-    progress: num(spec['progress']),
-    revision: num(r['revision']),
+    progress: num(spec["progress"]),
+    revision: num(r["revision"]),
     metadata: {
-      title: str(meta['title']) || str(spec['title']) || 'Untitled',
-      summary: str(meta['summary']) || undefined,
-      owner: str(meta['owner']),
-      theme: str(meta['theme']) || undefined,
+      title: str(meta["title"]) || str(spec["title"]) || "Untitled",
+      summary: str(meta["summary"]) || undefined,
+      owner: str(meta["owner"]),
+      theme: str(meta["theme"]) || undefined,
       tags,
-      targetRelease: str(meta['targetRelease']) || undefined,
+      targetRelease: str(meta["targetRelease"]) || undefined,
       retentionPolicy: retention
         ? {
-            type: str(retention.type, 'active_plus_2_years'),
+            type: str(retention.type, "active_plus_2_years"),
             customDate: str(retention.customDate) || undefined,
           }
         : undefined,
       approvers,
-      implementationRef: str(meta['implementationRef']) || undefined,
-      reviewedAt: str(meta['reviewedAt']) || undefined,
+      implementationRef: str(meta["implementationRef"]) || undefined,
+      reviewedAt: str(meta["reviewedAt"]) || undefined,
     },
     provenance: {
-      repository: str(spec['repository'], '—'),
-      relativePath: str(spec['relative_path'] ?? spec['relativePath'], '—'),
-      branch: str(spec['branch'], 'main'),
-      commitHash: str(spec['commit_hash'] ?? spec['commitHash']),
-      isDirty: spec['is_dirty'] === 1 || spec['is_dirty'] === true,
-      remoteUrl: str(spec['remote_url'] ?? spec['remoteUrl']) || undefined,
+      repository: str(spec["repository"], "—"),
+      relativePath: str(spec["relative_path"] ?? spec["relativePath"], "—"),
+      branch: str(spec["branch"], "main"),
+      commitHash: str(spec["commit_hash"] ?? spec["commitHash"]),
+      isDirty: spec["is_dirty"] === 1 || spec["is_dirty"] === true,
+      remoteUrl: str(spec["remote_url"] ?? spec["remoteUrl"]) || undefined,
     },
     createdAt: indexedAt || new Date().toISOString(),
-    completedAt: stage === 'completed' ? indexedAt || undefined : undefined,
+    completedAt: stage === "completed" ? indexedAt || undefined : undefined,
   };
 }
 
 function normalizeSuggestions(raw: unknown): PendingSuggestion[] {
   const r = raw as Record<string, unknown> | null;
-  const arr = r?.['suggestions'];
+  const arr = r?.["suggestions"];
   if (!Array.isArray(arr)) return [];
   return arr
-    .filter((s): s is Record<string, unknown> => !!s && typeof s === 'object')
+    .filter((s): s is Record<string, unknown> => !!s && typeof s === "object")
     .map((s) => ({
-      id: str(s['id']),
-      sourceSpecKey: str(s['source_spec_key'] ?? s['sourceSpecKey']),
-      targetSpecKey: str(s['target_spec_key'] ?? s['targetSpecKey']),
-      type: str(s['type'], 'related'),
-      confidence: num(s['confidence']),
-      reason: str(s['reason']),
-      evidence: str(s['evidence']),
+      id: str(s["id"]),
+      sourceSpecKey: str(s["source_spec_key"] ?? s["sourceSpecKey"]),
+      targetSpecKey: str(s["target_spec_key"] ?? s["targetSpecKey"]),
+      type: str(s["type"], "related"),
+      confidence: num(s["confidence"]),
+      reason: str(s["reason"]),
+      evidence: str(s["evidence"]),
     }))
-    .filter((s) => s.id !== '');
+    .filter((s) => s.id !== "");
 }
 
 function normalizeProposals(raw: unknown): PendingProposal[] {
   const r = raw as Record<string, unknown> | null;
-  const arr = r?.['proposals'];
+  const arr = r?.["proposals"];
   if (!Array.isArray(arr)) return [];
   return arr
-    .filter((p): p is Record<string, unknown> => !!p && typeof p === 'object')
+    .filter((p): p is Record<string, unknown> => !!p && typeof p === "object")
     .map((p) => ({
-      id: str(p['id']),
-      specKey: str(p['spec_key'] ?? p['specKey']),
-      patch: (typeof p['patch'] === 'string' ? JSON.parse(p['patch']) : p['patch'] ?? {}) as Record<string, unknown>,
-      status: (str(p['status'], 'pending') as 'pending' | 'accepted' | 'rejected'),
-      submittedAt: str(p['submitted_at'] ?? p['submittedAt']),
-      rationale: str(p['rationale']) || undefined,
-      source: str(p['source']) || undefined,
+      id: str(p["id"]),
+      specKey: str(p["spec_key"] ?? p["specKey"]),
+      patch: (typeof p["patch"] === "string"
+        ? JSON.parse(p["patch"])
+        : (p["patch"] ?? {})) as Record<string, unknown>,
+      status: str(p["status"], "pending") as "pending" | "accepted" | "rejected",
+      submittedAt: str(p["submitted_at"] ?? p["submittedAt"]),
+      rationale: str(p["rationale"]) || undefined,
+      source: str(p["source"]) || undefined,
     }))
-    .filter((p) => p.id !== '' && p.status === 'pending');
+    .filter((p) => p.id !== "" && p.status === "pending");
 }
 
 // ---------------------------------------------------------------------------
@@ -267,14 +267,11 @@ export function useSpecDetail(specKey: string | undefined): UseSpecDetailResult 
       setError(null);
 
       const attempt = async (expectedRevision: number): Promise<boolean> => {
-        const res = await api.fetch(
-          `/specs/${encodeURIComponent(specKey)}/metadata`,
-          {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ expectedRevision, patch }),
-          },
-        );
+        const res = await api.fetch(`/specs/${encodeURIComponent(specKey)}/metadata`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ expectedRevision, patch }),
+        });
         if (res.ok) {
           const body = (await res.json()) as { revision: number };
           setDetail((prev) =>
@@ -290,22 +287,18 @@ export function useSpecDetail(specKey: string | undefined): UseSpecDetailResult 
         }
         if (res.status === 409) {
           // Revision conflict — adopt the server's actual revision and retry once.
-          const body = (await res.json().catch(() => null)) as
-            | { actual?: number }
-            | null;
-          if (body && typeof body.actual === 'number') {
+          const body = (await res.json().catch(() => null)) as { actual?: number } | null;
+          if (body && typeof body.actual === "number") {
             return attempt(body.actual);
           }
         }
-        const body = (await res.json().catch(() => null)) as
-          | { message?: string }
-          | null;
+        const body = (await res.json().catch(() => null)) as { message?: string } | null;
         throw new Error(body?.message ?? `Save failed: ${res.status}`);
       };
 
       try {
         const ok = await attempt(detail.revision);
-        if (ok) notify.success('Metadata saved.');
+        if (ok) notify.success("Metadata saved.");
         return ok;
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
@@ -323,11 +316,11 @@ export function useSpecDetail(specKey: string | undefined): UseSpecDetailResult 
     async (id: string) => {
       try {
         const res = await api.fetch(`/suggestions/${encodeURIComponent(id)}/accept`, {
-          method: 'POST',
+          method: "POST",
         });
         if (!res.ok) throw new Error(`Accept failed: ${res.status}`);
         setSuggestions((prev) => prev.filter((s) => s.id !== id));
-        notify.success('Suggestion accepted.');
+        notify.success("Suggestion accepted.");
       } catch (err) {
         notify.error(err instanceof Error ? err.message : String(err));
       }
@@ -339,11 +332,11 @@ export function useSpecDetail(specKey: string | undefined): UseSpecDetailResult 
     async (id: string) => {
       try {
         const res = await api.fetch(`/suggestions/${encodeURIComponent(id)}/reject`, {
-          method: 'POST',
+          method: "POST",
         });
         if (!res.ok) throw new Error(`Reject failed: ${res.status}`);
         setSuggestions((prev) => prev.filter((s) => s.id !== id));
-        notify.info('Suggestion dismissed.');
+        notify.info("Suggestion dismissed.");
       } catch (err) {
         notify.error(err instanceof Error ? err.message : String(err));
       }
@@ -355,13 +348,13 @@ export function useSpecDetail(specKey: string | undefined): UseSpecDetailResult 
     async (id: string) => {
       try {
         const res = await api.fetch(`/proposals/${encodeURIComponent(id)}/accept`, {
-          method: 'POST',
+          method: "POST",
         });
         if (!res.ok) throw new Error(`Accept proposal failed: ${res.status}`);
         setProposals((prev) => prev.filter((p) => p.id !== id));
         // Refetch detail to get the updated metadata after the patch was applied
         void load();
-        notify.success('Proposal accepted — metadata updated.');
+        notify.success("Proposal accepted — metadata updated.");
       } catch (err) {
         notify.error(err instanceof Error ? err.message : String(err));
       }
@@ -373,11 +366,11 @@ export function useSpecDetail(specKey: string | undefined): UseSpecDetailResult 
     async (id: string) => {
       try {
         const res = await api.fetch(`/proposals/${encodeURIComponent(id)}/reject`, {
-          method: 'POST',
+          method: "POST",
         });
         if (!res.ok) throw new Error(`Reject proposal failed: ${res.status}`);
         setProposals((prev) => prev.filter((p) => p.id !== id));
-        notify.info('Proposal rejected.');
+        notify.info("Proposal rejected.");
       } catch (err) {
         notify.error(err instanceof Error ? err.message : String(err));
       }
@@ -400,6 +393,19 @@ export function useSpecDetail(specKey: string | undefined): UseSpecDetailResult 
       rejectProposal,
       refetch: load,
     }),
-    [detail, suggestions, proposals, loading, saving, error, save, acceptSuggestion, rejectSuggestion, acceptProposal, rejectProposal, load],
+    [
+      detail,
+      suggestions,
+      proposals,
+      loading,
+      saving,
+      error,
+      save,
+      acceptSuggestion,
+      rejectSuggestion,
+      acceptProposal,
+      rejectProposal,
+      load,
+    ],
   );
 }

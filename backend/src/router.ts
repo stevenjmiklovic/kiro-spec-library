@@ -1,27 +1,25 @@
+import type { Database } from "bun:sqlite";
+import { cors } from "@elysiajs/cors";
+import { MAX_ERROR_MESSAGE_LENGTH } from "@kiro-spec-library/shared";
+import type { ErrorEnvelope, FieldError } from "@kiro-spec-library/shared";
 // Elysia router — global middleware + health/bootstrap routes (Tasks 11.1, 11.2)
 import { Elysia } from "elysia";
-import { cors } from "@elysiajs/cors";
-import type { Database } from "bun:sqlite";
-import {
-  MAX_ERROR_MESSAGE_LENGTH,
-} from "@kiro-spec-library/shared";
-import type { ErrorEnvelope, FieldError } from "@kiro-spec-library/shared";
-import type { ScannerService } from "./services/scanner.js";
-import type { ArchiverService } from "./services/archiver.js";
-import { specRoutes } from "./routes/specs.js";
-import { syncRoutes } from "./routes/sync.js";
-import { settingsRoutes } from "./routes/settings.js";
+import { getOverlay, overlayRowToMetadataOverlay } from "./db/queries/metadata.js";
+import { listPendingProposals } from "./db/queries/proposals.js";
+import { findByKey } from "./db/queries/specs.js";
+import { listPending as listPendingSuggestions } from "./db/queries/suggestions.js";
 import { archiveRoutes } from "./routes/archive.js";
-import { relationshipRoutes } from "./routes/relationships.js";
-import { proposalRoutes } from "./routes/proposals.js";
 import { auditRoutes } from "./routes/audit.js";
 import { backupRoutes } from "./routes/backup.js";
+import { proposalRoutes } from "./routes/proposals.js";
+import { relationshipRoutes } from "./routes/relationships.js";
+import { settingsRoutes } from "./routes/settings.js";
+import { specRoutes } from "./routes/specs.js";
+import { syncRoutes } from "./routes/sync.js";
 import { textExportRoutes } from "./routes/text-export.js";
-import { findByKey } from "./db/queries/specs.js";
-import { getOverlay, overlayRowToMetadataOverlay } from "./db/queries/metadata.js";
+import type { ArchiverService } from "./services/archiver.js";
 import { resolveMetadata } from "./services/metadata.js";
-import { listPending as listPendingSuggestions } from "./db/queries/suggestions.js";
-import { listPendingProposals } from "./db/queries/proposals.js";
+import type { ScannerService } from "./services/scanner.js";
 
 // ─── Dependency interface ────────────────────────────────────────────────────
 
@@ -56,8 +54,7 @@ interface KnownError extends Error {
 
 function isKnownError(err: unknown): err is KnownError {
   return (
-    err instanceof Error &&
-    typeof (err as unknown as Record<string, unknown>).code === "string"
+    err instanceof Error && typeof (err as unknown as Record<string, unknown>).code === "string"
   );
 }
 
@@ -68,8 +65,7 @@ interface ValidationError extends Error {
 
 function isValidationError(err: unknown): err is ValidationError {
   return (
-    err instanceof Error &&
-    (err as unknown as Record<string, unknown>).code === "VALIDATION_ERROR"
+    err instanceof Error && (err as unknown as Record<string, unknown>).code === "VALIDATION_ERROR"
   );
 }
 
@@ -150,16 +146,12 @@ export function createRouter(deps: RouterDeps) {
       }
 
       // Spec count
-      const specRow = db
-        .query<{ count: number }, []>("SELECT COUNT(*) as count FROM specs")
-        .get();
+      const specRow = db.query<{ count: number }, []>("SELECT COUNT(*) as count FROM specs").get();
       const specCount = specRow?.count ?? 0;
 
       // Archive (snapshot) count
       const archiveRow = db
-        .query<{ count: number }, []>(
-          "SELECT COUNT(*) as count FROM snapshots WHERE purged = 0",
-        )
+        .query<{ count: number }, []>("SELECT COUNT(*) as count FROM snapshots WHERE purged = 0")
         .get();
       const archiveCount = archiveRow?.count ?? 0;
 
@@ -224,9 +216,15 @@ export function createRouter(deps: RouterDeps) {
     // URL path routing when the gateway proxy decodes %2F back to /.
     .get("/spec-detail", ({ query, set }) => {
       const key = (query as any).key as string | undefined;
-      if (!key) { set.status = 400; return { code: "BAD_REQUEST", message: "key required" }; }
+      if (!key) {
+        set.status = 400;
+        return { code: "BAD_REQUEST", message: "key required" };
+      }
       const spec = findByKey(db, key);
-      if (!spec) { set.status = 404; return { code: "NOT_FOUND", message: `Spec '${key}' not found` }; }
+      if (!spec) {
+        set.status = 404;
+        return { code: "NOT_FOUND", message: `Spec '${key}' not found` };
+      }
       const overlay = getOverlay(db, spec.key);
       const metadata = resolveMetadata(
         { title: spec.title, owner: spec.owner } as any,
@@ -236,13 +234,16 @@ export function createRouter(deps: RouterDeps) {
       return { spec, metadata, revision: overlay?.revision ?? 0 };
     })
     .get("/spec-suggestions", ({ query }) => {
-      const key = (query as any).key as string ?? "";
+      const key = ((query as any).key as string) ?? "";
       return { suggestions: listPendingSuggestions(db, key) };
     })
     .get("/spec-proposals", ({ query, set }) => {
-      const key = (query as any).key as string ?? "";
+      const key = ((query as any).key as string) ?? "";
       const spec = findByKey(db, key);
-      if (!spec) { set.status = 404; return { code: "NOT_FOUND", message: "Spec not found" }; }
+      if (!spec) {
+        set.status = 404;
+        return { code: "NOT_FOUND", message: "Spec not found" };
+      }
       return { proposals: listPendingProposals(db, spec.key) };
     })
     // ─── Sub-routes ──────────────────────────────────────────────────────────

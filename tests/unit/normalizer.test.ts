@@ -1,12 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import {
-  deriveKey,
+  calculateProgress,
+  calculateStage,
   classifyType,
   classifyWorkflow,
-  extractTitle,
-  calculateStage,
-  calculateProgress,
   countTasks,
+  deriveKey,
+  extractTitle,
 } from "../../backend/src/services/normalizer.js";
 import type { ArtifactManifest, TaskCounts } from "../../shared/src/types.js";
 
@@ -84,13 +84,21 @@ describe("extractTitle", () => {
 
 describe("calculateStage", () => {
   test("completed: has tasks.md, all tasks done", () => {
-    const files: ArtifactManifest = { "requirements.md": true, "design.md": true, "tasks.md": true };
+    const files: ArtifactManifest = {
+      "requirements.md": true,
+      "design.md": true,
+      "tasks.md": true,
+    };
     const tc: TaskCounts = { total: 5, completed: 5 };
     expect(calculateStage(files, tc)).toBe("done");
   });
 
   test("tasks in progress: has tasks.md, some completed", () => {
-    const files: ArtifactManifest = { "requirements.md": true, "design.md": true, "tasks.md": true };
+    const files: ArtifactManifest = {
+      "requirements.md": true,
+      "design.md": true,
+      "tasks.md": true,
+    };
     const tc: TaskCounts = { total: 5, completed: 2 };
     expect(calculateStage(files, tc)).toBe("in-flight");
   });
@@ -114,7 +122,11 @@ describe("calculateStage", () => {
   });
 
   test("tasks with zero checkboxes", () => {
-    const files: ArtifactManifest = { "requirements.md": true, "design.md": true, "tasks.md": true };
+    const files: ArtifactManifest = {
+      "requirements.md": true,
+      "design.md": true,
+      "tasks.md": true,
+    };
     const tc: TaskCounts = { total: 0, completed: 0 };
     expect(calculateStage(files, tc)).toBe("refined");
   });
@@ -134,25 +146,41 @@ describe("calculateProgress", () => {
   });
 
   test("requirements + design + tasks (5/10): 83", () => {
-    const files: ArtifactManifest = { "requirements.md": true, "design.md": true, "tasks.md": true };
+    const files: ArtifactManifest = {
+      "requirements.md": true,
+      "design.md": true,
+      "tasks.md": true,
+    };
     const tc: TaskCounts = { total: 10, completed: 5 };
     expect(calculateProgress(files, tc)).toBe(83);
   });
 
   test("requirements + design + tasks (10/10): 100", () => {
-    const files: ArtifactManifest = { "requirements.md": true, "design.md": true, "tasks.md": true };
+    const files: ArtifactManifest = {
+      "requirements.md": true,
+      "design.md": true,
+      "tasks.md": true,
+    };
     const tc: TaskCounts = { total: 10, completed: 10 };
     expect(calculateProgress(files, tc)).toBe(100);
   });
 
   test("requirements + design + tasks (0/10): 66", () => {
-    const files: ArtifactManifest = { "requirements.md": true, "design.md": true, "tasks.md": true };
+    const files: ArtifactManifest = {
+      "requirements.md": true,
+      "design.md": true,
+      "tasks.md": true,
+    };
     const tc: TaskCounts = { total: 10, completed: 0 };
     expect(calculateProgress(files, tc)).toBe(66);
   });
 
   test("tasks.md with zero checkboxes (has requirements + design): 66", () => {
-    const files: ArtifactManifest = { "requirements.md": true, "design.md": true, "tasks.md": true };
+    const files: ArtifactManifest = {
+      "requirements.md": true,
+      "design.md": true,
+      "tasks.md": true,
+    };
     const tc: TaskCounts = { total: 0, completed: 0 };
     expect(calculateProgress(files, tc)).toBe(66);
   });
