@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { X } from 'lucide-react';
-import { useCrew } from '../hooks/useCrewIntegration.js';
+import { X } from "lucide-react";
+import type React from "react";
+import { useEffect, useState } from "react";
+import { useCrew } from "../hooks/useCrewIntegration.js";
 
 interface Props {
   onClose: () => void;
@@ -10,34 +11,34 @@ interface Props {
 // rather than imported since the ui package doesn't depend on the shared
 // workspace package at runtime (only via a type-checking project reference).
 type AuditOperation =
-  | 'metadata_created'
-  | 'metadata_updated'
-  | 'metadata_deleted'
-  | 'relationship_created'
-  | 'relationship_deleted'
-  | 'suggestion_accepted'
-  | 'suggestion_rejected'
-  | 'snapshot_created'
-  | 'snapshot_purged'
-  | 'backup_created'
-  | 'backup_restored'
-  | 'text_export_created'
-  | 'text_export_applied';
+  | "metadata_created"
+  | "metadata_updated"
+  | "metadata_deleted"
+  | "relationship_created"
+  | "relationship_deleted"
+  | "suggestion_accepted"
+  | "suggestion_rejected"
+  | "snapshot_created"
+  | "snapshot_purged"
+  | "backup_created"
+  | "backup_restored"
+  | "text_export_created"
+  | "text_export_applied";
 
 const AUDIT_OPERATIONS: readonly AuditOperation[] = [
-  'metadata_created',
-  'metadata_updated',
-  'metadata_deleted',
-  'relationship_created',
-  'relationship_deleted',
-  'suggestion_accepted',
-  'suggestion_rejected',
-  'snapshot_created',
-  'snapshot_purged',
-  'backup_created',
-  'backup_restored',
-  'text_export_created',
-  'text_export_applied',
+  "metadata_created",
+  "metadata_updated",
+  "metadata_deleted",
+  "relationship_created",
+  "relationship_deleted",
+  "suggestion_accepted",
+  "suggestion_rejected",
+  "snapshot_created",
+  "snapshot_purged",
+  "backup_created",
+  "backup_restored",
+  "text_export_created",
+  "text_export_applied",
 ];
 
 interface AuditEvent {
@@ -50,7 +51,7 @@ interface AuditEvent {
 }
 
 function formatOperation(op: string): string {
-  return op.replace(/_/g, ' ');
+  return op.replace(/_/g, " ");
 }
 
 function formatTimestamp(iso: string): string {
@@ -66,17 +67,17 @@ function formatTimestamp(iso: string): string {
 export function AuditLogPanel({ onClose }: Props): React.ReactElement {
   const { api } = useCrew();
 
-  const [operation, setOperation] = useState<AuditOperation | ''>('');
+  const [operation, setOperation] = useState<AuditOperation | "">("");
   const [events, setEvents] = useState<AuditEvent[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === "Escape") onClose();
     };
-    document.addEventListener('keydown', handleKey);
-    return () => document.removeEventListener('keydown', handleKey);
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
   }, [onClose]);
 
   useEffect(() => {
@@ -84,8 +85,8 @@ export function AuditLogPanel({ onClose }: Props): React.ReactElement {
     setLoading(true);
     setError(null);
 
-    const params = new URLSearchParams({ limit: '100' });
-    if (operation) params.set('operation', operation);
+    const params = new URLSearchParams({ limit: "100" });
+    if (operation) params.set("operation", operation);
 
     api
       .fetch(`/audit?${params}`)
@@ -95,7 +96,7 @@ export function AuditLogPanel({ onClose }: Props): React.ReactElement {
         if (!cancelled) setEvents(data.events);
       })
       .catch((err: unknown) => {
-        if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load audit log.');
+        if (!cancelled) setError(err instanceof Error ? err.message : "Failed to load audit log.");
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -117,7 +118,12 @@ export function AuditLogPanel({ onClose }: Props): React.ReactElement {
       >
         <header className="backup-panel__header">
           <h2>Audit log</h2>
-          <button type="button" className="backup-panel__close" onClick={onClose} aria-label="Close">
+          <button
+            type="button"
+            className="backup-panel__close"
+            onClick={onClose}
+            aria-label="Close"
+          >
             <X size={16} />
           </button>
         </header>
@@ -127,7 +133,7 @@ export function AuditLogPanel({ onClose }: Props): React.ReactElement {
             <span>Operation</span>
             <select
               value={operation}
-              onChange={(e) => setOperation(e.target.value as AuditOperation | '')}
+              onChange={(e) => setOperation(e.target.value as AuditOperation | "")}
               aria-label="Filter by operation"
             >
               <option value="">All operations</option>
@@ -168,7 +174,7 @@ export function AuditLogPanel({ onClose }: Props): React.ReactElement {
                       <td>{formatTimestamp(event.timestamp)}</td>
                       <td>{formatOperation(event.operation)}</td>
                       <td>{event.actor}</td>
-                      <td>{event.spec_key ?? event.snapshot_id ?? '—'}</td>
+                      <td>{event.spec_key ?? event.snapshot_id ?? "—"}</td>
                     </tr>
                   ))}
                 </tbody>

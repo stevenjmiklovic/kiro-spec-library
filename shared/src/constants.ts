@@ -12,12 +12,7 @@ import type {
 
 // ─── Type Enumerations ───────────────────────────────────────────────────────
 
-export const SPEC_TYPES: readonly SpecType[] = [
-  "feature",
-  "bugfix",
-  "quick",
-  "unknown",
-] as const;
+export const SPEC_TYPES: readonly SpecType[] = ["feature", "bugfix", "quick", "unknown"] as const;
 
 export const WORKFLOW_TYPES: readonly WorkflowType[] = [
   "requirements-first",

@@ -113,9 +113,9 @@ export function upsertSpec(db: Database, spec: NormalizedSpec): number {
     $indexed_at: spec.indexedAt,
   });
 
-  const row = db
-    .prepare("SELECT rowid FROM specs WHERE key = $key")
-    .get({ $key: spec.key }) as { rowid: number };
+  const row = db.prepare("SELECT rowid FROM specs WHERE key = $key").get({ $key: spec.key }) as {
+    rowid: number;
+  };
   return row.rowid;
 }
 
@@ -201,10 +201,7 @@ export function listSpecs(db: Database, filters: SpecFilters): SpecRow[] {
   return stmt.all(params) as SpecRow[];
 }
 
-export function countSpecs(
-  db: Database,
-  filters: Omit<SpecFilters, "limit" | "offset">,
-): number {
+export function countSpecs(db: Database, filters: Omit<SpecFilters, "limit" | "offset">): number {
   const conditions: string[] = [];
   const params: Params = {};
 

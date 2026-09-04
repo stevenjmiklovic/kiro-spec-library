@@ -75,10 +75,7 @@ export function purgeSnapshot(db: Database, id: string): void {
   stmt.run({ $id: id, $purged_at: new Date().toISOString() });
 }
 
-export function listSnapshots(
-  db: Database,
-  filters: SnapshotFilters,
-): SnapshotRow[] {
+export function listSnapshots(db: Database, filters: SnapshotFilters): SnapshotRow[] {
   if (filters.cursor) {
     const stmt = db.prepare(`
       SELECT * FROM snapshots
@@ -135,12 +132,7 @@ export function insertSnapshotArtifact(
   });
 }
 
-export function getSnapshotArtifacts(
-  db: Database,
-  snapshotId: string,
-): SnapshotArtifactRow[] {
-  const stmt = db.prepare(
-    "SELECT * FROM snapshot_artifacts WHERE snapshot_id = $snapshot_id",
-  );
+export function getSnapshotArtifacts(db: Database, snapshotId: string): SnapshotArtifactRow[] {
+  const stmt = db.prepare("SELECT * FROM snapshot_artifacts WHERE snapshot_id = $snapshot_id");
   return stmt.all({ $snapshot_id: snapshotId }) as SnapshotArtifactRow[];
 }

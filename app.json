@@ -40,10 +40,7 @@
     "type": "exec"
   },
   "permissions": {
-    "api": [
-      "/apps/kiro-spec-library/api",
-      "/apps/kiro-spec-library/api/*"
-    ],
+    "api": ["/apps/kiro-spec-library/api", "/apps/kiro-spec-library/api/*"],
     "storage": true,
     "network": true
   },

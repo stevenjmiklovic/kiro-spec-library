@@ -18,16 +18,12 @@ export function createDatabase(dataDir: string): Database {
   db.exec("PRAGMA journal_mode = WAL");
   db.exec("PRAGMA foreign_keys = ON");
 
-  const result = db.query<{ integrity_check: string }, []>(
-    "PRAGMA integrity_check"
-  ).get();
+  const result = db.query<{ integrity_check: string }, []>("PRAGMA integrity_check").get();
 
   if (result?.integrity_check !== "ok") {
     const detail = result?.integrity_check ?? "no result returned";
     db.close();
-    throw new Error(
-      `Database integrity check failed for "${dbPath}": ${detail}`
-    );
+    throw new Error(`Database integrity check failed for "${dbPath}": ${detail}`);
   }
 
   return db;

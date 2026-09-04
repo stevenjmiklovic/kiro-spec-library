@@ -1,7 +1,7 @@
 // Path validation — reject traversal, symlink escapes, oversized files, credential paths
 
 import { realpath, stat } from "node:fs/promises";
-import { resolve, relative, normalize } from "node:path";
+import { normalize, relative, resolve } from "node:path";
 import { CREDENTIAL_PATHS, MAX_ARTIFACT_BYTES } from "@kiro-spec-library/shared";
 
 export interface ValidationResult {

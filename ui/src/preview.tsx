@@ -1,14 +1,72 @@
 import { createRoot } from "react-dom/client";
-import { type CrewIntegration } from "./hooks/useCrewIntegration.js";
 import { App } from "./App.js";
+import type { CrewIntegration } from "./hooks/useCrewIntegration.js";
 import "./styles/global.css";
 
 const sampleSpecs = [
-  { key: "agent-memory", title: "Agent Memory v2", type: "feature", stage: "scoped", progress: 66, owner: "Maya Chen", theme: "AI Foundations", repository: "/Users/dev/repos/crew-platform", projectName: "crew-platform", indexed_at: "2026-06-02T10:00:00Z", relationships: [{ targetKey: "retention", type: "depends_on" }] },
-  { key: "retention", title: "Memory retention controls", type: "feature", stage: "in-flight", progress: 78, owner: "Maya Chen", theme: "AI Foundations", repository: "/Users/dev/repos/crew-platform", projectName: "crew-platform", indexed_at: "2026-07-14T10:00:00Z", suggestions: [{ targetKey: "usage-alerts", type: "related" }] },
-  { key: "usage-alerts", title: "Usage anomaly alerts", type: "feature", stage: "new", progress: 33, owner: "Daniel Kim", theme: "Platform Reliability", repository: "/Users/dev/repos/crew-platform", projectName: "crew-platform", indexed_at: "2026-08-05T10:00:00Z" },
-  { key: "observability", title: "Trace correlation", type: "quick", stage: "done", progress: 100, owner: "Ravi Patel", theme: "Platform Reliability", repository: "/Users/dev/repos/web-console", projectName: "web-console", indexed_at: "2026-06-20T10:00:00Z" },
-  { key: "workspace-export", title: "Workspace export fixes", type: "bugfix", stage: "in-flight", progress: 68, owner: "Maya Chen", theme: "Developer Experience", repository: "/Users/dev/repos/web-console", projectName: "web-console", indexed_at: "2026-08-10T10:00:00Z", relationships: [{ targetKey: "agent-memory", type: "blocks" }] },
+  {
+    key: "agent-memory",
+    title: "Agent Memory v2",
+    type: "feature",
+    stage: "scoped",
+    progress: 66,
+    owner: "Maya Chen",
+    theme: "AI Foundations",
+    repository: "/Users/dev/repos/crew-platform",
+    projectName: "crew-platform",
+    indexed_at: "2026-06-02T10:00:00Z",
+    relationships: [{ targetKey: "retention", type: "depends_on" }],
+  },
+  {
+    key: "retention",
+    title: "Memory retention controls",
+    type: "feature",
+    stage: "in-flight",
+    progress: 78,
+    owner: "Maya Chen",
+    theme: "AI Foundations",
+    repository: "/Users/dev/repos/crew-platform",
+    projectName: "crew-platform",
+    indexed_at: "2026-07-14T10:00:00Z",
+    suggestions: [{ targetKey: "usage-alerts", type: "related" }],
+  },
+  {
+    key: "usage-alerts",
+    title: "Usage anomaly alerts",
+    type: "feature",
+    stage: "new",
+    progress: 33,
+    owner: "Daniel Kim",
+    theme: "Platform Reliability",
+    repository: "/Users/dev/repos/crew-platform",
+    projectName: "crew-platform",
+    indexed_at: "2026-08-05T10:00:00Z",
+  },
+  {
+    key: "observability",
+    title: "Trace correlation",
+    type: "quick",
+    stage: "done",
+    progress: 100,
+    owner: "Ravi Patel",
+    theme: "Platform Reliability",
+    repository: "/Users/dev/repos/web-console",
+    projectName: "web-console",
+    indexed_at: "2026-06-20T10:00:00Z",
+  },
+  {
+    key: "workspace-export",
+    title: "Workspace export fixes",
+    type: "bugfix",
+    stage: "in-flight",
+    progress: 68,
+    owner: "Maya Chen",
+    theme: "Developer Experience",
+    repository: "/Users/dev/repos/web-console",
+    projectName: "web-console",
+    indexed_at: "2026-08-10T10:00:00Z",
+    relationships: [{ targetKey: "agent-memory", type: "blocks" }],
+  },
 ];
 
 // Representative archive snapshots (backend row shape: JSON string columns).
@@ -18,8 +76,19 @@ const sampleSnapshots = [
     spec_key: "workspace-index",
     created_at: "2026-08-07T10:14:00Z",
     content_digest: "a1b2c3d4e5f60011",
-    metadata_projection: JSON.stringify({ title: "Workspace semantic index", type: "quick", theme: "AI Foundations", owner: "Priya Shah", tags: ["search", "index"] }),
-    provenance: JSON.stringify({ repository: "crew-platform", relativePath: ".kiro/specs/workspace-index", branch: "main", commitHash: "a1b2c3d4e5f6" }),
+    metadata_projection: JSON.stringify({
+      title: "Workspace semantic index",
+      type: "quick",
+      theme: "AI Foundations",
+      owner: "Priya Shah",
+      tags: ["search", "index"],
+    }),
+    provenance: JSON.stringify({
+      repository: "crew-platform",
+      relativePath: ".kiro/specs/workspace-index",
+      branch: "main",
+      commitHash: "a1b2c3d4e5f6",
+    }),
     retention_policy: JSON.stringify({ type: "active_plus_2_years" }),
   },
   {
@@ -27,8 +96,19 @@ const sampleSnapshots = [
     spec_key: "billing-export-v3",
     created_at: "2026-08-03T09:02:00Z",
     content_digest: "b2c3d4e5f6001122",
-    metadata_projection: JSON.stringify({ title: "Billing export v3", type: "feature", theme: "Commerce", owner: "Lena Ortiz", tags: ["billing", "export"] }),
-    provenance: JSON.stringify({ repository: "web-console", relativePath: ".kiro/specs/billing-export-v3", branch: "main", commitHash: "b2c3d4e5f600" }),
+    metadata_projection: JSON.stringify({
+      title: "Billing export v3",
+      type: "feature",
+      theme: "Commerce",
+      owner: "Lena Ortiz",
+      tags: ["billing", "export"],
+    }),
+    provenance: JSON.stringify({
+      repository: "web-console",
+      relativePath: ".kiro/specs/billing-export-v3",
+      branch: "main",
+      commitHash: "b2c3d4e5f600",
+    }),
     retention_policy: JSON.stringify({ type: "permanent" }),
     supersededBy: { specKey: "billing-export-v4", title: "Billing export v4" },
   },
@@ -37,8 +117,19 @@ const sampleSnapshots = [
     spec_key: "oauth-callback-loop",
     created_at: "2026-07-29T16:40:00Z",
     content_digest: "c3d4e5f600112233",
-    metadata_projection: JSON.stringify({ title: "OAuth callback loop", type: "bugfix", theme: "Security", owner: "Theo Grant", tags: [] }),
-    provenance: JSON.stringify({ repository: "identity-service", relativePath: ".kiro/specs/oauth-callback-loop", branch: "main", commitHash: "c3d4e5f60011" }),
+    metadata_projection: JSON.stringify({
+      title: "OAuth callback loop",
+      type: "bugfix",
+      theme: "Security",
+      owner: "Theo Grant",
+      tags: [],
+    }),
+    provenance: JSON.stringify({
+      repository: "identity-service",
+      relativePath: ".kiro/specs/oauth-callback-loop",
+      branch: "main",
+      commitHash: "c3d4e5f60011",
+    }),
     retention_policy: null,
   },
   {
@@ -46,8 +137,19 @@ const sampleSnapshots = [
     spec_key: "agent-tool-approval-audit",
     created_at: "2026-07-18T11:20:00Z",
     content_digest: "d4e5f60011223344",
-    metadata_projection: JSON.stringify({ title: "Agent tool approval audit", type: "feature", theme: "Governance", owner: "Maya Chen", tags: ["audit", "governance"] }),
-    provenance: JSON.stringify({ repository: "crew-platform", relativePath: ".kiro/specs/agent-tool-approval-audit", branch: "main", commitHash: "d4e5f6001122" }),
+    metadata_projection: JSON.stringify({
+      title: "Agent tool approval audit",
+      type: "feature",
+      theme: "Governance",
+      owner: "Maya Chen",
+      tags: ["audit", "governance"],
+    }),
+    provenance: JSON.stringify({
+      repository: "crew-platform",
+      relativePath: ".kiro/specs/agent-tool-approval-audit",
+      branch: "main",
+      commitHash: "d4e5f6001122",
+    }),
     retention_policy: JSON.stringify({ type: "active_plus_2_years" }),
   },
 ];
@@ -116,10 +218,14 @@ const overrides: Partial<CrewIntegration> = {
                 {
                   id: "prop-1",
                   spec_key: "retention",
-                  patch: JSON.stringify({ summary: "Updated memory retention controls with 30-day window", tags: ["retention", "memory", "controls"] }),
+                  patch: JSON.stringify({
+                    summary: "Updated memory retention controls with 30-day window",
+                    tags: ["retention", "memory", "controls"],
+                  }),
                   status: "pending",
                   submitted_at: "2026-08-15T06:30:00Z",
-                  rationale: "Auto-populated from code analysis: the implementation defines a 30-day retention window.",
+                  rationale:
+                    "Auto-populated from code analysis: the implementation defines a 30-day retention window.",
                   source: "agent",
                 },
               ]
@@ -172,7 +278,16 @@ const overrides: Partial<CrewIntegration> = {
       }
       // Sources listing + manual rescan trigger.
       if (path.startsWith("/settings/sources")) {
-        return json({ sources: [{ id: "local-1", type: "local", path: "/repos/crew-platform", addedAt: "2026-06-01T00:00:00Z" }] });
+        return json({
+          sources: [
+            {
+              id: "local-1",
+              type: "local",
+              path: "/repos/crew-platform",
+              addedAt: "2026-06-01T00:00:00Z",
+            },
+          ],
+        });
       }
       if (init?.method === "POST" && path.startsWith("/sync")) {
         return json({ runId: crypto.randomUUID() }, 202);
@@ -215,6 +330,4 @@ const overrides: Partial<CrewIntegration> = {
   },
 };
 
-createRoot(document.getElementById("root")!).render(
-  <App crewOverrides={overrides} />,
-);
+createRoot(document.getElementById("root")!).render(<App crewOverrides={overrides} />);

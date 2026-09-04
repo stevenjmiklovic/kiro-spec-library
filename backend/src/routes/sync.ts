@@ -1,8 +1,8 @@
-import { Elysia, t } from "elysia";
 import type { Database } from "bun:sqlite";
 import type { Source } from "@kiro-spec-library/shared";
-import type { ScannerService } from "../services/scanner.js";
+import { Elysia, t } from "elysia";
 import { getScan } from "../db/queries/scan-history.js";
+import type { ScannerService } from "../services/scanner.js";
 
 export interface SyncDeps {
   db: Database;

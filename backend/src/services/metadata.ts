@@ -1,9 +1,9 @@
 import type { Database } from "bun:sqlite";
 import type {
+  LifecycleStage,
   MetadataCompleteness,
   MetadataOverlay,
   NormalizedSpec,
-  LifecycleStage,
 } from "@kiro-spec-library/shared";
 import type { SpecLibrarySidecarV1 } from "@kiro-spec-library/shared";
 import { upsertOverlay } from "../db/queries/metadata.js";

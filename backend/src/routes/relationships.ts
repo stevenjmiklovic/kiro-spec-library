@@ -1,16 +1,12 @@
 import type { Database } from "bun:sqlite";
-import { Elysia, t } from "elysia";
 import type { RelationshipType } from "@kiro-spec-library/shared";
+import { Elysia, t } from "elysia";
 import {
+  checkDuplicate,
   createRelationship,
   deleteRelationship,
-  checkDuplicate,
 } from "../db/queries/relationships.js";
-import {
-  listPending,
-  acceptSuggestion,
-  rejectSuggestion,
-} from "../db/queries/suggestions.js";
+import { acceptSuggestion, listPending, rejectSuggestion } from "../db/queries/suggestions.js";
 import { recordEvent } from "../services/audit.js";
 
 const RelationshipTypeValues = [

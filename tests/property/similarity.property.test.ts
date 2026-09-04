@@ -7,25 +7,22 @@
  */
 import { describe, expect, test } from "bun:test";
 import fc from "fast-check";
+import type { ResolvedMetadata } from "../../backend/src/services/metadata.js";
 import {
+  type TfIdfVector,
   buildTfIdfVectors,
   cosineSimilarity,
   generateAll,
-  type TfIdfVector,
 } from "../../backend/src/services/suggester.js";
-import type { ResolvedMetadata } from "../../backend/src/services/metadata.js";
-import type { NormalizedSpec } from "../../shared/src/types.js";
 import { MAX_SUGGESTIONS_PER_SPEC } from "../../shared/src/constants.js";
+import type { NormalizedSpec } from "../../shared/src/types.js";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /** Arbitrary for a non-empty TF-IDF vector (all positive weights) */
 const arbTfIdfVector: fc.Arbitrary<TfIdfVector> = fc
   .array(
-    fc.tuple(
-      fc.stringMatching(/^[a-z]{3,10}$/),
-      fc.double({ min: 0.001, max: 10.0, noNaN: true }),
-    ),
+    fc.tuple(fc.stringMatching(/^[a-z]{3,10}$/), fc.double({ min: 0.001, max: 10.0, noNaN: true })),
     { minLength: 1, maxLength: 50 },
   )
   .map((entries) => new Map(entries));
@@ -33,10 +30,7 @@ const arbTfIdfVector: fc.Arbitrary<TfIdfVector> = fc
 /** Arbitrary for a possibly-empty TF-IDF vector */
 const arbMaybEmptyVector: fc.Arbitrary<TfIdfVector> = fc
   .array(
-    fc.tuple(
-      fc.stringMatching(/^[a-z]{3,10}$/),
-      fc.double({ min: 0.001, max: 10.0, noNaN: true }),
-    ),
+    fc.tuple(fc.stringMatching(/^[a-z]{3,10}$/), fc.double({ min: 0.001, max: 10.0, noNaN: true })),
     { minLength: 0, maxLength: 50 },
   )
   .map((entries) => new Map(entries));
@@ -170,9 +164,7 @@ describe("Property 11: Suggestion Deduplication and Limit", () => {
 
     fc.assert(
       fc.property(arbSpecCount, arbTheme, arbTags, (count, theme, tags) => {
-        const specs = Array.from({ length: count }, (_, i) =>
-          makeSpec(`spec-${i}`),
-        );
+        const specs = Array.from({ length: count }, (_, i) => makeSpec(`spec-${i}`));
         const metaMap = new Map<string, ResolvedMetadata>(
           specs.map((s) => [s.key, makeMeta({ theme, tags })]),
         );
@@ -182,14 +174,8 @@ describe("Property 11: Suggestion Deduplication and Limit", () => {
         // Count participation per spec
         const countPerSpec = new Map<string, number>();
         for (const r of results) {
-          countPerSpec.set(
-            r.sourceSpecKey,
-            (countPerSpec.get(r.sourceSpecKey) ?? 0) + 1,
-          );
-          countPerSpec.set(
-            r.targetSpecKey,
-            (countPerSpec.get(r.targetSpecKey) ?? 0) + 1,
-          );
+          countPerSpec.set(r.sourceSpecKey, (countPerSpec.get(r.sourceSpecKey) ?? 0) + 1);
+          countPerSpec.set(r.targetSpecKey, (countPerSpec.get(r.targetSpecKey) ?? 0) + 1);
         }
 
         for (const [, count] of countPerSpec) {
@@ -210,9 +196,7 @@ describe("Property 11: Suggestion Deduplication and Limit", () => {
 
     fc.assert(
       fc.property(arbSpecCount, arbTheme, arbTags, (count, theme, tags) => {
-        const specs = Array.from({ length: count }, (_, i) =>
-          makeSpec(`spec-${i}`),
-        );
+        const specs = Array.from({ length: count }, (_, i) => makeSpec(`spec-${i}`));
         const metaMap = new Map<string, ResolvedMetadata>(
           specs.map((s) => [s.key, makeMeta({ theme, tags })]),
         );
@@ -223,11 +207,7 @@ describe("Property 11: Suggestion Deduplication and Limit", () => {
         const seen = new Set<string>();
         for (const r of results) {
           const pairKey =
-            [r.sourceSpecKey, r.targetSpecKey].sort().join("|") +
-            "|" +
-            r.type +
-            "|" +
-            r.reason;
+            [r.sourceSpecKey, r.targetSpecKey].sort().join("|") + "|" + r.type + "|" + r.reason;
           expect(seen.has(pairKey)).toBe(false);
           seen.add(pairKey);
         }
@@ -242,9 +222,7 @@ describe("Property 11: Suggestion Deduplication and Limit", () => {
         fc.integer({ min: 2, max: 10 }),
         fc.stringMatching(/^[a-z]{3,8}$/),
         (count, theme) => {
-          const specs = Array.from({ length: count }, (_, i) =>
-            makeSpec(`spec-${i}`),
-          );
+          const specs = Array.from({ length: count }, (_, i) => makeSpec(`spec-${i}`));
           const metaMap = new Map<string, ResolvedMetadata>(
             specs.map((s) => [s.key, makeMeta({ theme, tags: ["shared"] })]),
           );
@@ -265,9 +243,7 @@ describe("Property 11: Suggestion Deduplication and Limit", () => {
     fc.assert(
       fc.property(fc.boolean(), (hasOne) => {
         const specs = hasOne ? [makeSpec("solo")] : [];
-        const metaMap = new Map<string, ResolvedMetadata>(
-          specs.map((s) => [s.key, makeMeta()]),
-        );
+        const metaMap = new Map<string, ResolvedMetadata>(specs.map((s) => [s.key, makeMeta()]));
         const results = generateAll(specs, metaMap);
         expect(results).toEqual([]);
       }),

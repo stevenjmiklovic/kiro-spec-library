@@ -33,9 +33,7 @@ export class RevisionConflictError extends Error {
 }
 
 export function getOverlay(db: Database, specKey: string): MetadataRow | null {
-  const stmt = db.prepare(
-    "SELECT * FROM metadata_overlays WHERE spec_key = $spec_key",
-  );
+  const stmt = db.prepare("SELECT * FROM metadata_overlays WHERE spec_key = $spec_key");
   return (stmt.get({ $spec_key: specKey }) as MetadataRow) ?? null;
 }
 
@@ -50,11 +48,7 @@ export function upsertOverlay(
 
     if (existing) {
       if (existing.revision !== expectedRevision) {
-        throw new RevisionConflictError(
-          specKey,
-          expectedRevision,
-          existing.revision,
-        );
+        throw new RevisionConflictError(specKey, expectedRevision, existing.revision);
       }
 
       const sets: string[] = [];
@@ -63,9 +57,10 @@ export function upsertOverlay(
       for (const [key, value] of Object.entries(patch)) {
         const col = key.replace(/([A-Z])/g, "_$1").toLowerCase();
         sets.push(`${col} = $${col}`);
-        params[`$${col}`] = typeof value === "object" && value !== null
-          ? JSON.stringify(value)
-          : (value as string | number | boolean | null) ?? null;
+        params[`$${col}`] =
+          typeof value === "object" && value !== null
+            ? JSON.stringify(value)
+            : ((value as string | number | boolean | null) ?? null);
       }
 
       sets.push("revision = revision + 1");
@@ -90,9 +85,10 @@ export function upsertOverlay(
         const col = key.replace(/([A-Z])/g, "_$1").toLowerCase();
         cols.push(col);
         vals.push(`$${col}`);
-        params[`$${col}`] = typeof value === "object" && value !== null
-          ? JSON.stringify(value)
-          : (value as string | number | boolean | null) ?? null;
+        params[`$${col}`] =
+          typeof value === "object" && value !== null
+            ? JSON.stringify(value)
+            : ((value as string | number | boolean | null) ?? null);
       }
 
       const sql = `INSERT INTO metadata_overlays (${cols.join(", ")}) VALUES (${vals.join(", ")})`;
@@ -115,9 +111,7 @@ export function overlayRowToMetadataOverlay(overlay: MetadataRow): MetadataOverl
     theme: overlay.theme ?? undefined,
     tags: overlay.tags ? JSON.parse(overlay.tags) : undefined,
     targetRelease: overlay.target_release ?? undefined,
-    retentionPolicy: overlay.retention_policy
-      ? JSON.parse(overlay.retention_policy)
-      : undefined,
+    retentionPolicy: overlay.retention_policy ? JSON.parse(overlay.retention_policy) : undefined,
     approvers: overlay.approvers ? JSON.parse(overlay.approvers) : undefined,
     implementationRef: overlay.implementation_ref ?? undefined,
     reviewedAt: overlay.reviewed_at ?? undefined,
@@ -127,8 +121,6 @@ export function overlayRowToMetadataOverlay(overlay: MetadataRow): MetadataOverl
 }
 
 export function deleteOverlay(db: Database, specKey: string): void {
-  const stmt = db.prepare(
-    "DELETE FROM metadata_overlays WHERE spec_key = $spec_key",
-  );
+  const stmt = db.prepare("DELETE FROM metadata_overlays WHERE spec_key = $spec_key");
   stmt.run({ $spec_key: specKey });
 }

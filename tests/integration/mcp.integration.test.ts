@@ -1,3 +1,4 @@
+import type { Database } from "bun:sqlite";
 /**
  * MCP Tool Integration Tests (Task 21.3)
  *
@@ -13,13 +14,12 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { Database } from "bun:sqlite";
 import { createDatabase } from "../../backend/src/db/connection.js";
 import { runMigrations } from "../../backend/src/db/migrator.js";
 import { createRouter } from "../../backend/src/router.js";
-import { specRoutes } from "../../backend/src/routes/specs.js";
 import { proposalRoutes } from "../../backend/src/routes/proposals.js";
-import { searchSpecs, getSpecContext, submitMetadataProposal } from "../../mcp/src/tools.js";
+import { specRoutes } from "../../backend/src/routes/specs.js";
+import { getSpecContext, searchSpecs, submitMetadataProposal } from "../../mcp/src/tools.js";
 import { API_PREFIX } from "../../shared/src/constants.js";
 
 // ─── Test Infrastructure ─────────────────────────────────────────────────────
@@ -252,7 +252,12 @@ beforeAll(async () => {
 
   // Patch global fetch to intercept requests to our fake base URLs
   globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
-    const url = typeof input === "string" ? input : input instanceof URL ? input.href : (input as Request).url;
+    const url =
+      typeof input === "string"
+        ? input
+        : input instanceof URL
+          ? input.href
+          : (input as Request).url;
 
     if (url.startsWith(FAKE_BASE_ENFORCED)) {
       const path = rewriteToAppPath(url.slice(FAKE_BASE_ENFORCED.length));
@@ -400,9 +405,9 @@ describe("MCP Integration: get_spec_context", () => {
   });
 
   test("returns 404 for unknown spec ID", async () => {
-    await expect(
-      getSpecContext(makeClient(), { specId: "nonexistent-spec" })
-    ).rejects.toThrow("Get spec failed");
+    await expect(getSpecContext(makeClient(), { specId: "nonexistent-spec" })).rejects.toThrow(
+      "Get spec failed",
+    );
   });
 
   test("redacts AWS access keys from response content", async () => {
@@ -465,7 +470,7 @@ describe("MCP Integration: submit_metadata_proposal", () => {
     // Verify the metadata was NOT applied — no overlay exists
     const overlay = db
       .query<{ theme: string | null }, [string]>(
-        "SELECT theme FROM metadata_overlays WHERE spec_key = ?"
+        "SELECT theme FROM metadata_overlays WHERE spec_key = ?",
       )
       .get("src-1::payment-gateway");
 
@@ -474,7 +479,7 @@ describe("MCP Integration: submit_metadata_proposal", () => {
     // Verify proposal exists in the proposals table
     const proposal = db
       .query<{ id: string; spec_key: string; patch: string; status: string }, [string]>(
-        "SELECT id, spec_key, patch, status FROM proposals WHERE id = ?"
+        "SELECT id, spec_key, patch, status FROM proposals WHERE id = ?",
       )
       .get(parsed.id);
 
@@ -510,7 +515,7 @@ describe("MCP Integration: submit_metadata_proposal", () => {
     // Both are in the table
     const proposals = db
       .query<{ id: string; status: string }, [string]>(
-        "SELECT id, status FROM proposals WHERE spec_key = ? AND status = 'pending'"
+        "SELECT id, status FROM proposals WHERE spec_key = ? AND status = 'pending'",
       )
       .all("src-1::auth-module");
     expect(proposals.length).toBeGreaterThanOrEqual(2);
@@ -523,7 +528,7 @@ describe("MCP Integration: submit_metadata_proposal", () => {
         baseRevision: 0,
         metadataPatch: { theme: "test" },
         rationale: "Should fail",
-      })
+      }),
     ).rejects.toThrow("Proposal failed");
   });
 
@@ -540,15 +545,18 @@ describe("MCP Integration: submit_metadata_proposal", () => {
 
     // Accept it via the proposals endpoint (routes through patched fetch -> app.handle)
     const acceptUrl = `${FAKE_BASE}${API_PREFIX}/proposals/${parsed.id}/accept`;
-    const acceptResp = await fetch(acceptUrl, { method: "POST", headers: { "Content-Type": "application/json" } });
+    const acceptResp = await fetch(acceptUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
     expect(acceptResp.status).toBe(200);
-    const acceptData = await acceptResp.json() as { status: string };
+    const acceptData = (await acceptResp.json()) as { status: string };
     expect(acceptData.status).toBe("accepted");
 
     // Now metadata should be applied
     const overlay = db
       .query<{ summary: string; revision: number }, [string]>(
-        "SELECT summary, revision FROM metadata_overlays WHERE spec_key = ?"
+        "SELECT summary, revision FROM metadata_overlays WHERE spec_key = ?",
       )
       .get("src-1::bugfix-login");
     expect(overlay).not.toBeNull();
@@ -628,9 +636,9 @@ describe("MCP Integration: Token Authentication (enforced)", () => {
    */
 
   test("request WITHOUT a token is rejected", async () => {
-    await expect(
-      searchSpecs(makeEnforcedClient(""), { query: "" }),
-    ).rejects.toThrow("Search failed");
+    await expect(searchSpecs(makeEnforcedClient(""), { query: "" })).rejects.toThrow(
+      "Search failed",
+    );
   });
 
   test("request with the WRONG token is rejected", async () => {

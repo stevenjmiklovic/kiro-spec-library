@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { Download, Clock, ExternalLink, Moon, RefreshCw, Sun, Users, Package } from 'lucide-react';
-import type { ThemeMode, ViewMode } from '../hooks/useUrlState.js';
-import { useCrew } from '../hooks/useCrewIntegration.js';
-import { BackupPanel } from './BackupPanel.js';
-import { AliasesPanel } from './AliasesPanel.js';
-import { AuditLogPanel } from './AuditLogPanel.js';
-import { SourcesPanel } from './SourcesPanel.js';
+import { Clock, Download, ExternalLink, Moon, Package, RefreshCw, Sun, Users } from "lucide-react";
+import React, { useState } from "react";
+import { useCrew } from "../hooks/useCrewIntegration.js";
+import type { ThemeMode, ViewMode } from "../hooks/useUrlState.js";
+import { AliasesPanel } from "./AliasesPanel.js";
+import { AuditLogPanel } from "./AuditLogPanel.js";
+import { BackupPanel } from "./BackupPanel.js";
+import { SourcesPanel } from "./SourcesPanel.js";
 
 interface Props {
   view: ViewMode;
@@ -24,9 +24,9 @@ export function AppChrome({
   onViewChange,
   onThemeChange,
 }: Props): React.ReactElement {
-  const nextTheme: ThemeMode = themeMode === 'dark' ? 'light' : 'dark';
+  const nextTheme: ThemeMode = themeMode === "dark" ? "light" : "dark";
   const { api, notify } = useCrew();
-  const [copyLabel, setCopyLabel] = useState('Copy link');
+  const [copyLabel, setCopyLabel] = useState("Copy link");
   const [backupPanelOpen, setBackupPanelOpen] = useState(false);
   const [aliasesPanelOpen, setAliasesPanelOpen] = useState(false);
   const [auditLogPanelOpen, setAuditLogPanelOpen] = useState(false);
@@ -37,20 +37,20 @@ export function AppChrome({
   // so the CTA there doesn't need to own the panel's state.
   React.useEffect(() => {
     const open = (): void => setSourcesPanelOpen(true);
-    window.addEventListener('spec-library:open-sources', open);
-    return () => window.removeEventListener('spec-library:open-sources', open);
+    window.addEventListener("spec-library:open-sources", open);
+    return () => window.removeEventListener("spec-library:open-sources", open);
   }, []);
 
   const handleCopyLink = (): void => {
     navigator.clipboard.writeText(window.location.href);
-    setCopyLabel('Copied!');
-    setTimeout(() => setCopyLabel('Copy link'), 1500);
+    setCopyLabel("Copied!");
+    setTimeout(() => setCopyLabel("Copy link"), 1500);
   };
 
   const handleRescan = async (): Promise<void> => {
     setRescanning(true);
     try {
-      const sourcesRes = await api.fetch('/settings/sources');
+      const sourcesRes = await api.fetch("/settings/sources");
       if (!sourcesRes.ok) throw new Error(`Failed to load sources: ${sourcesRes.status}`);
       const { sources } = (await sourcesRes.json()) as { sources: unknown[] };
 
@@ -58,40 +58,40 @@ export function AppChrome({
       // like a dead button — tell the user why instead.
       if (!Array.isArray(sources) || sources.length === 0) {
         notify.error(
-          'No sources are configured, so there is nothing to scan. Add a repository source in settings first.',
+          "No sources are configured, so there is nothing to scan. Add a repository source in settings first.",
         );
         return;
       }
 
-      const syncRes = await api.fetch('/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const syncRes = await api.fetch("/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sources }),
       });
       if (!syncRes.ok) throw new Error(`Rescan failed: ${syncRes.status}`);
       const { runId } = (await syncRes.json()) as { runId?: string };
-      notify.info('Rescan started…');
+      notify.info("Rescan started…");
 
       // Poll the scan to completion so we can report a real result and refresh
       // the graph, instead of firing and forgetting.
       const result = runId ? await pollScan(runId) : null;
 
-      if (result && (result.status === 'completed' || result.status === 'partial_failure')) {
+      if (result && (result.status === "completed" || result.status === "partial_failure")) {
         const n = result.specsDiscovered ?? 0;
         const errs = Array.isArray(result.errors) ? result.errors.length : 0;
         notify.success(
           errs > 0
-            ? `Rescan complete: ${n} spec${n === 1 ? '' : 's'} indexed, ${errs} source error${errs === 1 ? '' : 's'}.`
-            : `Rescan complete: ${n} spec${n === 1 ? '' : 's'} indexed.`,
+            ? `Rescan complete: ${n} spec${n === 1 ? "" : "s"} indexed, ${errs} source error${errs === 1 ? "" : "s"}.`
+            : `Rescan complete: ${n} spec${n === 1 ? "" : "s"} indexed.`,
         );
       } else {
-        notify.success('Rescan triggered.');
+        notify.success("Rescan triggered.");
       }
 
       // Signal open views to refetch their spec data (see useSpecData).
-      window.dispatchEvent(new CustomEvent('spec-library:rescan-complete'));
+      window.dispatchEvent(new CustomEvent("spec-library:rescan-complete"));
     } catch (err) {
-      notify.error(err instanceof Error ? err.message : 'Rescan failed.');
+      notify.error(err instanceof Error ? err.message : "Rescan failed.");
     } finally {
       setRescanning(false);
     }
@@ -113,9 +113,9 @@ export function AppChrome({
             errors?: unknown;
           };
           const status = scan.status;
-          if (status && status !== 'running') {
+          if (status && status !== "running") {
             const errors =
-              typeof scan.errors === 'string'
+              typeof scan.errors === "string"
                 ? (JSON.parse(scan.errors) as unknown[])
                 : Array.isArray(scan.errors)
                   ? scan.errors
@@ -137,26 +137,22 @@ export function AppChrome({
 
   return (
     <div className="app-chrome">
-      <div
-        className="view-switcher"
-        role="tablist"
-        aria-label="View"
-      >
+      <div className="view-switcher" role="tablist" aria-label="View">
         <button
           type="button"
           role="tab"
-          aria-selected={view === 'relationship'}
-          className={view === 'relationship' ? 'active' : undefined}
-          onClick={() => onViewChange('relationship')}
+          aria-selected={view === "relationship"}
+          className={view === "relationship" ? "active" : undefined}
+          onClick={() => onViewChange("relationship")}
         >
           Relationships
         </button>
         <button
           type="button"
           role="tab"
-          aria-selected={view === 'archive'}
-          className={view === 'archive' ? 'active' : undefined}
-          onClick={() => onViewChange('archive')}
+          aria-selected={view === "archive"}
+          className={view === "archive" ? "active" : undefined}
+          onClick={() => onViewChange("archive")}
         >
           Archive
         </button>
@@ -215,8 +211,12 @@ export function AppChrome({
           aria-label="Rescan sources now"
           title="Rescan sources now"
         >
-          <RefreshCw size={14} aria-hidden="true" className={rescanning ? 'is-spinning' : undefined} />
-          {rescanning ? 'Rescanning…' : 'Rescan'}
+          <RefreshCw
+            size={14}
+            aria-hidden="true"
+            className={rescanning ? "is-spinning" : undefined}
+          />
+          {rescanning ? "Rescanning…" : "Rescan"}
         </button>
 
         <button
@@ -237,8 +237,12 @@ export function AppChrome({
           aria-label={`Switch to ${nextTheme} theme`}
           title={`Switch to ${nextTheme} theme`}
         >
-          {themeMode === 'dark' ? <Moon size={14} aria-hidden="true" /> : <Sun size={14} aria-hidden="true" />}
-          {themeMode === 'dark' ? 'Dark' : 'Light'}
+          {themeMode === "dark" ? (
+            <Moon size={14} aria-hidden="true" />
+          ) : (
+            <Sun size={14} aria-hidden="true" />
+          )}
+          {themeMode === "dark" ? "Dark" : "Light"}
         </button>
       </div>
 

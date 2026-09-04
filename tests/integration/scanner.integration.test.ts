@@ -1,3 +1,4 @@
+import type { Database } from "bun:sqlite";
 /**
  * Scanner integration test (Task 21.1)
  *
@@ -5,21 +6,20 @@
  * temporary local repository, and verifies error isolation (one failing source
  * does not abort the scan).
  */
-import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import type { Database } from 'bun:sqlite';
+import { afterAll, beforeAll, describe, expect, test } from "bun:test";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
-import { createDatabase } from '../../backend/src/db/connection.js';
-import { runMigrations } from '../../backend/src/db/migrator.js';
-import { ScannerService } from '../../backend/src/services/scanner.js';
-import { ArchiverService } from '../../backend/src/services/archiver.js';
-import { listSpecs } from '../../backend/src/db/queries/specs.js';
-import { putSource } from '../../backend/src/db/queries/sources.js';
-import { listPending } from '../../backend/src/db/queries/suggestions.js';
-import { listSnapshots } from '../../backend/src/db/queries/snapshots.js';
-import type { Source } from '../../shared/src/types.js';
+import { createDatabase } from "../../backend/src/db/connection.js";
+import { runMigrations } from "../../backend/src/db/migrator.js";
+import { listSnapshots } from "../../backend/src/db/queries/snapshots.js";
+import { putSource } from "../../backend/src/db/queries/sources.js";
+import { listSpecs } from "../../backend/src/db/queries/specs.js";
+import { listPending } from "../../backend/src/db/queries/suggestions.js";
+import { ArchiverService } from "../../backend/src/services/archiver.js";
+import { ScannerService } from "../../backend/src/services/scanner.js";
+import type { Source } from "../../shared/src/types.js";
 
 let dataDir: string;
 let repoDir: string;
@@ -27,12 +27,8 @@ let db: Database;
 let scanner: ScannerService;
 
 /** Create a `.kiro/specs/<slug>/` spec with the given artifact contents. */
-function writeSpec(
-  repo: string,
-  slug: string,
-  files: Record<string, string>,
-): void {
-  const dir = join(repo, '.kiro', 'specs', slug);
+function writeSpec(repo: string, slug: string, files: Record<string, string>): void {
+  const dir = join(repo, ".kiro", "specs", slug);
   mkdirSync(dir, { recursive: true });
   for (const [name, content] of Object.entries(files)) {
     writeFileSync(join(dir, name), content);
@@ -40,23 +36,23 @@ function writeSpec(
 }
 
 beforeAll(async () => {
-  dataDir = mkdtempSync(join(tmpdir(), 'scanner-data-'));
-  repoDir = mkdtempSync(join(tmpdir(), 'scanner-repo-'));
+  dataDir = mkdtempSync(join(tmpdir(), "scanner-data-"));
+  repoDir = mkdtempSync(join(tmpdir(), "scanner-repo-"));
 
   // A completed feature spec.
-  writeSpec(repoDir, 'agent-memory', {
-    'requirements.md': '# Agent Memory\n\nPersistent memory.',
-    'design.md': '# Design\n\nArchitecture.',
-    'tasks.md': '- [x] Task one\n- [x] Task two\n- [ ] Task three\n',
+  writeSpec(repoDir, "agent-memory", {
+    "requirements.md": "# Agent Memory\n\nPersistent memory.",
+    "design.md": "# Design\n\nArchitecture.",
+    "tasks.md": "- [x] Task one\n- [x] Task two\n- [ ] Task three\n",
   });
   // A quick spec (tasks only).
-  writeSpec(repoDir, 'quick-fix', {
-    'tasks.md': '- [ ] Do the thing\n',
+  writeSpec(repoDir, "quick-fix", {
+    "tasks.md": "- [ ] Do the thing\n",
   });
 
   db = createDatabase(dataDir);
   await runMigrations(db);
-  const archiveDir = join(dataDir, 'archive');
+  const archiveDir = join(dataDir, "archive");
   mkdirSync(archiveDir, { recursive: true });
   const archiver = new ArchiverService(db, { archiveDir });
   scanner = new ScannerService(db, dataDir, archiver);
@@ -68,11 +64,11 @@ afterAll(() => {
   rmSync(repoDir, { recursive: true, force: true });
 });
 
-describe('Scanner integration', () => {
-  test('discovers, normalizes, and stores local specs', async () => {
+describe("Scanner integration", () => {
+  test("discovers, normalizes, and stores local specs", async () => {
     const source: Source = {
-      id: 'local-1',
-      type: 'local',
+      id: "local-1",
+      type: "local",
       path: repoDir,
       addedAt: new Date().toISOString(),
     };
@@ -80,85 +76,85 @@ describe('Scanner integration', () => {
 
     const result = await scanner.triggerScan([source]);
 
-    expect(result.status).toBe('completed');
+    expect(result.status).toBe("completed");
     expect(result.specsDiscovered).toBe(2);
     expect(result.errors).toHaveLength(0);
 
     const stored = listSpecs(db, { limit: 100, offset: 0 });
     const keys = stored.map((s) => s.key).sort();
-    expect(keys).toContain('local-1::.kiro/specs/agent-memory');
-    expect(keys).toContain('local-1::.kiro/specs/quick-fix');
+    expect(keys).toContain("local-1::.kiro/specs/agent-memory");
+    expect(keys).toContain("local-1::.kiro/specs/quick-fix");
 
     // Normalization results are persisted.
-    const agentMem = stored.find((s) => s.key === 'local-1::.kiro/specs/agent-memory');
+    const agentMem = stored.find((s) => s.key === "local-1::.kiro/specs/agent-memory");
     expect(agentMem).toBeDefined();
-    expect(agentMem!.type).toBe('feature');
-    expect(agentMem!.stage).toBe('in-flight'); // has tasks.md, some completed
+    expect(agentMem!.type).toBe("feature");
+    expect(agentMem!.stage).toBe("in-flight"); // has tasks.md, some completed
     expect(agentMem!.total_tasks).toBe(3);
     expect(agentMem!.completed_tasks).toBe(2);
     expect(agentMem!.progress).toBeGreaterThan(0);
     expect(agentMem!.progress).toBeLessThanOrEqual(100);
 
-    const quick = stored.find((s) => s.key === 'local-1::.kiro/specs/quick-fix');
-    expect(quick!.type).toBe('quick');
+    const quick = stored.find((s) => s.key === "local-1::.kiro/specs/quick-fix");
+    expect(quick!.type).toBe("quick");
   });
 
-  test('scan syncs specs_fts so a search term matches the scanned content', () => {
+  test("scan syncs specs_fts so a search term matches the scanned content", () => {
     // Relies on the scan above having indexed agent-memory's requirements.md
     // ("Persistent memory.") into specs_fts.
-    const results = listSpecs(db, { query: 'Persistent', limit: 10, offset: 0 });
+    const results = listSpecs(db, { query: "Persistent", limit: 10, offset: 0 });
     const keys = results.map((s) => s.key);
-    expect(keys).toContain('local-1::.kiro/specs/agent-memory');
-    expect(keys).not.toContain('local-1::.kiro/specs/quick-fix');
+    expect(keys).toContain("local-1::.kiro/specs/agent-memory");
+    expect(keys).not.toContain("local-1::.kiro/specs/quick-fix");
   });
 
-  test('scan generates a suggestion between proximate specs in the same cycle', () => {
+  test("scan generates a suggestion between proximate specs in the same cycle", () => {
     // agent-memory and quick-fix are siblings under the same repo's
     // .kiro/specs/ directory, so isProximate() should link them.
     const pending = listPending(db);
     const proximitySuggestion = pending.find(
       (s) =>
-        s.reason === 'repository_proximity' &&
-        [s.source_spec_key, s.target_spec_key].includes('local-1::.kiro/specs/agent-memory') &&
-        [s.source_spec_key, s.target_spec_key].includes('local-1::.kiro/specs/quick-fix'),
+        s.reason === "repository_proximity" &&
+        [s.source_spec_key, s.target_spec_key].includes("local-1::.kiro/specs/agent-memory") &&
+        [s.source_spec_key, s.target_spec_key].includes("local-1::.kiro/specs/quick-fix"),
     );
     expect(proximitySuggestion).toBeDefined();
   });
 
-  test('auto-creates a snapshot for a spec that reaches the done stage', async () => {
-    const doneRepo = mkdtempSync(join(tmpdir(), 'scanner-done-'));
+  test("auto-creates a snapshot for a spec that reaches the done stage", async () => {
+    const doneRepo = mkdtempSync(join(tmpdir(), "scanner-done-"));
     try {
-      writeSpec(doneRepo, 'finished-thing', {
-        'tasks.md': '- [x] Only task\n',
+      writeSpec(doneRepo, "finished-thing", {
+        "tasks.md": "- [x] Only task\n",
       });
       const source: Source = {
-        id: 'done-src',
-        type: 'local',
+        id: "done-src",
+        type: "local",
         path: doneRepo,
         addedAt: new Date().toISOString(),
       };
       putSource(db, source);
       const result = await scanner.triggerScan([source]);
-      expect(result.status).toBe('completed');
+      expect(result.status).toBe("completed");
 
       const stored = listSpecs(db, { limit: 100, offset: 0 });
-      const finished = stored.find((s) => s.key === 'done-src::.kiro/specs/finished-thing');
+      const finished = stored.find((s) => s.key === "done-src::.kiro/specs/finished-thing");
       expect(finished).toBeDefined();
-      expect(finished!.stage).toBe('done');
+      expect(finished!.stage).toBe("done");
 
       const snapshots = listSnapshots(db, { limit: 50 });
-      expect(
-        snapshots.some((s) => s.spec_key === 'done-src::.kiro/specs/finished-thing'),
-      ).toBe(true);
+      expect(snapshots.some((s) => s.spec_key === "done-src::.kiro/specs/finished-thing")).toBe(
+        true,
+      );
     } finally {
       rmSync(doneRepo, { recursive: true, force: true });
     }
   });
 
-  test('error isolation: one failing source does not abort the scan', async () => {
+  test("error isolation: one failing source does not abort the scan", async () => {
     const good: Source = {
-      id: 'good-src',
-      type: 'local',
+      id: "good-src",
+      type: "local",
       path: repoDir,
       addedAt: new Date().toISOString(),
     };
@@ -166,10 +162,10 @@ describe('Scanner integration', () => {
     // command builder rejects it, throwing inside scanSource; the scan must
     // isolate that failure and still process the good source.
     const bad: Source = {
-      id: 'bad-src',
-      type: 'remote',
-      url: 'https://evil.example.com/$(rm -rf ~).git',
-      branch: 'main',
+      id: "bad-src",
+      type: "remote",
+      url: "https://evil.example.com/$(rm -rf ~).git",
+      branch: "main",
       addedAt: new Date().toISOString(),
     };
     putSource(db, good);
@@ -177,28 +173,28 @@ describe('Scanner integration', () => {
 
     const result = await scanner.triggerScan([good, bad]);
 
-    expect(result.status).toBe('partial_failure');
+    expect(result.status).toBe("partial_failure");
     expect(result.errors.length).toBeGreaterThanOrEqual(1);
-    expect(result.errors.some((e) => e.sourceId === 'bad-src')).toBe(true);
+    expect(result.errors.some((e) => e.sourceId === "bad-src")).toBe(true);
 
     // The good source's specs are still discovered and stored.
     expect(result.specsDiscovered).toBeGreaterThanOrEqual(2);
     const stored = listSpecs(db, { limit: 100, offset: 0 });
-    expect(stored.some((s) => s.key.startsWith('good-src::'))).toBe(true);
+    expect(stored.some((s) => s.key.startsWith("good-src::"))).toBe(true);
   });
 
-  test('an empty local source (no .kiro/specs) yields zero specs without error', async () => {
-    const emptyRepo = mkdtempSync(join(tmpdir(), 'scanner-empty-'));
+  test("an empty local source (no .kiro/specs) yields zero specs without error", async () => {
+    const emptyRepo = mkdtempSync(join(tmpdir(), "scanner-empty-"));
     try {
       const source: Source = {
-        id: 'empty-src',
-        type: 'local',
+        id: "empty-src",
+        type: "local",
         path: emptyRepo,
         addedAt: new Date().toISOString(),
       };
       putSource(db, source);
       const result = await scanner.triggerScan([source]);
-      expect(result.status).toBe('completed');
+      expect(result.status).toBe("completed");
       expect(result.errors).toHaveLength(0);
     } finally {
       rmSync(emptyRepo, { recursive: true, force: true });

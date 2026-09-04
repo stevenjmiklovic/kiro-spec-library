@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { X } from 'lucide-react';
-import { useCrew } from '../hooks/useCrewIntegration.js';
+import { X } from "lucide-react";
+import type React from "react";
+import { useEffect, useState } from "react";
+import { useCrew } from "../hooks/useCrewIntegration.js";
 
 interface Props {
   onClose: () => void;
@@ -28,11 +29,11 @@ interface ErrorResponse {
   message: string;
 }
 
-const RESTORE_CONFIRMATION = 'RESTORE';
+const RESTORE_CONFIRMATION = "RESTORE";
 
 function triggerDownload(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = filename;
   a.click();
@@ -60,32 +61,32 @@ export function BackupPanel({ onClose }: Props): React.ReactElement {
   const [restoring, setRestoring] = useState(false);
   const [applying, setApplying] = useState(false);
 
-  const [restoreConfirmText, setRestoreConfirmText] = useState('');
+  const [restoreConfirmText, setRestoreConfirmText] = useState("");
   const [restoreResult, setRestoreResult] = useState<RestoreResponse | null>(null);
   const [applyResult, setApplyResult] = useState<ApplyTextExportResponse | null>(null);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === "Escape") onClose();
     };
-    document.addEventListener('keydown', handleKey);
-    return () => document.removeEventListener('keydown', handleKey);
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
   }, [onClose]);
 
   const handleDownloadBackup = async (): Promise<void> => {
     setDownloadingBackup(true);
     try {
-      const res = await api.fetch('/backup');
+      const res = await api.fetch("/backup");
       if (!res.ok) throw new Error(`Download failed: ${res.status}`);
       const blob = await res.blob();
       const filename = filenameFromContentDisposition(
-        res.headers.get('content-disposition'),
-        'spec-library-backup.db',
+        res.headers.get("content-disposition"),
+        "spec-library-backup.db",
       );
       triggerDownload(blob, filename);
-      notify.success('Backup downloaded.');
+      notify.success("Backup downloaded.");
     } catch (err) {
-      notify.error(err instanceof Error ? err.message : 'Backup download failed.');
+      notify.error(err instanceof Error ? err.message : "Backup download failed.");
     } finally {
       setDownloadingBackup(false);
     }
@@ -94,17 +95,17 @@ export function BackupPanel({ onClose }: Props): React.ReactElement {
   const handleDownloadTextExport = async (): Promise<void> => {
     setDownloadingExport(true);
     try {
-      const res = await api.fetch('/export/text');
+      const res = await api.fetch("/export/text");
       if (!res.ok) throw new Error(`Download failed: ${res.status}`);
       const blob = await res.blob();
       const filename = filenameFromContentDisposition(
-        res.headers.get('content-disposition'),
-        'spec-library-export.zip',
+        res.headers.get("content-disposition"),
+        "spec-library-export.zip",
       );
       triggerDownload(blob, filename);
-      notify.success('Text export downloaded.');
+      notify.success("Text export downloaded.");
     } catch (err) {
-      notify.error(err instanceof Error ? err.message : 'Text export download failed.');
+      notify.error(err instanceof Error ? err.message : "Text export download failed.");
     } finally {
       setDownloadingExport(false);
     }
@@ -112,22 +113,23 @@ export function BackupPanel({ onClose }: Props): React.ReactElement {
 
   const handleRestore = async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
     const file = e.target.files?.[0];
-    e.target.value = '';
+    e.target.value = "";
     if (!file) return;
 
     setRestoring(true);
     setRestoreResult(null);
     try {
       const form = new FormData();
-      form.set('confirmation', restoreConfirmText);
-      form.set('file', file);
-      const res = await api.fetch('/backup/restore', { method: 'POST', body: form });
+      form.set("confirmation", restoreConfirmText);
+      form.set("file", file);
+      const res = await api.fetch("/backup/restore", { method: "POST", body: form });
       const data = (await res.json()) as RestoreResponse | ErrorResponse;
-      if (!res.ok) throw new Error((data as ErrorResponse).message || `Restore failed: ${res.status}`);
+      if (!res.ok)
+        throw new Error((data as ErrorResponse).message || `Restore failed: ${res.status}`);
       setRestoreResult(data as RestoreResponse);
-      notify.success('Backup restored to disk — restart the backend to load it.');
+      notify.success("Backup restored to disk — restart the backend to load it.");
     } catch (err) {
-      notify.error(err instanceof Error ? err.message : 'Restore failed.');
+      notify.error(err instanceof Error ? err.message : "Restore failed.");
     } finally {
       setRestoring(false);
     }
@@ -135,22 +137,23 @@ export function BackupPanel({ onClose }: Props): React.ReactElement {
 
   const handleApply = async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
     const file = e.target.files?.[0];
-    e.target.value = '';
+    e.target.value = "";
     if (!file) return;
 
     setApplying(true);
     setApplyResult(null);
     try {
       const form = new FormData();
-      form.set('file', file);
-      const res = await api.fetch('/export/text/apply', { method: 'POST', body: form });
+      form.set("file", file);
+      const res = await api.fetch("/export/text/apply", { method: "POST", body: form });
       const data = (await res.json()) as ApplyTextExportResponse | ErrorResponse;
-      if (!res.ok) throw new Error((data as ErrorResponse).message || `Apply failed: ${res.status}`);
+      if (!res.ok)
+        throw new Error((data as ErrorResponse).message || `Apply failed: ${res.status}`);
       const applied = data as ApplyTextExportResponse;
       setApplyResult(applied);
       notify.success(`Applied export — ${applied.specsUpdated.length} spec(s) updated.`);
     } catch (err) {
-      notify.error(err instanceof Error ? err.message : 'Apply failed.');
+      notify.error(err instanceof Error ? err.message : "Apply failed.");
     } finally {
       setApplying(false);
     }
@@ -169,7 +172,12 @@ export function BackupPanel({ onClose }: Props): React.ReactElement {
       >
         <header className="backup-panel__header">
           <h2>Backup &amp; restore</h2>
-          <button type="button" className="backup-panel__close" onClick={onClose} aria-label="Close">
+          <button
+            type="button"
+            className="backup-panel__close"
+            onClick={onClose}
+            aria-label="Close"
+          >
             <X size={16} />
           </button>
         </header>
@@ -178,8 +186,8 @@ export function BackupPanel({ onClose }: Props): React.ReactElement {
           <h3>Full backup</h3>
           <p>
             One file with the entire library&rsquo;s contents — specs, metadata, relationships,
-            suggestions, proposals, and audit history. Restoring replaces everything and requires
-            a backend restart to take effect.
+            suggestions, proposals, and audit history. Restoring replaces everything and requires a
+            backend restart to take effect.
           </p>
           <button
             type="button"
@@ -187,7 +195,7 @@ export function BackupPanel({ onClose }: Props): React.ReactElement {
             onClick={handleDownloadBackup}
             disabled={downloadingBackup}
           >
-            {downloadingBackup ? 'Downloading…' : 'Download backup (.db)'}
+            {downloadingBackup ? "Downloading…" : "Download backup (.db)"}
           </button>
 
           <div className="backup-panel__restore">
@@ -203,8 +211,8 @@ export function BackupPanel({ onClose }: Props): React.ReactElement {
                 aria-label={`Type ${RESTORE_CONFIRMATION} to confirm`}
               />
             </label>
-            <label className={`backup-panel__file-button${restoreReady ? '' : ' is-disabled'}`}>
-              {restoring ? 'Restoring…' : 'Choose backup file…'}
+            <label className={`backup-panel__file-button${restoreReady ? "" : " is-disabled"}`}>
+              {restoring ? "Restoring…" : "Choose backup file…"}
               <input
                 type="file"
                 accept=".db,application/octet-stream"
@@ -225,9 +233,9 @@ export function BackupPanel({ onClose }: Props): React.ReactElement {
           <h3>Text export</h3>
           <p>
             Human-readable JSON files — one per spec, plus sources, suggestions, rejections, and
-            proposals — meant for committing into its own version-control repo. Applying merges
-            its contents into the current library; it doesn&rsquo;t touch audit history or
-            archived snapshot content (use the full backup for exact historical fidelity).
+            proposals — meant for committing into its own version-control repo. Applying merges its
+            contents into the current library; it doesn&rsquo;t touch audit history or archived
+            snapshot content (use the full backup for exact historical fidelity).
           </p>
           <button
             type="button"
@@ -235,12 +243,12 @@ export function BackupPanel({ onClose }: Props): React.ReactElement {
             onClick={handleDownloadTextExport}
             disabled={downloadingExport}
           >
-            {downloadingExport ? 'Downloading…' : 'Download text export (.zip)'}
+            {downloadingExport ? "Downloading…" : "Download text export (.zip)"}
           </button>
 
           <div className="backup-panel__restore">
             <label className="backup-panel__file-button">
-              {applying ? 'Applying…' : 'Choose export file…'}
+              {applying ? "Applying…" : "Choose export file…"}
               <input
                 type="file"
                 accept=".zip,application/zip"
@@ -255,15 +263,15 @@ export function BackupPanel({ onClose }: Props): React.ReactElement {
                   {applyResult.specsUpdated.length} spec(s) updated
                   {applyResult.specsSkipped.length > 0
                     ? `, ${applyResult.specsSkipped.length} skipped (not found)`
-                    : ''}
-                  . {applyResult.relationshipsApplied} relationship(s),{' '}
-                  {applyResult.suggestionsAdded} suggestion(s), {applyResult.rejectionsAdded}{' '}
+                    : ""}
+                  . {applyResult.relationshipsApplied} relationship(s),{" "}
+                  {applyResult.suggestionsAdded} suggestion(s), {applyResult.rejectionsAdded}{" "}
                   rejection(s), {applyResult.proposalsAdded} proposal(s) applied.
                 </p>
                 {applyResult.errors.length > 0 && (
                   <ul className="backup-panel__errors">
-                    {applyResult.errors.map((err, i) => (
-                      <li key={i}>{err}</li>
+                    {applyResult.errors.map((err) => (
+                      <li key={err}>{err}</li>
                     ))}
                   </ul>
                 )}

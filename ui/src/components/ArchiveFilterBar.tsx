@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from "react";
 
 export interface ArchiveFilters {
   query?: string;
@@ -26,7 +26,6 @@ interface Props {
   resultCount: number;
 }
 
-
 function isNonDefault(f: ArchiveFilters): boolean {
   return Boolean(
     f.query ||
@@ -40,20 +39,13 @@ function isNonDefault(f: ArchiveFilters): boolean {
   );
 }
 
-export function ArchiveFilterBar({
-  filters,
-  options,
-  onChange,
-}: Props): React.ReactElement {
-  const set = <K extends keyof ArchiveFilters>(
-    key: K,
-    value: ArchiveFilters[K],
-  ): void => {
+export function ArchiveFilterBar({ filters, options, onChange }: Props): React.ReactElement {
+  const set = <K extends keyof ArchiveFilters>(key: K, value: ArchiveFilters[K]): void => {
     onChange({ ...filters, [key]: value });
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    set('query', e.target.value.slice(0, 200) || undefined);
+    set("query", e.target.value.slice(0, 200) || undefined);
   };
 
   const selectHandler =
@@ -69,7 +61,7 @@ export function ArchiveFilterBar({
         <input
           type="search"
           maxLength={200}
-          value={filters.query ?? ''}
+          value={filters.query ?? ""}
           onChange={handleSearch}
           placeholder="Search…"
           aria-label="Search archived specs"
@@ -80,13 +72,15 @@ export function ArchiveFilterBar({
         <label>
           <span className="visually-hidden">Type</span>
           <select
-            value={filters.type ?? ''}
-            onChange={selectHandler('type')}
+            value={filters.type ?? ""}
+            onChange={selectHandler("type")}
             aria-label="Filter by type"
           >
             <option value="">All types</option>
             {options.types.map((t) => (
-              <option key={t} value={t}>{t}</option>
+              <option key={t} value={t}>
+                {t}
+              </option>
             ))}
           </select>
         </label>
@@ -94,13 +88,15 @@ export function ArchiveFilterBar({
         <label>
           <span className="visually-hidden">Theme</span>
           <select
-            value={filters.theme ?? ''}
-            onChange={selectHandler('theme')}
+            value={filters.theme ?? ""}
+            onChange={selectHandler("theme")}
             aria-label="Filter by theme"
           >
             <option value="">All themes</option>
             {options.themes.map((t) => (
-              <option key={t} value={t}>{t}</option>
+              <option key={t} value={t}>
+                {t}
+              </option>
             ))}
           </select>
         </label>
@@ -108,13 +104,15 @@ export function ArchiveFilterBar({
         <label>
           <span className="visually-hidden">Repository</span>
           <select
-            value={filters.repository ?? ''}
-            onChange={selectHandler('repository')}
+            value={filters.repository ?? ""}
+            onChange={selectHandler("repository")}
             aria-label="Filter by repository"
           >
             <option value="">All repositories</option>
             {options.repositories.map((r) => (
-              <option key={r} value={r}>{r}</option>
+              <option key={r} value={r}>
+                {r}
+              </option>
             ))}
           </select>
         </label>
@@ -122,13 +120,15 @@ export function ArchiveFilterBar({
         <label>
           <span className="visually-hidden">Owner</span>
           <select
-            value={filters.owner ?? ''}
-            onChange={selectHandler('owner')}
+            value={filters.owner ?? ""}
+            onChange={selectHandler("owner")}
             aria-label="Filter by owner"
           >
             <option value="">All owners</option>
             {options.owners.map((o) => (
-              <option key={o} value={o}>{o}</option>
+              <option key={o} value={o}>
+                {o}
+              </option>
             ))}
           </select>
         </label>
@@ -138,17 +138,14 @@ export function ArchiveFilterBar({
           <select
             value={
               filters.metadataComplete === true
-                ? 'true'
+                ? "true"
                 : filters.metadataComplete === false
-                  ? 'false'
-                  : ''
+                  ? "false"
+                  : ""
             }
             onChange={(e) => {
               const v = e.target.value;
-              set(
-                'metadataComplete',
-                v === 'true' ? true : v === 'false' ? false : undefined,
-              );
+              set("metadataComplete", v === "true" ? true : v === "false" ? false : undefined);
             }}
             aria-label="Filter by metadata completeness"
           >
@@ -162,8 +159,8 @@ export function ArchiveFilterBar({
           <span className="visually-hidden">From date</span>
           <input
             type="date"
-            value={filters.fromDate ?? ''}
-            onChange={(e) => set('fromDate', e.target.value || undefined)}
+            value={filters.fromDate ?? ""}
+            onChange={(e) => set("fromDate", e.target.value || undefined)}
             aria-label="Completed on or after"
           />
         </label>
@@ -171,19 +168,15 @@ export function ArchiveFilterBar({
           <span className="visually-hidden">To date</span>
           <input
             type="date"
-            value={filters.toDate ?? ''}
-            onChange={(e) => set('toDate', e.target.value || undefined)}
+            value={filters.toDate ?? ""}
+            onChange={(e) => set("toDate", e.target.value || undefined)}
             aria-label="Completed on or before"
           />
         </label>
       </div>
 
       {isNonDefault(filters) && (
-        <button
-          type="button"
-          className="archive-clear"
-          onClick={() => onChange({})}
-        >
+        <button type="button" className="archive-clear" onClick={() => onChange({})}>
           Clear filters
         </button>
       )}
@@ -197,8 +190,10 @@ export function ArchiveFilterBar({
               <button
                 type="button"
                 aria-label="Remove search filter"
-                onClick={() => set('query', undefined)}
-              >✕</button>
+                onClick={() => set("query", undefined)}
+              >
+                ✕
+              </button>
             </span>
           )}
           {filters.type && (
@@ -207,8 +202,10 @@ export function ArchiveFilterBar({
               <button
                 type="button"
                 aria-label={`Remove type filter: ${filters.type}`}
-                onClick={() => set('type', undefined)}
-              >✕</button>
+                onClick={() => set("type", undefined)}
+              >
+                ✕
+              </button>
             </span>
           )}
           {filters.theme && (
@@ -217,8 +214,10 @@ export function ArchiveFilterBar({
               <button
                 type="button"
                 aria-label={`Remove theme filter: ${filters.theme}`}
-                onClick={() => set('theme', undefined)}
-              >✕</button>
+                onClick={() => set("theme", undefined)}
+              >
+                ✕
+              </button>
             </span>
           )}
           {filters.repository && (
@@ -227,8 +226,10 @@ export function ArchiveFilterBar({
               <button
                 type="button"
                 aria-label={`Remove repository filter: ${filters.repository}`}
-                onClick={() => set('repository', undefined)}
-              >✕</button>
+                onClick={() => set("repository", undefined)}
+              >
+                ✕
+              </button>
             </span>
           )}
           {filters.owner && (
@@ -237,8 +238,10 @@ export function ArchiveFilterBar({
               <button
                 type="button"
                 aria-label={`Remove owner filter: ${filters.owner}`}
-                onClick={() => set('owner', undefined)}
-              >✕</button>
+                onClick={() => set("owner", undefined)}
+              >
+                ✕
+              </button>
             </span>
           )}
         </div>

@@ -33,25 +33,21 @@ export function createProposal(
     $patch: JSON.stringify(params.patch),
     $submitted_at: params.submittedAt,
     $rationale: params.rationale ?? null,
-    $source: params.source ?? 'human',
+    $source: params.source ?? "human",
   });
 
-  return db
-    .query<ProposalRow, [string]>("SELECT * FROM proposals WHERE id = ?")
-    .get(params.id)!;
+  return db.query<ProposalRow, [string]>("SELECT * FROM proposals WHERE id = ?").get(params.id)!;
 }
 
 /** Every proposal in the database (any status), for full-library export. */
 export function listAllProposals(db: Database): ProposalRow[] {
-  return db
-    .query<ProposalRow, []>("SELECT * FROM proposals ORDER BY submitted_at ASC")
-    .all();
+  return db.query<ProposalRow, []>("SELECT * FROM proposals ORDER BY submitted_at ASC").all();
 }
 
 export function listPendingProposals(db: Database, specKey: string): ProposalRow[] {
   return db
     .query<ProposalRow, [string]>(
-      "SELECT * FROM proposals WHERE spec_key = ? AND status = 'pending' ORDER BY submitted_at DESC"
+      "SELECT * FROM proposals WHERE spec_key = ? AND status = 'pending' ORDER BY submitted_at DESC",
     )
     .all(specKey);
 }
@@ -64,9 +60,7 @@ export function acceptProposal(db: Database, id: string): ProposalRow | null {
   `);
   stmt.run({ $id: id, $resolved_at: new Date().toISOString() });
 
-  return db
-    .query<ProposalRow, [string]>("SELECT * FROM proposals WHERE id = ?")
-    .get(id) ?? null;
+  return db.query<ProposalRow, [string]>("SELECT * FROM proposals WHERE id = ?").get(id) ?? null;
 }
 
 export function rejectProposal(db: Database, id: string): ProposalRow | null {
@@ -77,13 +71,9 @@ export function rejectProposal(db: Database, id: string): ProposalRow | null {
   `);
   stmt.run({ $id: id, $resolved_at: new Date().toISOString() });
 
-  return db
-    .query<ProposalRow, [string]>("SELECT * FROM proposals WHERE id = ?")
-    .get(id) ?? null;
+  return db.query<ProposalRow, [string]>("SELECT * FROM proposals WHERE id = ?").get(id) ?? null;
 }
 
 export function getProposal(db: Database, id: string): ProposalRow | null {
-  return db
-    .query<ProposalRow, [string]>("SELECT * FROM proposals WHERE id = ?")
-    .get(id) ?? null;
+  return db.query<ProposalRow, [string]>("SELECT * FROM proposals WHERE id = ?").get(id) ?? null;
 }

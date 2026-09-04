@@ -21,13 +21,14 @@ export type ConfigKiro = z.infer<typeof ConfigKiroSchema>;
 
 // ─── Retention Policy ────────────────────────────────────────────────────────
 
-export const RetentionPolicySchema = z.object({
-  type: z.enum(RETENTION_POLICY_TYPES as unknown as [string, ...string[]]),
-  customDate: z.string().datetime().optional(),
-}).refine(
-  (data) => data.type !== "custom_date" || data.customDate !== undefined,
-  { message: "customDate is required when type is custom_date" },
-);
+export const RetentionPolicySchema = z
+  .object({
+    type: z.enum(RETENTION_POLICY_TYPES as unknown as [string, ...string[]]),
+    customDate: z.string().datetime().optional(),
+  })
+  .refine((data) => data.type !== "custom_date" || data.customDate !== undefined, {
+    message: "customDate is required when type is custom_date",
+  });
 
 // ─── Sidecar Schema (spec-library.json) ──────────────────────────────────────
 
@@ -43,10 +44,12 @@ export const SidecarMetadataSchema = z.object({
   summary: z.string().max(2000).optional(),
   theme: z.string().max(100).optional(),
   tags: z.array(z.string().max(50)).max(20).optional(),
-  owner: z.object({
-    name: z.string().min(1).max(100),
-    email: z.string().email().optional(),
-  }).optional(),
+  owner: z
+    .object({
+      name: z.string().min(1).max(100),
+      email: z.string().email().optional(),
+    })
+    .optional(),
   targetRelease: z.string().max(50).optional(),
   retentionPolicy: RetentionPolicySchema.optional(),
 });

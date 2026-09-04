@@ -1,3 +1,4 @@
+import { validateArgs } from "../security/git-validator.js";
 /**
  * Agentic auto-population of metadata fields from repository context.
  *
@@ -6,8 +7,7 @@
  * Returns only fields it can populate with reasonable confidence — callers
  * decide whether to persist or propose the results.
  */
-import type { RawSpecArtifacts } from './normalizer.js';
-import { validateArgs } from '../security/git-validator.js';
+import type { RawSpecArtifacts } from "./normalizer.js";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -29,20 +29,120 @@ export interface AutoPopulatedFields {
 // ─── Stop words for tag inference ────────────────────────────────────────────
 
 const STOP_WORDS = new Set([
-  'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
-  'of', 'with', 'by', 'from', 'is', 'are', 'was', 'were', 'be', 'been',
-  'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would',
-  'could', 'should', 'may', 'might', 'shall', 'can', 'this', 'that',
-  'these', 'those', 'it', 'its', 'not', 'no', 'if', 'then', 'else',
-  'so', 'very', 'just', 'about', 'up', 'out', 'all', 'my', 'your',
-  'our', 'we', 'they', 'them', 'their', 'what', 'which', 'who',
-  'when', 'where', 'how', 'any', 'each', 'every', 'both', 'few',
-  'more', 'most', 'other', 'some', 'such', 'than', 'too', 'only',
-  'same', 'also', 'into', 'over', 'after', 'before', 'between',
-  'under', 'again', 'further', 'once', 'here', 'there', 'why',
-  'new', 'first', 'last', 'many', 'much', 'well', 'back', 'use',
-  'make', 'like', 'need', 'see', 'must', 'set', 'simple', 'basic',
-  'test', 'spec', 'kiro', 'specs',
+  "the",
+  "a",
+  "an",
+  "and",
+  "or",
+  "but",
+  "in",
+  "on",
+  "at",
+  "to",
+  "for",
+  "of",
+  "with",
+  "by",
+  "from",
+  "is",
+  "are",
+  "was",
+  "were",
+  "be",
+  "been",
+  "being",
+  "have",
+  "has",
+  "had",
+  "do",
+  "does",
+  "did",
+  "will",
+  "would",
+  "could",
+  "should",
+  "may",
+  "might",
+  "shall",
+  "can",
+  "this",
+  "that",
+  "these",
+  "those",
+  "it",
+  "its",
+  "not",
+  "no",
+  "if",
+  "then",
+  "else",
+  "so",
+  "very",
+  "just",
+  "about",
+  "up",
+  "out",
+  "all",
+  "my",
+  "your",
+  "our",
+  "we",
+  "they",
+  "them",
+  "their",
+  "what",
+  "which",
+  "who",
+  "when",
+  "where",
+  "how",
+  "any",
+  "each",
+  "every",
+  "both",
+  "few",
+  "more",
+  "most",
+  "other",
+  "some",
+  "such",
+  "than",
+  "too",
+  "only",
+  "same",
+  "also",
+  "into",
+  "over",
+  "after",
+  "before",
+  "between",
+  "under",
+  "again",
+  "further",
+  "once",
+  "here",
+  "there",
+  "why",
+  "new",
+  "first",
+  "last",
+  "many",
+  "much",
+  "well",
+  "back",
+  "use",
+  "make",
+  "like",
+  "need",
+  "see",
+  "must",
+  "set",
+  "simple",
+  "basic",
+  "test",
+  "spec",
+  "kiro",
+  "specs",
 ]);
 
 // ─── Git helper ──────────────────────────────────────────────────────────────
@@ -53,7 +153,7 @@ const STOP_WORDS = new Set([
  */
 async function execGit(repoPath: string, args: string[]): Promise<string> {
   // Validate user-supplied path arguments that follow `--`
-  const separatorIdx = args.indexOf('--');
+  const separatorIdx = args.indexOf("--");
   if (separatorIdx !== -1) {
     const pathArgs = args.slice(separatorIdx + 1);
     const validation = validateArgs(pathArgs);
@@ -62,13 +162,10 @@ async function execGit(repoPath: string, args: string[]): Promise<string> {
     }
   }
 
-  const proc = Bun.spawn(
-    ['git', '-C', repoPath, ...args],
-    { stdout: 'pipe', stderr: 'pipe' },
-  );
+  const proc = Bun.spawn(["git", "-C", repoPath, ...args], { stdout: "pipe", stderr: "pipe" });
   const output = await new Response(proc.stdout).text();
   const exitCode = await proc.exited;
-  if (exitCode !== 0) return '';
+  if (exitCode !== 0) return "";
   return output.trim();
 }
 
@@ -79,15 +176,12 @@ async function execGit(repoPath: string, args: string[]): Promise<string> {
  * Identifies the primary committer (most commits) and excludes them.
  * Returns up to 5 unique secondary contributors.
  */
-export async function extractApprovers(
-  repoPath: string,
-  specPath: string,
-): Promise<string[]> {
+export async function extractApprovers(repoPath: string, specPath: string): Promise<string[]> {
   try {
-    const output = await execGit(repoPath, ['log', '--format=%aN', '--', specPath]);
+    const output = await execGit(repoPath, ["log", "--format=%aN", "--", specPath]);
     if (!output) return [];
 
-    const authors = output.split('\n').filter(Boolean);
+    const authors = output.split("\n").filter(Boolean);
     if (authors.length === 0) return [];
 
     // Count occurrences to identify primary owner
@@ -97,7 +191,7 @@ export async function extractApprovers(
     }
 
     // Find the primary committer (most commits)
-    let primaryAuthor = '';
+    let primaryAuthor = "";
     let maxCount = 0;
     for (const [name, count] of counts) {
       if (count > maxCount) {
@@ -121,40 +215,32 @@ export async function extractApprovers(
  * Scan spec file contents for implementation references (PR/MR/issue URLs).
  * Checks content first, then falls back to .config.kiro tracking fields.
  */
-export function extractImplementationRef(
-  contents: Record<string, string>,
-): string | undefined {
+export function extractImplementationRef(contents: Record<string, string>): string | undefined {
   // Search all markdown content for URLs
   const allContent = Object.entries(contents)
-    .filter(([name]) => name !== '.config.kiro')
+    .filter(([name]) => name !== ".config.kiro")
     .map(([, content]) => content)
-    .join('\n');
+    .join("\n");
 
   // Full GitHub PR URL
-  const prUrlMatch = allContent.match(
-    /https?:\/\/github\.com\/[^\s)]+\/pull\/\d+/,
-  );
+  const prUrlMatch = allContent.match(/https?:\/\/github\.com\/[^\s)]+\/pull\/\d+/);
   if (prUrlMatch) return prUrlMatch[0];
 
   // Full GitHub issue URL
-  const issueUrlMatch = allContent.match(
-    /https?:\/\/github\.com\/[^\s)]+\/issues\/\d+/,
-  );
+  const issueUrlMatch = allContent.match(/https?:\/\/github\.com\/[^\s)]+\/issues\/\d+/);
   if (issueUrlMatch) return issueUrlMatch[0];
 
   // Full GitLab MR URL
-  const mrUrlMatch = allContent.match(
-    /https?:\/\/gitlab\.com\/[^\s)]+\/-\/merge_requests\/\d+/,
-  );
+  const mrUrlMatch = allContent.match(/https?:\/\/gitlab\.com\/[^\s)]+\/-\/merge_requests\/\d+/);
   if (mrUrlMatch) return mrUrlMatch[0];
 
   // Fall back to .config.kiro fields
-  const configContent = contents['.config.kiro'];
+  const configContent = contents[".config.kiro"];
   if (configContent) {
     try {
       const config = JSON.parse(configContent) as Record<string, unknown>;
-      if (typeof config.tracking_issue === 'string') return config.tracking_issue;
-      if (typeof config.implementation === 'string') return config.implementation;
+      if (typeof config.tracking_issue === "string") return config.tracking_issue;
+      if (typeof config.implementation === "string") return config.implementation;
     } catch {
       // Invalid JSON, skip
     }
@@ -167,46 +253,44 @@ export function extractImplementationRef(
  * Extract a summary from the first non-heading, non-list paragraph in
  * requirements.md or design.md. Truncates to 200 characters.
  */
-export function extractSummary(
-  contents: Record<string, string>,
-): string | undefined {
-  const source = contents['requirements.md'] ?? contents['design.md'];
+export function extractSummary(contents: Record<string, string>): string | undefined {
+  const source = contents["requirements.md"] ?? contents["design.md"];
   if (!source) return undefined;
 
-  const lines = source.split('\n');
+  const lines = source.split("\n");
   let inParagraph = false;
-  let paragraph = '';
+  let paragraph = "";
 
   for (const line of lines) {
     const trimmed = line.trim();
 
     // Skip headings
-    if (trimmed.startsWith('#')) {
+    if (trimmed.startsWith("#")) {
       inParagraph = false;
-      paragraph = '';
+      paragraph = "";
       continue;
     }
 
     // Skip list items
-    if (trimmed.startsWith('-') || trimmed.startsWith('*') || /^\d+\./.test(trimmed)) {
+    if (trimmed.startsWith("-") || trimmed.startsWith("*") || /^\d+\./.test(trimmed)) {
       inParagraph = false;
-      paragraph = '';
+      paragraph = "";
       continue;
     }
 
     // Empty line ends a paragraph attempt
-    if (trimmed === '') {
+    if (trimmed === "") {
       if (inParagraph && paragraph.length > 0) {
         break; // Found a complete paragraph
       }
       inParagraph = false;
-      paragraph = '';
+      paragraph = "";
       continue;
     }
 
     // Accumulate paragraph text
     inParagraph = true;
-    paragraph += (paragraph ? ' ' : '') + trimmed;
+    paragraph += (paragraph ? " " : "") + trimmed;
   }
 
   if (!paragraph) return undefined;
@@ -232,7 +316,7 @@ export function inferTags(
   // Extract from title words
   const titleWords = title
     .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, ' ')
+    .replace(/[^a-z0-9\s-]/g, " ")
     .split(/\s+/)
     .filter((w) => w.length > 2 && !STOP_WORDS.has(w));
 
@@ -242,8 +326,8 @@ export function inferTags(
 
   // Extract from path segments
   const pathSegments = relativePath
-    .split('/')
-    .filter((seg) => seg !== '.kiro' && seg !== 'specs' && seg.length > 2);
+    .split("/")
+    .filter((seg) => seg !== ".kiro" && seg !== "specs" && seg.length > 2);
 
   for (const seg of pathSegments) {
     const normalized = seg.toLowerCase();
@@ -254,13 +338,13 @@ export function inferTags(
 
   // Extract high-frequency terms from content
   const allContent = Object.entries(contents)
-    .filter(([name]) => name.endsWith('.md'))
+    .filter(([name]) => name.endsWith(".md"))
     .map(([, content]) => content)
-    .join(' ');
+    .join(" ");
 
   const contentWords = allContent
     .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, ' ')
+    .replace(/[^a-z0-9\s-]/g, " ")
     .split(/\s+/)
     .filter((w) => w.length > 3 && !STOP_WORDS.has(w));
 
@@ -292,10 +376,10 @@ export async function extractCreatedAt(
 ): Promise<string | undefined> {
   try {
     // Use --reverse to get oldest commit first, then take the first line
-    const output = await execGit(repoPath, ['log', '--format=%aI', '--reverse', '--', specPath]);
+    const output = await execGit(repoPath, ["log", "--format=%aI", "--reverse", "--", specPath]);
     if (!output) return undefined;
 
-    const firstLine = output.split('\n')[0];
+    const firstLine = output.split("\n")[0];
     return firstLine || undefined;
   } catch {
     return undefined;
@@ -311,13 +395,13 @@ export async function extractCompletedAt(
   repoPath: string,
   specPath: string,
 ): Promise<string | undefined> {
-  if (stage !== 'done') return undefined;
+  if (stage !== "done") return undefined;
 
   try {
-    const output = await execGit(repoPath, ['log', '--format=%aI', '-1', '--', specPath]);
+    const output = await execGit(repoPath, ["log", "--format=%aI", "-1", "--", specPath]);
     if (!output) return undefined;
 
-    const date = output.split('\n')[0];
+    const date = output.split("\n")[0];
     return date || undefined;
   } catch {
     return undefined;
@@ -342,7 +426,7 @@ export async function autoPopulate(
   const specPath = raw.relativePath;
 
   // Determine completion stage heuristically from task content
-  const stage = isCompleted(raw.contents['tasks.md']) ? 'done' : 'in-flight';
+  const stage = isCompleted(raw.contents["tasks.md"]) ? "done" : "in-flight";
 
   const [approversRaw, createdAt, completedAt] = await Promise.all([
     extractApprovers(repoPath, specPath),
@@ -356,7 +440,10 @@ export async function autoPopulate(
   const implementationRef = extractImplementationRef(raw.contents);
   const summary = extractSummary(raw.contents);
   const tags = inferTags(
-    raw.slug.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+    raw.slug
+      .split("-")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" "),
     raw.relativePath,
     raw.contents,
   );
@@ -378,5 +465,5 @@ function isCompleted(tasksContent: string | undefined): boolean {
   if (!tasksContent) return false;
   const matches = [...tasksContent.matchAll(/^\s*-\s*\[([x ~])\]/gm)];
   if (matches.length === 0) return false;
-  return matches.every((m) => m[1] === 'x');
+  return matches.every((m) => m[1] === "x");
 }

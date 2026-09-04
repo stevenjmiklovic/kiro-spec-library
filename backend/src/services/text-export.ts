@@ -9,40 +9,37 @@
 // bytes live on disk, not in this export. Exact, byte-for-byte restoration of
 // all of that is what the single-file DB backup (services/backup.ts) is for.
 import type { Database } from "bun:sqlite";
-import { zipSync, unzipSync } from "fflate";
 import {
-  SpecLibrarySidecarV1Schema,
-  TextExportSuggestionSchema,
-  TextExportRejectionSchema,
-  TextExportProposalSchema,
+  type RelationshipType,
   type SpecLibrarySidecarV1,
+  SpecLibrarySidecarV1Schema,
+  type SuggestionReason,
   type TextExportManifest,
+  type TextExportProposal,
+  TextExportProposalSchema,
+  type TextExportRejection,
+  TextExportRejectionSchema,
+  type TextExportSnapshot,
   type TextExportSource,
   type TextExportSuggestion,
-  type TextExportRejection,
-  type TextExportProposal,
-  type TextExportSnapshot,
-  type RelationshipType,
-  type SuggestionReason,
+  TextExportSuggestionSchema,
 } from "@kiro-spec-library/shared";
-import { listSpecs, type SpecRow } from "../db/queries/specs.js";
-import { getOverlay, upsertOverlay } from "../db/queries/metadata.js";
-import {
-  listAllRelationships,
-  replaceOutgoingRelationships,
-} from "../db/queries/relationships.js";
-import {
-  listAllSuggestions,
-  listAllRejections,
-  createSuggestion,
-  createRejection,
-  suggestionExists,
-  isRejected,
-} from "../db/queries/suggestions.js";
-import { listAllProposals, createProposal, getProposal } from "../db/queries/proposals.js";
-import { listAllSnapshots, getSnapshotArtifacts } from "../db/queries/snapshots.js";
-import { listSources } from "../db/queries/sources.js";
+import { unzipSync, zipSync } from "fflate";
 import { listAllAuditEvents } from "../db/queries/audit.js";
+import { getOverlay, upsertOverlay } from "../db/queries/metadata.js";
+import { createProposal, getProposal, listAllProposals } from "../db/queries/proposals.js";
+import { listAllRelationships, replaceOutgoingRelationships } from "../db/queries/relationships.js";
+import { getSnapshotArtifacts, listAllSnapshots } from "../db/queries/snapshots.js";
+import { listSources } from "../db/queries/sources.js";
+import { type SpecRow, listSpecs } from "../db/queries/specs.js";
+import {
+  createRejection,
+  createSuggestion,
+  isRejected,
+  listAllRejections,
+  listAllSuggestions,
+  suggestionExists,
+} from "../db/queries/suggestions.js";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -135,7 +132,11 @@ export function buildTextExportZip(db: Database): Uint8Array {
       ...(relationships.length > 0 ? { relationships } : {}),
     };
 
-    putJson(files, `specs/${sanitizeSegment(spec.repository)}/${sanitizeSegment(spec.spec_id)}.json`, sidecar);
+    putJson(
+      files,
+      `specs/${sanitizeSegment(spec.repository)}/${sanitizeSegment(spec.spec_id)}.json`,
+      sidecar,
+    );
   }
 
   const sources: TextExportSource[] = listSources(db).map((s) => ({
@@ -279,16 +280,16 @@ export interface ApplyTextExportResult {
 export function applyTextExportZip(db: Database, zipBytes: Uint8Array): ApplyTextExportResult {
   const MAX_UNCOMPRESSED_SIZE = 100 * 1024 * 1024; // 100 MB limit
   let totalSize = 0;
-  
+
   const files = unzipSync(zipBytes);
-  
+
   for (const bytes of Object.values(files)) {
     totalSize += bytes.length;
     if (totalSize > MAX_UNCOMPRESSED_SIZE) {
       throw new Error("Uploaded archive exceeds maximum allowed size");
     }
   }
-  
+
   const decoder = new TextDecoder();
   const readJsonArray = (path: string): unknown[] => {
     const bytes = files[path];
@@ -377,7 +378,9 @@ export function applyTextExportZip(db: Database, zipBytes: Uint8Array): ApplyTex
     result.specsUpdated.push(sidecar.specId);
   }
 
-  const suggestionsParsed = TextExportSuggestionSchema.array().safeParse(readJsonArray("suggestions.json"));
+  const suggestionsParsed = TextExportSuggestionSchema.array().safeParse(
+    readJsonArray("suggestions.json"),
+  );
   if (suggestionsParsed.success) {
     for (const s of suggestionsParsed.data) {
       if (s.status !== "pending") continue;
@@ -399,10 +402,14 @@ export function applyTextExportZip(db: Database, zipBytes: Uint8Array): ApplyTex
       result.suggestionsAdded++;
     }
   } else {
-    result.errors.push(`suggestions.json: ${suggestionsParsed.error.issues.map((i) => i.message).join("; ")}`);
+    result.errors.push(
+      `suggestions.json: ${suggestionsParsed.error.issues.map((i) => i.message).join("; ")}`,
+    );
   }
 
-  const rejectionsParsed = TextExportRejectionSchema.array().safeParse(readJsonArray("rejections.json"));
+  const rejectionsParsed = TextExportRejectionSchema.array().safeParse(
+    readJsonArray("rejections.json"),
+  );
   if (rejectionsParsed.success) {
     for (const r of rejectionsParsed.data) {
       const source = index.byRef.get(refKey(r.source.repository, r.source.specId));
@@ -420,10 +427,14 @@ export function applyTextExportZip(db: Database, zipBytes: Uint8Array): ApplyTex
       result.rejectionsAdded++;
     }
   } else {
-    result.errors.push(`rejections.json: ${rejectionsParsed.error.issues.map((i) => i.message).join("; ")}`);
+    result.errors.push(
+      `rejections.json: ${rejectionsParsed.error.issues.map((i) => i.message).join("; ")}`,
+    );
   }
 
-  const proposalsParsed = TextExportProposalSchema.array().safeParse(readJsonArray("proposals.json"));
+  const proposalsParsed = TextExportProposalSchema.array().safeParse(
+    readJsonArray("proposals.json"),
+  );
   if (proposalsParsed.success) {
     for (const p of proposalsParsed.data) {
       if (p.status !== "pending") continue;
@@ -441,7 +452,9 @@ export function applyTextExportZip(db: Database, zipBytes: Uint8Array): ApplyTex
       result.proposalsAdded++;
     }
   } else {
-    result.errors.push(`proposals.json: ${proposalsParsed.error.issues.map((i) => i.message).join("; ")}`);
+    result.errors.push(
+      `proposals.json: ${proposalsParsed.error.issues.map((i) => i.message).join("; ")}`,
+    );
   }
 
   return result;

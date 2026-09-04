@@ -1,23 +1,19 @@
+import type { Database } from "bun:sqlite";
 // Archive service — immutable snapshots, hash verification, purge gates
 import { createHash } from "node:crypto";
-import { mkdir, writeFile, readFile, chmod, rm } from "node:fs/promises";
+import { chmod, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { Database } from "bun:sqlite";
-import type {
-  NormalizedSpec,
-  Snapshot,
-  SnapshotArtifact,
-} from "@kiro-spec-library/shared";
-import type { ResolvedMetadata } from "./metadata.js";
+import type { NormalizedSpec, Snapshot, SnapshotArtifact } from "@kiro-spec-library/shared";
 import {
   createSnapshot as dbCreateSnapshot,
-  findByDigest,
   getSnapshot as dbGetSnapshot,
+  purgeSnapshot as dbPurgeSnapshot,
+  findByDigest,
   getSnapshotArtifacts,
   insertSnapshotArtifact,
-  purgeSnapshot as dbPurgeSnapshot,
 } from "../db/queries/snapshots.js";
 import { recordEvent } from "./audit.js";
+import type { ResolvedMetadata } from "./metadata.js";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -81,11 +77,7 @@ export class ArchiverService {
 
     try {
       // Store artifacts
-      const storedArtifacts = await this.storeArtifacts(
-        snapshotId,
-        snapshotDir,
-        artifactContents,
-      );
+      const storedArtifacts = await this.storeArtifacts(snapshotId, snapshotDir, artifactContents);
 
       // Build snapshot record
       const snapshot: Snapshot = {
@@ -117,9 +109,7 @@ export class ArchiverService {
         contentDigest,
         metadataProjection: snapshot.metadata as unknown as Record<string, unknown>,
         provenance: snapshot.provenance as unknown as Record<string, unknown>,
-        retentionPolicy: snapshot.retentionPolicy
-          ? JSON.stringify(snapshot.retentionPolicy)
-          : null,
+        retentionPolicy: snapshot.retentionPolicy ? JSON.stringify(snapshot.retentionPolicy) : null,
       });
 
       // Persist artifact records
@@ -175,7 +165,7 @@ export class ArchiverService {
         if (currentHash !== artifactRow.content_hash) {
           throw new Error(
             `Content hash mismatch for artifact "${artifactRow.name}" in snapshot ${snapshotId}: ` +
-            `expected ${artifactRow.content_hash}, got ${currentHash}`,
+              `expected ${artifactRow.content_hash}, got ${currentHash}`,
           );
         }
       } catch (err) {
@@ -203,9 +193,7 @@ export class ArchiverService {
       artifacts,
       metadata,
       provenance,
-      retentionPolicy: row.retention_policy
-        ? JSON.parse(row.retention_policy)
-        : undefined,
+      retentionPolicy: row.retention_policy ? JSON.parse(row.retention_policy) : undefined,
       purged: Boolean(row.purged),
       purgedAt: row.purged_at ?? undefined,
     };
@@ -230,9 +218,7 @@ export class ArchiverService {
     // Validate confirmation text
     const expectedConfirmation = `PURGE ${snapshotId}`;
     if (confirmationText !== expectedConfirmation) {
-      throw new Error(
-        `Invalid confirmation text. Expected: "${expectedConfirmation}"`,
-      );
+      throw new Error(`Invalid confirmation text. Expected: "${expectedConfirmation}"`);
     }
 
     // Check eligibility

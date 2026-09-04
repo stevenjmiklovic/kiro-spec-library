@@ -1,13 +1,13 @@
 // Backend entry point — server startup sequence (Task 12.1)
-import { mkdirSync, writeFileSync, chmodSync } from "node:fs";
+import { chmodSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { DEFAULT_SCAN_INTERVAL_MS } from "@kiro-spec-library/shared";
 import { createDatabase } from "./db/connection.js";
 import { runMigrations } from "./db/migrator.js";
-import { createRouter } from "./router.js";
-import { ScannerService } from "./services/scanner.js";
-import { ArchiverService } from "./services/archiver.js";
 import { listSources } from "./db/queries/sources.js";
-import { DEFAULT_SCAN_INTERVAL_MS } from "@kiro-spec-library/shared";
+import { createRouter } from "./router.js";
+import { ArchiverService } from "./services/archiver.js";
+import { ScannerService } from "./services/scanner.js";
 // ─── Configuration ───────────────────────────────────────────────────────────
 const port = Number(process.env["PORT"]) || Number(process.env["SPEC_LIBRARY_PORT"]) || 3100;
 const dataDir = process.env["SPEC_LIBRARY_DATA_DIR"] || join(process.cwd(), "data");
@@ -96,5 +96,5 @@ function shutdown(signal) {
     console.log("[shutdown] Clean shutdown complete");
     process.exit(0);
 }
-// Export for testing and CLI embedding
-export { app, db, server, mcpToken };
+// Export for testing
+export { app, db, mcpToken };

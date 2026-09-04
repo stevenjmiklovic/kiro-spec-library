@@ -7,7 +7,7 @@
  *   bun run scripts/changelog.ts compile   # Write to CHANGELOG.md and clear fragments
  */
 
-import { readdir, readFile, unlink, writeFile } from "node:fs/promises";
+import { readFile, readdir, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const CHANGES_DIR = join(import.meta.dir, "..", "changes");
@@ -116,7 +116,8 @@ async function main() {
   try {
     existing = await readFile(CHANGELOG_PATH, "utf-8");
   } catch {
-    existing = "# Changelog\n\nAll notable changes to this project will be documented in this file.\n\n";
+    existing =
+      "# Changelog\n\nAll notable changes to this project will be documented in this file.\n\n";
   }
 
   // Insert after the header

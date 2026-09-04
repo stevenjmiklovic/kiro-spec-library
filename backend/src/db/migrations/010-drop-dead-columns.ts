@@ -1,4 +1,4 @@
-import type { Database } from 'bun:sqlite';
+import type { Database } from "bun:sqlite";
 
 /**
  * Drops columns/tables confirmed fully unused (docs/known-issues.md's
@@ -10,7 +10,7 @@ import type { Database } from 'bun:sqlite';
  */
 export const migration = {
   number: 10,
-  name: 'drop-dead-columns',
+  name: "drop-dead-columns",
   up(db: Database): void {
     db.exec(`
       ALTER TABLE sources DROP COLUMN last_scan_at;

@@ -14,10 +14,10 @@
  *
  * Validates: Requirements 1.1, 1.2, 1.3, 2.1, 2.2, 2.3
  */
-import { describe, test, expect } from "bun:test";
-import fc from "fast-check";
+import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import fc from "fast-check";
 
 // ─── Source paths ────────────────────────────────────────────────────────────
 
@@ -25,10 +25,7 @@ const RELATIONSHIPS_PATH = resolve(
   import.meta.dir,
   "../../backend/src/db/queries/relationships.ts",
 );
-const SUGGESTIONS_PATH = resolve(
-  import.meta.dir,
-  "../../backend/src/db/queries/suggestions.ts",
-);
+const SUGGESTIONS_PATH = resolve(import.meta.dir, "../../backend/src/db/queries/suggestions.ts");
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -38,10 +35,7 @@ const SUGGESTIONS_PATH = resolve(
  * closing brace at the same indentation level.
  */
 function extractFunctionBody(source: string, functionName: string): string {
-  const regex = new RegExp(
-    `export function ${functionName}\\b[^{]*\\{`,
-    "m",
-  );
+  const regex = new RegExp(`export function ${functionName}\\b[^{]*\\{`, "m");
   const match = regex.exec(source);
   if (!match) throw new Error(`Function ${functionName} not found in source`);
 
@@ -68,12 +62,13 @@ function simulatePlaceholderConstruction(
   specKeys: string[],
 ): { placeholders: string; usesNamedParams: boolean } {
   // Detect the pattern: uses $k{i} named placeholders
-  const usesNamedPattern = /\$k\$\{i\}|\$k\${i}|`\$k\${i}`|\$k\d/.test(functionBody)
-    || /map\(\(_, i\) => `\$k\$\{i\}`\)/.test(functionBody);
+  const usesNamedPattern =
+    /\$k\$\{i\}|\$k\${i}|`\$k\${i}`|\$k\d/.test(functionBody) ||
+    /map\(\(_, i\) => `\$k\$\{i\}`\)/.test(functionBody);
 
   // Detect positional ? pattern
-  const usesPositionalPattern = /map\(\(\) => "\?"\)/.test(functionBody)
-    || /map\(\(\) => '\?'\)/.test(functionBody);
+  const usesPositionalPattern =
+    /map\(\(\) => "\?"\)/.test(functionBody) || /map\(\(\) => '\?'\)/.test(functionBody);
 
   let placeholders: string;
   if (usesNamedPattern) {
@@ -102,39 +97,33 @@ describe("Property 1: Bug Condition — SQL String Interpolation in IN Clauses",
   const relationshipsSource = readFileSync(RELATIONSHIPS_PATH, "utf-8");
   const suggestionsSource = readFileSync(SUGGESTIONS_PATH, "utf-8");
 
-  const listBySourceKeysBody = extractFunctionBody(
-    relationshipsSource,
-    "listBySourceKeys",
-  );
+  const listBySourceKeysBody = extractFunctionBody(relationshipsSource, "listBySourceKeys");
   const listPendingBySourceKeysBody = extractFunctionBody(
     suggestionsSource,
     "listPendingBySourceKeys",
   );
 
   // Arbitrary spec key: alphanumeric with dashes and dots, realistic format
-  const arbSpecKey = fc
-    .stringMatching(/^[a-z][a-z0-9._-]{2,30}$/)
-    .filter((s) => s.length >= 3);
+  const arbSpecKey = fc.stringMatching(/^[a-z][a-z0-9._-]{2,30}$/).filter((s) => s.length >= 3);
 
   test("listBySourceKeys uses only ? placeholders for all non-empty specKeys arrays", () => {
     /**
      * Validates: Requirements 2.1, 2.3
      */
     fc.assert(
-      fc.property(
-        fc.array(arbSpecKey, { minLength: 1, maxLength: 50 }),
-        (specKeys) => {
-          const { placeholders, usesNamedParams } =
-            simulatePlaceholderConstruction(listBySourceKeysBody, specKeys);
+      fc.property(fc.array(arbSpecKey, { minLength: 1, maxLength: 50 }), (specKeys) => {
+        const { placeholders, usesNamedParams } = simulatePlaceholderConstruction(
+          listBySourceKeysBody,
+          specKeys,
+        );
 
-          // The SQL placeholders should be only ? characters
-          const expectedPlaceholders = specKeys.map(() => "?").join(", ");
-          expect(placeholders).toBe(expectedPlaceholders);
+        // The SQL placeholders should be only ? characters
+        const expectedPlaceholders = specKeys.map(() => "?").join(", ");
+        expect(placeholders).toBe(expectedPlaceholders);
 
-          // Parameters should NOT be named (no Record<string, string> object)
-          expect(usesNamedParams).toBe(false);
-        },
-      ),
+        // Parameters should NOT be named (no Record<string, string> object)
+        expect(usesNamedParams).toBe(false);
+      }),
       { numRuns: 100 },
     );
   });
@@ -144,23 +133,19 @@ describe("Property 1: Bug Condition — SQL String Interpolation in IN Clauses",
      * Validates: Requirements 2.2, 2.3
      */
     fc.assert(
-      fc.property(
-        fc.array(arbSpecKey, { minLength: 1, maxLength: 50 }),
-        (specKeys) => {
-          const { placeholders, usesNamedParams } =
-            simulatePlaceholderConstruction(
-              listPendingBySourceKeysBody,
-              specKeys,
-            );
+      fc.property(fc.array(arbSpecKey, { minLength: 1, maxLength: 50 }), (specKeys) => {
+        const { placeholders, usesNamedParams } = simulatePlaceholderConstruction(
+          listPendingBySourceKeysBody,
+          specKeys,
+        );
 
-          // The SQL placeholders should be only ? characters
-          const expectedPlaceholders = specKeys.map(() => "?").join(", ");
-          expect(placeholders).toBe(expectedPlaceholders);
+        // The SQL placeholders should be only ? characters
+        const expectedPlaceholders = specKeys.map(() => "?").join(", ");
+        expect(placeholders).toBe(expectedPlaceholders);
 
-          // Parameters should NOT be named (no Record<string, string> object)
-          expect(usesNamedParams).toBe(false);
-        },
-      ),
+        // Parameters should NOT be named (no Record<string, string> object)
+        expect(usesNamedParams).toBe(false);
+      }),
       { numRuns: 100 },
     );
   });

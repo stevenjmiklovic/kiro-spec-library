@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from "react";
 
 /**
  * The Kiro bespectacled ghost — from assets/kiro-icon/mark.svg.
@@ -13,7 +13,7 @@ export function GhostIcon({ size = 24 }: { size?: number }): React.ReactElement 
       viewBox="0 0 256 256"
       role="img"
       aria-label="Kiro ghost"
-      style={{ display: 'inline-block', verticalAlign: 'middle' }}
+      style={{ display: "inline-block", verticalAlign: "middle" }}
     >
       <g transform="translate(16.0 11.6) scale(13.5194 13.9519)">
         <path
@@ -37,8 +37,22 @@ export function GhostIcon({ size = 24 }: { size?: number }): React.ReactElement 
           <path d="M12.0 6.0Q13.0 5.4 13.7 6.4" />
           <path d="M7.8 6.0Q6.0 5.3 4.5 6.3" />
         </g>
-        <ellipse cx="8.862" cy="6.53" rx="0.8" ry="1.5" fill="var(--ghost-glasses, #fcc419)" opacity=".14" />
-        <ellipse cx="11.017" cy="6.53" rx="0.8" ry="1.5" fill="var(--ghost-glasses, #fcc419)" opacity=".14" />
+        <ellipse
+          cx="8.862"
+          cy="6.53"
+          rx="0.8"
+          ry="1.5"
+          fill="var(--ghost-glasses, #fcc419)"
+          opacity=".14"
+        />
+        <ellipse
+          cx="11.017"
+          cy="6.53"
+          rx="0.8"
+          ry="1.5"
+          fill="var(--ghost-glasses, #fcc419)"
+          opacity=".14"
+        />
       </g>
     </svg>
   );

@@ -1,8 +1,8 @@
+import type { Database } from "bun:sqlite";
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { Database } from "bun:sqlite";
 import { createDatabase } from "../../backend/src/db/connection.js";
 import { runMigrations } from "../../backend/src/db/migrator.js";
 
@@ -26,7 +26,7 @@ describe("Migration integration tests", () => {
 
       const rows = db
         .query<{ number: number; name: string }, []>(
-          "SELECT number, name FROM _migrations ORDER BY number"
+          "SELECT number, name FROM _migrations ORDER BY number",
         )
         .all();
 
@@ -55,16 +55,12 @@ describe("Migration integration tests", () => {
 
     test("_migrations rows have applied_at timestamps", () => {
       const rows = db
-        .query<{ applied_at: string }, []>(
-          "SELECT applied_at FROM _migrations ORDER BY number"
-        )
+        .query<{ applied_at: string }, []>("SELECT applied_at FROM _migrations ORDER BY number")
         .all();
 
       for (const row of rows) {
         // ISO 8601 timestamp
-        expect(row.applied_at).toMatch(
-          /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/
-        );
+        expect(row.applied_at).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
       }
     });
   });
@@ -88,7 +84,7 @@ describe("Migration integration tests", () => {
       test(`table '${table}' exists`, () => {
         const result = db
           .query<{ name: string }, [string]>(
-            "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?"
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?",
           )
           .get(table);
         expect(result).not.toBeNull();
@@ -104,7 +100,7 @@ describe("Migration integration tests", () => {
       test(`FTS5 virtual table '${table}' exists`, () => {
         const result = db
           .query<{ name: string }, [string]>(
-            "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?"
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?",
           )
           .get(table);
         expect(result).not.toBeNull();
@@ -134,7 +130,7 @@ describe("Migration integration tests", () => {
       test(`index '${idx}' exists`, () => {
         const result = db
           .query<{ name: string }, [string]>(
-            "SELECT name FROM sqlite_master WHERE type = 'index' AND name = ?"
+            "SELECT name FROM sqlite_master WHERE type = 'index' AND name = ?",
           )
           .get(idx);
         expect(result).not.toBeNull();
@@ -147,7 +143,7 @@ describe("Migration integration tests", () => {
     test("table 'proposals' exists", () => {
       const result = db
         .query<{ name: string }, [string]>(
-          "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?"
+          "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?",
         )
         .get("proposals");
       expect(result).not.toBeNull();
@@ -158,7 +154,7 @@ describe("Migration integration tests", () => {
       for (const idx of ["idx_proposals_spec_key", "idx_proposals_status"]) {
         const result = db
           .query<{ name: string }, [string]>(
-            "SELECT name FROM sqlite_master WHERE type = 'index' AND name = ?"
+            "SELECT name FROM sqlite_master WHERE type = 'index' AND name = ?",
           )
           .get(idx);
         expect(result).not.toBeNull();
@@ -215,7 +211,7 @@ describe("Migration integration tests", () => {
     test("owner_aliases table no longer exists", () => {
       const result = db
         .query<{ name: string }, [string]>(
-          "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?"
+          "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?",
         )
         .get("owner_aliases");
       expect(result).toBeNull();
@@ -227,7 +223,7 @@ describe("Migration integration tests", () => {
       // Get state before second run
       const beforeRows = db
         .query<{ number: number; applied_at: string }, []>(
-          "SELECT number, applied_at FROM _migrations ORDER BY number"
+          "SELECT number, applied_at FROM _migrations ORDER BY number",
         )
         .all();
 
@@ -237,7 +233,7 @@ describe("Migration integration tests", () => {
       // Get state after second run
       const afterRows = db
         .query<{ number: number; applied_at: string }, []>(
-          "SELECT number, applied_at FROM _migrations ORDER BY number"
+          "SELECT number, applied_at FROM _migrations ORDER BY number",
         )
         .all();
 
@@ -267,7 +263,7 @@ describe("Migration integration tests", () => {
 
       const migrations = db
         .query<{ number: number; name: string }, []>(
-          "SELECT number, name FROM _migrations ORDER BY number"
+          "SELECT number, name FROM _migrations ORDER BY number",
         )
         .all();
 
@@ -279,7 +275,7 @@ describe("Migration integration tests", () => {
       // and 3 ran, we'd get errors or missing indexes.
       const allIndexes = db
         .query<{ name: string }, []>(
-          "SELECT name FROM sqlite_master WHERE type = 'index' AND name LIKE 'idx_%'"
+          "SELECT name FROM sqlite_master WHERE type = 'index' AND name LIKE 'idx_%'",
         )
         .all();
       expect(allIndexes.length).toBe(17);
@@ -288,9 +284,7 @@ describe("Migration integration tests", () => {
     test("a fresh DB with a simulated partial state proves rollback semantics", () => {
       // Create a second DB to test that if a migration were to fail after BEGIN
       // but before COMMIT, the _migrations table would NOT record it.
-      const tmpDir2 = mkdtempSync(
-        join(tmpdir(), "spec-library-migration-rollback-test-")
-      );
+      const tmpDir2 = mkdtempSync(join(tmpdir(), "spec-library-migration-rollback-test-"));
       const db2 = createDatabase(tmpDir2);
 
       try {
@@ -305,15 +299,13 @@ describe("Migration integration tests", () => {
         `);
         db2.run("BEGIN");
         db2.run(
-          "INSERT INTO _migrations (number, name, applied_at) VALUES (1, 'core-tables', '2024-01-01T00:00:00.000Z')"
+          "INSERT INTO _migrations (number, name, applied_at) VALUES (1, 'core-tables', '2024-01-01T00:00:00.000Z')",
         );
         db2.run("COMMIT");
 
         // Verify only migration 1 is recorded
         const rows = db2
-          .query<{ number: number }, []>(
-            "SELECT number FROM _migrations ORDER BY number"
-          )
+          .query<{ number: number }, []>("SELECT number FROM _migrations ORDER BY number")
           .all();
         expect(rows).toHaveLength(1);
         expect(rows[0]!.number).toBe(1);
@@ -321,15 +313,13 @@ describe("Migration integration tests", () => {
         // Now simulate a ROLLBACK scenario: begin, insert migration 2, then rollback
         db2.run("BEGIN");
         db2.run(
-          "INSERT INTO _migrations (number, name, applied_at) VALUES (2, 'fts5-indexes', '2024-01-01T00:00:00.000Z')"
+          "INSERT INTO _migrations (number, name, applied_at) VALUES (2, 'fts5-indexes', '2024-01-01T00:00:00.000Z')",
         );
         db2.run("ROLLBACK");
 
         // Migration 2 should NOT be recorded
         const rowsAfter = db2
-          .query<{ number: number }, []>(
-            "SELECT number FROM _migrations ORDER BY number"
-          )
+          .query<{ number: number }, []>("SELECT number FROM _migrations ORDER BY number")
           .all();
         expect(rowsAfter).toHaveLength(1);
         expect(rowsAfter[0]!.number).toBe(1);

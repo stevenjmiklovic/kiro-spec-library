@@ -1,13 +1,13 @@
-import { useCallback, useMemo, useState, useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-export type ViewMode = 'relationship' | 'archive';
-export type ThemeMode = 'light' | 'dark';
-export type YAxisField = 'project' | 'theme' | 'owner' | 'repository' | 'type';
-export type XAxisField = 'status' | 'chronological';
+export type ViewMode = "relationship" | "archive";
+export type ThemeMode = "light" | "dark";
+export type YAxisField = "project" | "theme" | "owner" | "repository" | "type";
+export type XAxisField = "status" | "chronological";
 
 export interface UrlStateFilters {
   type?: string;
@@ -35,26 +35,26 @@ export interface UrlState {
 // URL param names → state field mapping
 // ---------------------------------------------------------------------------
 
-const VIEW_PARAM = 'view';
-const MODE_PARAM = 'mode';
-const SELECTED_PARAM = 'selected';
-const REVISION_PARAM = 'revision';
-const QUERY_PARAM = 'q';
-const Y_AXIS_PARAM = 'yAxis';
-const X_AXIS_PARAM = 'xAxis';
+const VIEW_PARAM = "view";
+const MODE_PARAM = "mode";
+const SELECTED_PARAM = "selected";
+const REVISION_PARAM = "revision";
+const QUERY_PARAM = "q";
+const Y_AXIS_PARAM = "yAxis";
+const X_AXIS_PARAM = "xAxis";
 
 const FILTER_PARAMS: ReadonlyArray<keyof UrlStateFilters> = [
-  'type',
-  'stage',
-  'theme',
-  'owner',
-  'repository',
+  "type",
+  "stage",
+  "theme",
+  "owner",
+  "repository",
 ] as const;
 
 // Alias: URL uses `repo` for brevity but state uses `repository`
-const REPO_URL_PARAM = 'repo';
+const REPO_URL_PARAM = "repo";
 
-const THEME_STORAGE_KEY = 'kiro-spec-library:theme';
+const THEME_STORAGE_KEY = "kiro-spec-library:theme";
 
 // ---------------------------------------------------------------------------
 // Parse URL → UrlState
@@ -64,17 +64,16 @@ function parseUrl(): UrlState {
   const params = new URLSearchParams(window.location.search);
 
   const viewRaw = params.get(VIEW_PARAM);
-  const view: ViewMode =
-    viewRaw === 'archive' ? 'archive' : 'relationship';
+  const view: ViewMode = viewRaw === "archive" ? "archive" : "relationship";
 
   // Theme: URL param takes priority, then localStorage, then default 'dark'
   const modeParam = params.get(MODE_PARAM);
   let themeMode: ThemeMode;
-  if (modeParam === 'light' || modeParam === 'dark') {
+  if (modeParam === "light" || modeParam === "dark") {
     themeMode = modeParam;
   } else {
     const stored = localStorage.getItem(THEME_STORAGE_KEY);
-    themeMode = stored === 'light' ? 'light' : 'dark';
+    themeMode = stored === "light" ? "light" : "dark";
   }
 
   const selected = params.get(SELECTED_PARAM) ?? undefined;
@@ -83,20 +82,20 @@ function parseUrl(): UrlState {
 
   const yAxisRaw = params.get(Y_AXIS_PARAM);
   const yAxis: YAxisField =
-    yAxisRaw === 'owner' ||
-    yAxisRaw === 'repository' ||
-    yAxisRaw === 'type' ||
-    yAxisRaw === 'theme' ||
-    yAxisRaw === 'project'
+    yAxisRaw === "owner" ||
+    yAxisRaw === "repository" ||
+    yAxisRaw === "type" ||
+    yAxisRaw === "theme" ||
+    yAxisRaw === "project"
       ? yAxisRaw
-      : 'project';
+      : "project";
 
   const xAxisRaw = params.get(X_AXIS_PARAM);
-  const xAxis: XAxisField = xAxisRaw === 'chronological' ? 'chronological' : 'status';
+  const xAxis: XAxisField = xAxisRaw === "chronological" ? "chronological" : "status";
 
   const filters: UrlStateFilters = {};
   for (const key of FILTER_PARAMS) {
-    const urlKey = key === 'repository' ? REPO_URL_PARAM : key;
+    const urlKey = key === "repository" ? REPO_URL_PARAM : key;
     const val = params.get(urlKey);
     if (val) {
       filters[key] = val;
@@ -113,16 +112,16 @@ function parseUrl(): UrlState {
 function serializeToUrl(state: UrlState): void {
   const params = new URLSearchParams();
 
-  if (state.view !== 'relationship') {
+  if (state.view !== "relationship") {
     params.set(VIEW_PARAM, state.view);
   }
-  if (state.themeMode === 'light') {
-    params.set(MODE_PARAM, 'light');
+  if (state.themeMode === "light") {
+    params.set(MODE_PARAM, "light");
   }
-  if (state.yAxis && state.yAxis !== 'project') {
+  if (state.yAxis && state.yAxis !== "project") {
     params.set(Y_AXIS_PARAM, state.yAxis);
   }
-  if (state.xAxis && state.xAxis !== 'status') {
+  if (state.xAxis && state.xAxis !== "status") {
     params.set(X_AXIS_PARAM, state.xAxis);
   }
   if (state.selected) params.set(SELECTED_PARAM, state.selected);
@@ -132,7 +131,7 @@ function serializeToUrl(state: UrlState): void {
   for (const key of FILTER_PARAMS) {
     const val = state.filters[key];
     if (val) {
-      const urlKey = key === 'repository' ? REPO_URL_PARAM : key;
+      const urlKey = key === "repository" ? REPO_URL_PARAM : key;
       params.set(urlKey, val);
     }
   }
@@ -142,7 +141,7 @@ function serializeToUrl(state: UrlState): void {
 
   const qs = params.toString();
   const url = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
-  window.history.replaceState(null, '', url);
+  window.history.replaceState(null, "", url);
 }
 
 // ---------------------------------------------------------------------------
@@ -173,8 +172,8 @@ function emitChange(next: UrlState): void {
 }
 
 // Listen for back/forward navigation so the state stays in sync.
-if (typeof window !== 'undefined') {
-  window.addEventListener('popstate', () => {
+if (typeof window !== "undefined") {
+  window.addEventListener("popstate", () => {
     emitChange(parseUrl());
   });
 }
@@ -207,13 +206,10 @@ export function useUrlState(): [UrlState, (update: Partial<UrlState>) => void] {
       themeMode: patch.themeMode ?? prev.themeMode,
       yAxis: patch.yAxis ?? prev.yAxis,
       xAxis: patch.xAxis ?? prev.xAxis,
-      selected: 'selected' in patch ? patch.selected : prev.selected,
-      revision: 'revision' in patch ? patch.revision : prev.revision,
-      query: 'query' in patch ? patch.query : prev.query,
-      filters:
-        patch.filters !== undefined
-          ? { ...prev.filters, ...patch.filters }
-          : prev.filters,
+      selected: "selected" in patch ? patch.selected : prev.selected,
+      revision: "revision" in patch ? patch.revision : prev.revision,
+      query: "query" in patch ? patch.query : prev.query,
+      filters: patch.filters !== undefined ? { ...prev.filters, ...patch.filters } : prev.filters,
     };
 
     serializeToUrl(next);

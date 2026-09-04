@@ -54,6 +54,8 @@
     "start": "./scripts/start-backend.sh",
     "dev": "bun run --filter backend dev",
     "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
     "prepublishOnly": "bun run build",
     "changelog:draft": "bun run scripts/changelog.ts draft",
     "changelog:compile": "bun run scripts/changelog.ts compile"

@@ -1,15 +1,15 @@
 import { describe, expect, test } from "bun:test";
+import type { ResolvedMetadata } from "../../backend/src/services/metadata.js";
 import {
+  type TfIdfVector,
   buildTfIdfVectors,
   cosineSimilarity,
   extractMarkdownLinks,
-  isProximate,
   filterRejected,
   generateAll,
-  type TfIdfVector,
+  isProximate,
 } from "../../backend/src/services/suggester.js";
 import type { NormalizedSpec, Suggestion } from "../../shared/src/types.js";
-import type { ResolvedMetadata } from "../../backend/src/services/metadata.js";
 
 function makeSpec(overrides: Partial<NormalizedSpec> & { key: string }): NormalizedSpec {
   return {
@@ -139,14 +139,50 @@ describe("extractMarkdownLinks", () => {
 
 describe("isProximate", () => {
   test("same repo and same directory = proximate", () => {
-    const a = makeSpec({ key: "a", provenance: { repository: "/repo", relativePath: ".kiro/specs/a", branch: "main", commitHash: "x", isDirty: false } });
-    const b = makeSpec({ key: "b", provenance: { repository: "/repo", relativePath: ".kiro/specs/b", branch: "main", commitHash: "y", isDirty: false } });
+    const a = makeSpec({
+      key: "a",
+      provenance: {
+        repository: "/repo",
+        relativePath: ".kiro/specs/a",
+        branch: "main",
+        commitHash: "x",
+        isDirty: false,
+      },
+    });
+    const b = makeSpec({
+      key: "b",
+      provenance: {
+        repository: "/repo",
+        relativePath: ".kiro/specs/b",
+        branch: "main",
+        commitHash: "y",
+        isDirty: false,
+      },
+    });
     expect(isProximate(a, b)).toBe(true);
   });
 
   test("different repos = not proximate", () => {
-    const a = makeSpec({ key: "a", provenance: { repository: "/repo1", relativePath: ".kiro/specs/a", branch: "main", commitHash: "x", isDirty: false } });
-    const b = makeSpec({ key: "b", provenance: { repository: "/repo2", relativePath: ".kiro/specs/b", branch: "main", commitHash: "y", isDirty: false } });
+    const a = makeSpec({
+      key: "a",
+      provenance: {
+        repository: "/repo1",
+        relativePath: ".kiro/specs/a",
+        branch: "main",
+        commitHash: "x",
+        isDirty: false,
+      },
+    });
+    const b = makeSpec({
+      key: "b",
+      provenance: {
+        repository: "/repo2",
+        relativePath: ".kiro/specs/b",
+        branch: "main",
+        commitHash: "y",
+        isDirty: false,
+      },
+    });
     expect(isProximate(a, b)).toBe(false);
   });
 });
@@ -154,18 +190,44 @@ describe("isProximate", () => {
 describe("filterRejected", () => {
   test("filters out previously rejected with same dataHash", () => {
     const suggestions: Suggestion[] = [
-      { id: "1", sourceSpecKey: "a", targetSpecKey: "b", type: "related", confidence: 0.5, reason: "shared_theme", evidence: "x", status: "pending", createdAt: "", dataHash: "hash1" },
+      {
+        id: "1",
+        sourceSpecKey: "a",
+        targetSpecKey: "b",
+        type: "related",
+        confidence: 0.5,
+        reason: "shared_theme",
+        evidence: "x",
+        status: "pending",
+        createdAt: "",
+        dataHash: "hash1",
+      },
     ];
-    const rejections = [{ sourceSpecKey: "a", targetSpecKey: "b", type: "related", dataHash: "hash1" }];
+    const rejections = [
+      { sourceSpecKey: "a", targetSpecKey: "b", type: "related", dataHash: "hash1" },
+    ];
     const result = filterRejected(suggestions, rejections);
     expect(result.length).toBe(0);
   });
 
   test("keeps suggestion if dataHash changed since rejection", () => {
     const suggestions: Suggestion[] = [
-      { id: "1", sourceSpecKey: "a", targetSpecKey: "b", type: "related", confidence: 0.5, reason: "shared_theme", evidence: "x", status: "pending", createdAt: "", dataHash: "hash2" },
+      {
+        id: "1",
+        sourceSpecKey: "a",
+        targetSpecKey: "b",
+        type: "related",
+        confidence: 0.5,
+        reason: "shared_theme",
+        evidence: "x",
+        status: "pending",
+        createdAt: "",
+        dataHash: "hash2",
+      },
     ];
-    const rejections = [{ sourceSpecKey: "a", targetSpecKey: "b", type: "related", dataHash: "hash1" }];
+    const rejections = [
+      { sourceSpecKey: "a", targetSpecKey: "b", type: "related", dataHash: "hash1" },
+    ];
     const result = filterRejected(suggestions, rejections);
     expect(result.length).toBe(1);
   });

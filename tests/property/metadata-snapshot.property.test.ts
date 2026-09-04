@@ -6,15 +6,11 @@
  *              (sha256 of concatenated sorted artifact contents)
  */
 import { describe, expect, test } from "bun:test";
-import fc from "fast-check";
 import { createHash } from "node:crypto";
-import { resolveMetadata, evaluateCompleteness } from "../../backend/src/services/metadata.js";
-import type {
-  NormalizedSpec,
-  MetadataOverlay,
-  LifecycleStage,
-} from "../../shared/src/types.js";
+import fc from "fast-check";
+import { evaluateCompleteness, resolveMetadata } from "../../backend/src/services/metadata.js";
 import type { SpecLibrarySidecarV1 } from "../../shared/src/schemas.js";
+import type { LifecycleStage, MetadataOverlay, NormalizedSpec } from "../../shared/src/types.js";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -22,9 +18,7 @@ import type { SpecLibrarySidecarV1 } from "../../shared/src/schemas.js";
  * Replicate the contentDigest computation from archiver.ts:
  * sha256 of concatenated sorted (by name) artifact contents.
  */
-function computeContentDigest(
-  artifacts: { name: string; content: string }[],
-): string {
+function computeContentDigest(artifacts: { name: string; content: string }[]): string {
   const sorted = [...artifacts].sort((a, b) => a.name.localeCompare(b.name));
   const hash = createHash("sha256");
   for (const a of sorted) {
@@ -232,13 +226,11 @@ describe("Property 12: Metadata Resolution Priority", () => {
         const sm = sidecar?.metadata;
 
         // Title resolution chain: overlay.title ?? sidecar.metadata.displayTitle ?? spec.title
-        const expectedTitle =
-          overlay?.title ?? sm?.displayTitle ?? spec.title;
+        const expectedTitle = overlay?.title ?? sm?.displayTitle ?? spec.title;
         expect(resolved.title).toBe(expectedTitle);
 
         // Owner resolution chain: overlay.owner ?? sidecar.metadata.owner.name ?? spec.owner
-        const expectedOwner =
-          overlay?.owner ?? sm?.owner?.name ?? spec.owner;
+        const expectedOwner = overlay?.owner ?? sm?.owner?.name ?? spec.owner;
         expect(resolved.owner).toBe(expectedOwner);
 
         // Tags resolution chain: overlay.tags ?? sidecar.metadata.tags ?? []

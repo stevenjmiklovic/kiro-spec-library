@@ -1,14 +1,14 @@
 // Backend entry point — server startup sequence (Task 12.1)
-import { mkdirSync, writeFileSync, chmodSync } from "node:fs";
+import { chmodSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { createDatabase } from "./db/connection.js";
-import { runMigrations } from "./db/migrator.js";
-import { createRouter } from "./router.js";
-import { ScannerService } from "./services/scanner.js";
-import { ArchiverService } from "./services/archiver.js";
-import { listSources } from "./db/queries/sources.js";
 import { DEFAULT_SCAN_INTERVAL_MS } from "@kiro-spec-library/shared";
 import type { Source } from "@kiro-spec-library/shared";
+import { createDatabase } from "./db/connection.js";
+import { runMigrations } from "./db/migrator.js";
+import { listSources } from "./db/queries/sources.js";
+import { createRouter } from "./router.js";
+import { ArchiverService } from "./services/archiver.js";
+import { ScannerService } from "./services/scanner.js";
 
 // ─── Configuration ───────────────────────────────────────────────────────────
 

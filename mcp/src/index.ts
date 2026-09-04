@@ -3,11 +3,8 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from "@modelcontextprotocol/sdk/types.js";
-import { searchSpecs, getSpecContext, submitMetadataProposal, listSources } from "./tools.js";
+import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import { getSpecContext, listSources, searchSpecs, submitMetadataProposal } from "./tools.js";
 
 // ─── Configuration ───────────────────────────────────────────────────────────
 
@@ -69,7 +66,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
         properties: {
           query: {
             type: "string",
-            description: "Search query (matched against title, content, owner, theme, tags, repository)",
+            description:
+              "Search query (matched against title, content, owner, theme, tags, repository)",
           },
           filters: {
             type: "object",
@@ -126,7 +124,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
           },
           metadataPatch: {
             type: "object",
-            description: "Metadata fields to change (title, summary, owner, theme, tags, targetRelease, retentionPolicy)",
+            description:
+              "Metadata fields to change (title, summary, owner, theme, tags, targetRelease, retentionPolicy)",
           },
           relationshipAdds: {
             type: "array",
@@ -134,7 +133,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
               type: "object",
               properties: {
                 targetSpecId: { type: "string" },
-                type: { type: "string", enum: ["depends_on", "blocks", "supersedes", "duplicates", "related"] },
+                type: {
+                  type: "string",
+                  enum: ["depends_on", "blocks", "supersedes", "duplicates", "related"],
+                },
                 note: { type: "string" },
               },
               required: ["targetSpecId", "type"],
@@ -168,10 +170,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         result = await searchSpecs(client, args as unknown as Parameters<typeof searchSpecs>[1]);
         break;
       case "get_spec_context":
-        result = await getSpecContext(client, args as unknown as Parameters<typeof getSpecContext>[1]);
+        result = await getSpecContext(
+          client,
+          args as unknown as Parameters<typeof getSpecContext>[1],
+        );
         break;
       case "submit_metadata_proposal":
-        result = await submitMetadataProposal(client, args as unknown as Parameters<typeof submitMetadataProposal>[1]);
+        result = await submitMetadataProposal(
+          client,
+          args as unknown as Parameters<typeof submitMetadataProposal>[1],
+        );
         break;
       default:
         return {

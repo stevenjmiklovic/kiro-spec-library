@@ -68,11 +68,7 @@ export function acceptSuggestion(db: Database, id: string): void {
   stmt.run({ $id: id, $resolved_at: new Date().toISOString() });
 }
 
-export function rejectSuggestion(
-  db: Database,
-  id: string,
-  dataHash: string,
-): void {
+export function rejectSuggestion(db: Database, id: string, dataHash: string): void {
   db.transaction(() => {
     const suggestion = db
       .prepare("SELECT * FROM suggestions WHERE id = $id")
@@ -141,10 +137,7 @@ export function createRejection(
   });
 }
 
-export function listPending(
-  db: Database,
-  specKey?: string,
-): SuggestionRow[] {
+export function listPending(db: Database, specKey?: string): SuggestionRow[] {
   if (specKey) {
     const stmt = db.prepare(`
       SELECT * FROM suggestions
@@ -198,10 +191,12 @@ export function isRejected(
       AND type = $type AND data_hash = $data_hash
     LIMIT 1
   `);
-  return stmt.get({
-    $source: sourceKey,
-    $target: targetKey,
-    $type: type,
-    $data_hash: dataHash,
-  }) !== null;
+  return (
+    stmt.get({
+      $source: sourceKey,
+      $target: targetKey,
+      $type: type,
+      $data_hash: dataHash,
+    }) !== null
+  );
 }

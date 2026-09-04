@@ -43,7 +43,7 @@ export async function runMigrations(db: Database): Promise<void> {
     db
       .query<{ number: number }, []>("SELECT number FROM _migrations")
       .all()
-      .map((row) => row.number)
+      .map((row) => row.number),
   );
 
   for (const migration of migrations) {
@@ -54,20 +54,16 @@ export async function runMigrations(db: Database): Promise<void> {
     try {
       db.run("BEGIN");
       migration.up(db);
-      db.run(
-        "INSERT INTO _migrations (number, name, applied_at) VALUES (?, ?, ?)",
-        [migration.number, migration.name, new Date().toISOString()]
-      );
+      db.run("INSERT INTO _migrations (number, name, applied_at) VALUES (?, ?, ?)", [
+        migration.number,
+        migration.name,
+        new Date().toISOString(),
+      ]);
       db.run("COMMIT");
-      console.log(
-        `[migrator] Applied migration ${migration.number}: ${migration.name}`
-      );
+      console.log(`[migrator] Applied migration ${migration.number}: ${migration.name}`);
     } catch (error) {
       db.run("ROLLBACK");
-      console.error(
-        `[migrator] Failed migration ${migration.number}: ${migration.name}`,
-        error
-      );
+      console.error(`[migrator] Failed migration ${migration.number}: ${migration.name}`, error);
       throw error;
     }
   }

@@ -1,6 +1,6 @@
-import React from 'react';
-import { useCrew } from '../hooks/useCrewIntegration.js';
-import type { PendingProposal } from '../hooks/useSpecDetail.js';
+import type React from "react";
+import { useCrew } from "../hooks/useCrewIntegration.js";
+import type { PendingProposal } from "../hooks/useSpecDetail.js";
 
 interface Props {
   proposals: PendingProposal[];
@@ -15,7 +15,13 @@ interface Props {
  * Shows each pending proposal as a card with a diff preview of proposed
  * changes plus Accept/Reject actions.
  */
-export function ProposalQueue({ proposals, specKey, specTitle, onAccept, onReject }: Props): React.ReactElement | null {
+export function ProposalQueue({
+  proposals,
+  specKey,
+  specTitle,
+  onAccept,
+  onReject,
+}: Props): React.ReactElement | null {
   const { chatLauncher } = useCrew();
 
   if (proposals.length === 0) return null;
@@ -27,9 +33,7 @@ export function ProposalQueue({ proposals, specKey, specTitle, onAccept, onRejec
           Pending proposals
           <span className="proposal-queue__count">{proposals.length}</span>
         </h4>
-        <p className="proposal-queue__subtitle">
-          Agent-submitted changes awaiting your approval.
-        </p>
+        <p className="proposal-queue__subtitle">Agent-submitted changes awaiting your approval.</p>
       </header>
 
       <ul className="proposal-queue__list">
@@ -71,46 +75,44 @@ function ProposalCard({
   const fields = Object.entries(proposal.patch);
   const submittedDate = proposal.submittedAt
     ? new Date(proposal.submittedAt).toLocaleString()
-    : 'Unknown';
+    : "Unknown";
 
   const buildChatPrompt = (): string => {
     const fieldSummary = fields
       .map(([k, v]) => `  • ${formatFieldName(k)}: ${formatValue(v)}`)
-      .join('\n');
+      .join("\n");
     return [
       `Help me decide on this metadata proposal for "${specTitle}" (${specKey}):`,
-      '',
-      `Proposed changes:`,
+      "",
+      "Proposed changes:",
       fieldSummary,
-      '',
-      proposal.rationale ? `Agent rationale: ${proposal.rationale}` : '',
-      '',
+      "",
+      proposal.rationale ? `Agent rationale: ${proposal.rationale}` : "",
+      "",
       `Use get_spec_context to read the current spec and tell me whether these proposed metadata values are accurate and should be accepted, or if they're wrong/incomplete and should be rejected.`,
-    ].filter(Boolean).join('\n');
+    ]
+      .filter(Boolean)
+      .join("\n");
   };
 
   return (
     <li className="proposal-card">
       <div className="proposal-card__meta">
         <span className="proposal-card__source">
-          {proposal.source === 'agent' ? '🤖 Agent' : '📝 Manual'}
+          {proposal.source === "agent" ? "🤖 Agent" : "📝 Manual"}
         </span>
         <time className="proposal-card__time" dateTime={proposal.submittedAt}>
           {submittedDate}
         </time>
       </div>
 
-      {proposal.rationale && (
-        <p className="proposal-card__rationale">{proposal.rationale}</p>
-      )}
+      {proposal.rationale && <p className="proposal-card__rationale">{proposal.rationale}</p>}
 
       <div className="proposal-card__diff">
         {fields.map(([key, value]) => (
           <div key={key} className="proposal-card__field">
             <span className="proposal-card__key">{formatFieldName(key)}</span>
-            <span className="proposal-card__value">
-              {formatValue(value)}
-            </span>
+            <span className="proposal-card__value">{formatValue(value)}</span>
           </div>
         ))}
       </div>
@@ -151,14 +153,14 @@ function ProposalCard({
 
 function formatFieldName(key: string): string {
   return key
-    .replace(/([A-Z])/g, ' $1')
+    .replace(/([A-Z])/g, " $1")
     .replace(/^./, (c) => c.toUpperCase())
     .trim();
 }
 
 function formatValue(value: unknown): string {
-  if (value === null || value === undefined) return '(clear)';
-  if (Array.isArray(value)) return value.join(', ');
-  if (typeof value === 'object') return JSON.stringify(value);
+  if (value === null || value === undefined) return "(clear)";
+  if (Array.isArray(value)) return value.join(", ");
+  if (typeof value === "object") return JSON.stringify(value);
   return String(value);
 }

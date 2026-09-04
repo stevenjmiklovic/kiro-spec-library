@@ -53,10 +53,7 @@ export function listAllAuditEvents(db: Database): AuditRow[] {
   return stmt.all() as AuditRow[];
 }
 
-export function queryAuditEvents(
-  db: Database,
-  filters: AuditFilters,
-): AuditRow[] {
+export function queryAuditEvents(db: Database, filters: AuditFilters): AuditRow[] {
   const conditions: string[] = [];
   const params: Params = {};
 

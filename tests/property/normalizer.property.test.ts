@@ -7,16 +7,21 @@
  *  3. Progress Bounds
  *  4. Task Counting
  */
-import { describe, test, expect } from 'bun:test';
-import * as fc from 'fast-check';
+import { describe, expect, test } from "bun:test";
+import * as fc from "fast-check";
 import {
-  normalize,
-  deriveKey,
+  type RawSpecArtifacts,
   calculateProgress,
   countTasks,
-  type RawSpecArtifacts,
-} from '../../backend/src/services/normalizer.js';
-import type { ArtifactManifest, Source, SpecProvenance, TaskCounts } from '../../shared/src/types.js';
+  deriveKey,
+  normalize,
+} from "../../backend/src/services/normalizer.js";
+import type {
+  ArtifactManifest,
+  Source,
+  SpecProvenance,
+  TaskCounts,
+} from "../../shared/src/types.js";
 
 // ─── Arbitraries ─────────────────────────────────────────────────────────────
 
@@ -31,7 +36,7 @@ const arbProvenance: fc.Arbitrary<SpecProvenance> = fc.record({
 
 const arbSource: fc.Arbitrary<Source> = fc.record({
   id: fc.string({ minLength: 1, maxLength: 30 }),
-  type: fc.constantFrom('local' as const, 'remote' as const),
+  type: fc.constantFrom("local" as const, "remote" as const),
   path: fc.option(fc.string({ minLength: 1 }), { nil: undefined }),
   url: fc.option(fc.webUrl(), { nil: undefined }),
   branch: fc.option(fc.string({ minLength: 1 }), { nil: undefined }),
@@ -40,13 +45,13 @@ const arbSource: fc.Arbitrary<Source> = fc.record({
 });
 
 const ARTIFACT_FILES = [
-  'requirements.md',
-  'design.md',
-  'tasks.md',
-  'bugfix.md',
-  '.config.kiro',
-  'tasks.meta.json',
-  'spec-library.json',
+  "requirements.md",
+  "design.md",
+  "tasks.md",
+  "bugfix.md",
+  ".config.kiro",
+  "tasks.meta.json",
+  "spec-library.json",
 ] as const;
 
 /** Generate a valid contents record (at least one file) */
@@ -66,13 +71,12 @@ const arbConfigKiro = fc.option(
   fc.record({
     specId: fc.string({ minLength: 1, maxLength: 30 }),
     workflowType: fc.option(
-      fc.constantFrom('requirements-first' as const, 'design-first' as const),
+      fc.constantFrom("requirements-first" as const, "design-first" as const),
       { nil: undefined },
     ),
-    specType: fc.option(
-      fc.constantFrom('feature' as const, 'bugfix' as const, 'quick' as const),
-      { nil: undefined },
-    ),
+    specType: fc.option(fc.constantFrom("feature" as const, "bugfix" as const, "quick" as const), {
+      nil: undefined,
+    }),
   }),
   { nil: null },
 );
@@ -87,8 +91,8 @@ const arbRaw: fc.Arbitrary<RawSpecArtifacts> = fc.record({
 
 // ─── Property 1: Normalizer Determinism ──────────────────────────────────────
 
-describe('Property 1: Normalizer Determinism', () => {
-  test('identical RawSpecArtifacts + Source produce identical normalize() output (excluding indexedAt)', () => {
+describe("Property 1: Normalizer Determinism", () => {
+  test("identical RawSpecArtifacts + Source produce identical normalize() output (excluding indexedAt)", () => {
     fc.assert(
       fc.property(arbRaw, arbSource, (raw, source) => {
         const a = normalize(raw, source);
@@ -107,8 +111,8 @@ describe('Property 1: Normalizer Determinism', () => {
 
 // ─── Property 2: Spec Key Stability ─────────────────────────────────────────
 
-describe('Property 2: Spec Key Stability', () => {
-  test('deriveKey is stable for the same inputs', () => {
+describe("Property 2: Spec Key Stability", () => {
+  test("deriveKey is stable for the same inputs", () => {
     fc.assert(
       fc.property(
         fc.string({ minLength: 1, maxLength: 30 }),
@@ -124,7 +128,7 @@ describe('Property 2: Spec Key Stability', () => {
     );
   });
 
-  test('specId present => key is `${sourceId}::${specId}`', () => {
+  test("specId present => key is `${sourceId}::${specId}`", () => {
     fc.assert(
       fc.property(
         fc.string({ minLength: 1, maxLength: 30 }),
@@ -139,7 +143,7 @@ describe('Property 2: Spec Key Stability', () => {
     );
   });
 
-  test('specId absent => key is `${sourceId}::${relativePath}`', () => {
+  test("specId absent => key is `${sourceId}::${relativePath}`", () => {
     fc.assert(
       fc.property(
         fc.string({ minLength: 1, maxLength: 30 }),
@@ -156,15 +160,15 @@ describe('Property 2: Spec Key Stability', () => {
 
 // ─── Property 3: Progress Bounds ─────────────────────────────────────────────
 
-describe('Property 3: Progress Bounds', () => {
+describe("Property 3: Progress Bounds", () => {
   const arbArtifactManifest: fc.Arbitrary<ArtifactManifest> = fc.record({
-    'requirements.md': fc.option(fc.constant(true), { nil: undefined }),
-    'bugfix.md': fc.option(fc.constant(true), { nil: undefined }),
-    'design.md': fc.option(fc.constant(true), { nil: undefined }),
-    'tasks.md': fc.option(fc.constant(true), { nil: undefined }),
-    '.config.kiro': fc.option(fc.constant(true), { nil: undefined }),
-    'tasks.meta.json': fc.option(fc.constant(true), { nil: undefined }),
-    'spec-library.json': fc.option(fc.constant(true), { nil: undefined }),
+    "requirements.md": fc.option(fc.constant(true), { nil: undefined }),
+    "bugfix.md": fc.option(fc.constant(true), { nil: undefined }),
+    "design.md": fc.option(fc.constant(true), { nil: undefined }),
+    "tasks.md": fc.option(fc.constant(true), { nil: undefined }),
+    ".config.kiro": fc.option(fc.constant(true), { nil: undefined }),
+    "tasks.meta.json": fc.option(fc.constant(true), { nil: undefined }),
+    "spec-library.json": fc.option(fc.constant(true), { nil: undefined }),
   });
 
   const arbTaskCounts: fc.Arbitrary<TaskCounts> = fc
@@ -174,7 +178,7 @@ describe('Property 3: Progress Bounds', () => {
     })
     .filter((tc) => tc.completed <= tc.total);
 
-  test('progress is always in [0, 100]', () => {
+  test("progress is always in [0, 100]", () => {
     fc.assert(
       fc.property(arbArtifactManifest, arbTaskCounts, (artifacts, taskCounts) => {
         const progress = calculateProgress(artifacts, taskCounts);
@@ -185,7 +189,7 @@ describe('Property 3: Progress Bounds', () => {
     );
   });
 
-  test('progress is monotonic as completed increases (same artifacts, same total)', () => {
+  test("progress is monotonic as completed increases (same artifacts, same total)", () => {
     fc.assert(
       fc.property(
         arbArtifactManifest,
@@ -205,16 +209,16 @@ describe('Property 3: Progress Bounds', () => {
     );
   });
 
-  test('progress is monotonic as artifacts are added', () => {
+  test("progress is monotonic as artifacts are added", () => {
     fc.assert(
       fc.property(arbTaskCounts, (taskCounts) => {
         const noArtifacts: ArtifactManifest = {};
-        const withReqs: ArtifactManifest = { 'requirements.md': true };
-        const withReqsDesign: ArtifactManifest = { 'requirements.md': true, 'design.md': true };
+        const withReqs: ArtifactManifest = { "requirements.md": true };
+        const withReqsDesign: ArtifactManifest = { "requirements.md": true, "design.md": true };
         const withAll: ArtifactManifest = {
-          'requirements.md': true,
-          'design.md': true,
-          'tasks.md': true,
+          "requirements.md": true,
+          "design.md": true,
+          "tasks.md": true,
         };
 
         const p0 = calculateProgress(noArtifacts, taskCounts);
@@ -233,14 +237,23 @@ describe('Property 3: Progress Bounds', () => {
 
 // ─── Property 4: Task Counting ───────────────────────────────────────────────
 
-describe('Property 4: Task Counting', () => {
+describe("Property 4: Task Counting", () => {
   /** Generate a markdown string with a known count of checkboxes */
-  const arbTaskContent: fc.Arbitrary<{ content: string; expectedTotal: number; expectedCompleted: number }> = fc
+  const arbTaskContent: fc.Arbitrary<{
+    content: string;
+    expectedTotal: number;
+    expectedCompleted: number;
+  }> = fc
     .array(
       fc.record({
-        type: fc.constantFrom('done' as const, 'open' as const, 'partial' as const, 'text' as const),
+        type: fc.constantFrom(
+          "done" as const,
+          "open" as const,
+          "partial" as const,
+          "text" as const,
+        ),
         indent: fc.nat({ max: 4 }),
-        text: fc.string({ minLength: 1, maxLength: 40 }).filter((s) => !s.includes('\n')),
+        text: fc.string({ minLength: 1, maxLength: 40 }).filter((s) => !s.includes("\n")),
       }),
       { minLength: 0, maxLength: 50 },
     )
@@ -250,31 +263,35 @@ describe('Property 4: Task Counting', () => {
       const contentLines: string[] = [];
 
       for (const line of lines) {
-        const indent = ' '.repeat(line.indent);
+        const indent = " ".repeat(line.indent);
         switch (line.type) {
-          case 'done':
+          case "done":
             contentLines.push(`${indent}- [x] ${line.text}`);
             total++;
             completed++;
             break;
-          case 'open':
+          case "open":
             contentLines.push(`${indent}- [ ] ${line.text}`);
             total++;
             break;
-          case 'partial':
+          case "partial":
             contentLines.push(`${indent}- [~] ${line.text}`);
             total++;
             break;
-          case 'text':
+          case "text":
             contentLines.push(`${indent}${line.text}`);
             break;
         }
       }
 
-      return { content: contentLines.join('\n'), expectedTotal: total, expectedCompleted: completed };
+      return {
+        content: contentLines.join("\n"),
+        expectedTotal: total,
+        expectedCompleted: completed,
+      };
     });
 
-  test('total = count of [x], [ ], [~] checkbox lines; completed = only [x]', () => {
+  test("total = count of [x], [ ], [~] checkbox lines; completed = only [x]", () => {
     fc.assert(
       fc.property(arbTaskContent, ({ content, expectedTotal, expectedCompleted }) => {
         const result = countTasks(content);
@@ -285,12 +302,12 @@ describe('Property 4: Task Counting', () => {
     );
   });
 
-  test('undefined/empty content returns zero counts', () => {
+  test("undefined/empty content returns zero counts", () => {
     expect(countTasks(undefined)).toEqual({ total: 0, completed: 0 });
-    expect(countTasks('')).toEqual({ total: 0, completed: 0 });
+    expect(countTasks("")).toEqual({ total: 0, completed: 0 });
   });
 
-  test('completed is always <= total', () => {
+  test("completed is always <= total", () => {
     fc.assert(
       fc.property(arbTaskContent, ({ content }) => {
         const result = countTasks(content);

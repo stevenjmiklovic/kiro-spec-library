@@ -1,13 +1,14 @@
-import React, { useEffect } from 'react';
-import { useSpecDetail } from '../hooks/useSpecDetail.js';
-import { SpecActions } from './SpecActions.js';
-import { MetadataPanel } from './MetadataPanel.js';
-import { ProposalQueue } from './ProposalQueue.js';
+import type React from "react";
+import { useEffect } from "react";
+import { useSpecDetail } from "../hooks/useSpecDetail.js";
+import { MetadataPanel } from "./MetadataPanel.js";
+import { ProposalQueue } from "./ProposalQueue.js";
+import { SpecActions } from "./SpecActions.js";
 
 interface Props {
   specKey: string | undefined;
   /** 'rail' = right inspection rail (Relationship); 'drawer' = Archive drawer. */
-  variant?: 'rail' | 'drawer';
+  variant?: "rail" | "drawer";
   onClose?: () => void;
 }
 
@@ -19,7 +20,7 @@ interface Props {
  */
 export function DetailPanel({
   specKey,
-  variant = 'rail',
+  variant = "rail",
   onClose,
 }: Props): React.ReactElement | null {
   const {
@@ -40,10 +41,10 @@ export function DetailPanel({
   useEffect(() => {
     if (!onClose) return undefined;
     const handleKey = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === "Escape") onClose();
     };
-    document.addEventListener('keydown', handleKey);
-    return () => document.removeEventListener('keydown', handleKey);
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
   }, [onClose]);
 
   if (!specKey) return null;
