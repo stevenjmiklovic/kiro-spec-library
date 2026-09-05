@@ -1,5 +1,5 @@
-import { Elysia } from "elysia";
 import type { Database } from "bun:sqlite";
+import { Elysia } from "elysia";
 import type { ScannerService } from "../services/scanner.js";
 export interface SyncDeps {
     db: Database;
@@ -25,11 +25,11 @@ export declare function syncRoutes(deps: SyncDeps): Elysia<"/sync", {
         post: {
             body: {
                 sources: {
+                    url?: string | undefined;
                     path?: string | undefined;
                     branch?: string | undefined;
-                    url?: string | undefined;
                     webUrlTemplate?: string | undefined;
-                    type: "local" | "remote";
+                    type: "remote" | "local";
                     id: string;
                     addedAt: string;
                 }[];

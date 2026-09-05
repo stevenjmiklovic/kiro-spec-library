@@ -9,7 +9,7 @@ export type RelationshipType = "depends_on" | "blocks" | "supersedes" | "duplica
 /** Retention policy type */
 export type RetentionPolicyType = "permanent" | "project_lifetime" | "active_plus_2_years" | "custom_date";
 /** Audit operation types (content-free) */
-export type AuditOperation = "metadata_created" | "metadata_updated" | "metadata_deleted" | "relationship_created" | "relationship_deleted" | "suggestion_accepted" | "suggestion_rejected" | "snapshot_created" | "snapshot_purged" | "backup_created" | "backup_restored" | "text_export_created" | "text_export_applied";
+export type AuditOperation = "metadata_created" | "metadata_updated" | "metadata_deleted" | "relationship_created" | "relationship_deleted" | "suggestion_accepted" | "suggestion_rejected" | "snapshot_created" | "snapshot_purged" | "backup_created" | "backup_restored" | "text_export_created" | "text_export_applied" | "knowledge_sync_run";
 /** Scan error category */
 export type ScanErrorCategory = "auth" | "network" | "timeout" | "validation" | "io";
 /** Suggestion reason */

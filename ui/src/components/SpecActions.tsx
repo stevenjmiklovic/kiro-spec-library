@@ -1,4 +1,5 @@
 import type React from "react";
+import { useState } from "react";
 import { useCrew } from "../hooks/useCrewIntegration.js";
 import type { SpecDetail } from "../hooks/useSpecDetail.js";
 
@@ -33,9 +34,10 @@ export function buildPermalink(detail: SpecDetail): string | null {
 }
 
 export function SpecActions({ detail }: Props): React.ReactElement {
-  const { chatLauncher } = useCrew();
+  const { chatLauncher, api, notify } = useCrew();
   const permalink = buildPermalink(detail);
   const { isDirty, commitHash } = detail.provenance;
+  const [sending, setSending] = useState(false);
 
   const openInChat = (): void => {
     const specLabel = detail.metadata.title || detail.specId || detail.key;
@@ -51,10 +53,71 @@ export function SpecActions({ detail }: Props): React.ReactElement {
     });
   };
 
+  // Push THIS spec into the KiroCrew Knowledge Library (graph-based store), so
+  // it becomes searchable and cross-linkable with other specs there. Idempotent
+  // on the backend: re-sending an unchanged spec is reported as a duplicate.
+  const sendToLibrary = async (): Promise<void> => {
+    setSending(true);
+    try {
+      const res = await api.fetch("/knowledge-sync/spec", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: detail.key }),
+      });
+      let payload: {
+        status?: string;
+        error?: string;
+        bodiesTruncated?: boolean;
+        message?: string;
+      } = {};
+      try {
+        payload = (await res.json()) as typeof payload;
+      } catch {
+        /* non-JSON response — handled by status below */
+      }
+
+      if (res.status === 409 || payload.status === "disabled") {
+        notify.error(
+          payload.error ||
+            "The Knowledge Library isn't accepting documents (knowledge.auto_add_documents is off).",
+        );
+        return;
+      }
+      if (!res.ok || payload.status === "failed") {
+        notify.error(
+          payload.error || payload.message || `Could not send spec (HTTP ${res.status}).`,
+        );
+        return;
+      }
+      const truncNote = payload.bodiesTruncated ? " (some body content was truncated)" : "";
+      if (payload.status === "duplicate") {
+        notify.info(`Already up to date in the Knowledge Library${truncNote}.`);
+      } else {
+        notify.success(`Sent to the Knowledge Library${truncNote}.`);
+      }
+    } catch (err) {
+      notify.error(
+        err instanceof Error ? `Could not send spec: ${err.message}` : "Could not send spec.",
+      );
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
     <div className="spec-actions" role="group" aria-label="Spec actions">
       <button type="button" className="spec-actions__primary" onClick={openInChat}>
         Open in Crew chat
+      </button>
+
+      <button
+        type="button"
+        className="spec-actions__secondary"
+        onClick={() => void sendToLibrary()}
+        disabled={sending}
+        title="Push this spec into the KiroCrew Knowledge Library so it's searchable and cross-linkable there"
+      >
+        {sending ? "Sending…" : "Send to Knowledge Library"}
       </button>
 
       <div className="spec-actions__permalink">

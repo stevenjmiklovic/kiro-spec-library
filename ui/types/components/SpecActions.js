@@ -1,6 +1,6 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import React from 'react';
-import { useCrew } from '../hooks/useCrewIntegration.js';
+import { useState } from "react";
+import { useCrew } from "../hooks/useCrewIntegration.js";
 /**
  * Build a repository web permalink from provenance, when a web URL template
  * can be derived from the remote. Returns null when no web URL is available
@@ -20,18 +20,19 @@ export function buildPermalink(detail) {
         base = `https://${ssh[1]}/${ssh[2]}`;
     if (!base)
         return null;
-    const host = base.replace(/^https:\/\//, '').split('/')[0] ?? '';
-    const ref = commitHash || branch || 'main';
-    const path = relativePath.replace(/^\/+/, '');
+    const host = base.replace(/^https:\/\//, "").split("/")[0] ?? "";
+    const ref = commitHash || branch || "main";
+    const path = relativePath.replace(/^\/+/, "");
     // GitHub / Gitea style: /tree/<ref>/<path>; GitLab: /-/tree/<ref>/<path>.
-    if (host.includes('gitlab'))
+    if (host.includes("gitlab"))
         return `${base}/-/tree/${ref}/${path}`;
     return `${base}/tree/${ref}/${path}`;
 }
 export function SpecActions({ detail }) {
-    const { chatLauncher } = useCrew();
+    const { chatLauncher, api, notify } = useCrew();
     const permalink = buildPermalink(detail);
     const { isDirty, commitHash } = detail.provenance;
+    const [sending, setSending] = useState(false);
     const openInChat = () => {
         const specLabel = detail.metadata.title || detail.specId || detail.key;
         const prompt = `Tell me about the spec "${specLabel}" (key: ${detail.key})`;
@@ -41,8 +42,50 @@ export function SpecActions({ detail }) {
             specId: detail.specId || detail.key,
             revisionId: commitHash || undefined,
             prompt,
-            agent: 'spectral-librarian',
+            agent: "spectral-librarian",
         });
     };
-    return (_jsxs("div", { className: "spec-actions", role: "group", "aria-label": "Spec actions", children: [_jsx("button", { type: "button", className: "spec-actions__primary", onClick: openInChat, children: "Open in Crew chat" }), _jsxs("div", { className: "spec-actions__permalink", children: [permalink ? (_jsx("a", { className: "spec-actions__link", href: permalink, target: "_blank", rel: "noopener noreferrer", children: "Repository permalink \u2197" })) : (_jsx("span", { className: "spec-actions__link spec-actions__link--disabled", "aria-disabled": "true", title: "No web URL is available for this source", children: "Repository permalink" })), isDirty && (_jsx("span", { className: "spec-actions__dirty", title: "Working tree has uncommitted changes; the permalink points at the last commit", children: "\u25CF Uncommitted changes" }))] })] }));
+    // Push THIS spec into the KiroCrew Knowledge Library (graph-based store), so
+    // it becomes searchable and cross-linkable with other specs there. Idempotent
+    // on the backend: re-sending an unchanged spec is reported as a duplicate.
+    const sendToLibrary = async () => {
+        setSending(true);
+        try {
+            const res = await api.fetch("/knowledge-sync/spec", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ key: detail.key }),
+            });
+            let payload = {};
+            try {
+                payload = (await res.json());
+            }
+            catch {
+                /* non-JSON response — handled by status below */
+            }
+            if (res.status === 409 || payload.status === "disabled") {
+                notify.error(payload.error ||
+                    "The Knowledge Library isn't accepting documents (knowledge.auto_add_documents is off).");
+                return;
+            }
+            if (!res.ok || payload.status === "failed") {
+                notify.error(payload.error || payload.message || `Could not send spec (HTTP ${res.status}).`);
+                return;
+            }
+            const truncNote = payload.bodiesTruncated ? " (some body content was truncated)" : "";
+            if (payload.status === "duplicate") {
+                notify.info(`Already up to date in the Knowledge Library${truncNote}.`);
+            }
+            else {
+                notify.success(`Sent to the Knowledge Library${truncNote}.`);
+            }
+        }
+        catch (err) {
+            notify.error(err instanceof Error ? `Could not send spec: ${err.message}` : "Could not send spec.");
+        }
+        finally {
+            setSending(false);
+        }
+    };
+    return (_jsxs("div", { className: "spec-actions", role: "group", "aria-label": "Spec actions", children: [_jsx("button", { type: "button", className: "spec-actions__primary", onClick: openInChat, children: "Open in Crew chat" }), _jsx("button", { type: "button", className: "spec-actions__secondary", onClick: () => void sendToLibrary(), disabled: sending, title: "Push this spec into the KiroCrew Knowledge Library so it's searchable and cross-linkable there", children: sending ? "Sending…" : "Send to Knowledge Library" }), _jsxs("div", { className: "spec-actions__permalink", children: [permalink ? (_jsx("a", { className: "spec-actions__link", href: permalink, target: "_blank", rel: "noopener noreferrer", children: "Repository permalink \u2197" })) : (_jsx("span", { className: "spec-actions__link spec-actions__link--disabled", "aria-disabled": "true", title: "No web URL is available for this source", children: "Repository permalink" })), isDirty && (_jsx("span", { className: "spec-actions__dirty", title: "Working tree has uncommitted changes; the permalink points at the last commit", children: "\u25CF Uncommitted changes" }))] })] }));
 }

@@ -91,8 +91,8 @@ export declare function settingsRoutes(deps: SettingsDeps): Elysia<"/settings", 
                     branch?: string | undefined;
                     webUrlTemplate?: string | undefined;
                     addedAt?: string | undefined;
-                    id: string;
                     type: "remote" | "local";
+                    id: string;
                 }[];
                 params: {};
                 query: unknown;

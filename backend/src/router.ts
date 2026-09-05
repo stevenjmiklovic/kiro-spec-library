@@ -11,6 +11,7 @@ import { listPending as listPendingSuggestions } from "./db/queries/suggestions.
 import { archiveRoutes } from "./routes/archive.js";
 import { auditRoutes } from "./routes/audit.js";
 import { backupRoutes } from "./routes/backup.js";
+import { knowledgeSyncRoutes } from "./routes/knowledge-sync.js";
 import { proposalRoutes } from "./routes/proposals.js";
 import { relationshipRoutes } from "./routes/relationships.js";
 import { settingsRoutes } from "./routes/settings.js";
@@ -255,7 +256,8 @@ export function createRouter(deps: RouterDeps) {
     .use(proposalRoutes({ db }))
     .use(auditRoutes({ db }))
     .use(backupRoutes({ db, dataDir }))
-    .use(textExportRoutes({ db }));
+    .use(textExportRoutes({ db }))
+    .use(knowledgeSyncRoutes({ db, dataDir }));
 
   return app;
 }

@@ -5342,7 +5342,7 @@ var require_dist = __commonJS((exports) => {
 
 // backend/src/index.ts
 import { chmodSync, mkdirSync as mkdirSync2, writeFileSync as writeFileSync2 } from "fs";
-import { join as join6 } from "path";
+import { join as join7 } from "path";
 // shared/src/constants.ts
 var SPEC_TYPES = ["feature", "bugfix", "quick", "unknown"];
 var WORKFLOW_TYPES = [
@@ -5383,7 +5383,8 @@ var AUDIT_OPERATIONS = [
   "backup_created",
   "backup_restored",
   "text_export_created",
-  "text_export_applied"
+  "text_export_applied",
+  "knowledge_sync_run"
 ];
 var DEFAULT_SCAN_INTERVAL_MS = 900000;
 var MAX_ARTIFACT_BYTES = 1048576;
@@ -24292,12 +24293,12 @@ var _Elysia = class _Elysia2 {
     }), this) : (typeof this.server?.reload == "function" && this.server.reload(this.server || {}), this._handle = composeGeneralHandler(this), this);
   }
   get fetch() {
-    const fetch = this.config.aot ? composeGeneralHandler(this) : createDynamicHandler(this);
+    const fetch2 = this.config.aot ? composeGeneralHandler(this) : createDynamicHandler(this);
     return Object.defineProperty(this, "fetch", {
-      value: fetch,
+      value: fetch2,
       configurable: true,
       writable: true
-    }), fetch;
+    }), fetch2;
   }
   get modules() {
     return this.promisedModules;
@@ -25340,6 +25341,356 @@ function backupRoutes(deps) {
   });
 }
 
+// backend/src/services/knowledge-sync.ts
+import { join as join3, relative as relative2 } from "path";
+
+// backend/src/security/path-validator.ts
+import { realpath, stat as stat2 } from "fs/promises";
+import { normalize, relative, resolve } from "path";
+var ok = { valid: true };
+var reject = (reason) => ({ valid: false, reason });
+async function validatePath(filePath, sourceRoot) {
+  const normalized = normalize(filePath);
+  if (normalized === "/" || normalized === "\\") {
+    return reject("Filesystem root is not allowed as a path");
+  }
+  if (filePath.split(/[/\\]/).includes("..")) {
+    return reject(`Path contains traversal component: ${filePath}`);
+  }
+  const absolute = resolve(sourceRoot, normalized);
+  const resolvedRoot = resolve(sourceRoot);
+  const rel = relative(resolvedRoot, absolute);
+  if (rel.startsWith("..") || resolve(resolvedRoot, rel) !== absolute) {
+    return reject(`Path resolves outside source root: ${absolute}`);
+  }
+  const lowerRel = rel.toLowerCase();
+  for (const credPath of CREDENTIAL_PATHS) {
+    if (lowerRel === credPath || lowerRel.startsWith(credPath + "/")) {
+      return reject(`Access to credential path is forbidden: ${credPath}`);
+    }
+  }
+  try {
+    const realFile = await realpath(absolute);
+    const realRoot = await realpath(resolvedRoot);
+    const relFromReal = relative(realRoot, realFile);
+    if (relFromReal.startsWith("..")) {
+      return reject(`Symlink escapes source root: ${absolute} -> ${realFile}`);
+    }
+  } catch (err) {
+    if (err.code !== "ENOENT") {
+      return reject(`Cannot resolve path: ${err.message}`);
+    }
+  }
+  try {
+    const stats = await stat2(absolute);
+    if (stats.isFile() && stats.size > MAX_ARTIFACT_BYTES) {
+      return reject(`File exceeds maximum size (${stats.size} > ${MAX_ARTIFACT_BYTES} bytes): ${normalized}`);
+    }
+  } catch {}
+  return ok;
+}
+
+// backend/src/services/knowledge-sync.ts
+function gatewayBaseUrl() {
+  const raw = process.env["KIROCREW_GATEWAY_URL"] || "http://127.0.0.1:5476";
+  return raw.replace(/\/+$/, "");
+}
+function specSourceUri(spec) {
+  return `spec-library://${spec.repository}/${spec.spec_id}`;
+}
+var BODY_ARTIFACTS = [
+  SPEC_ARTIFACTS.REQUIREMENTS,
+  SPEC_ARTIFACTS.BUGFIX,
+  SPEC_ARTIFACTS.DESIGN,
+  SPEC_ARTIFACTS.TASKS
+];
+var MAX_BODY_BYTES_PER_SPEC = 256 * 1024;
+async function readSpecArtifactBodies(spec, repoPath, opts = {}) {
+  const readFile = opts.fileReader ?? (async (p) => {
+    const file2 = Bun.file(p);
+    return await file2.exists() ? file2.text() : null;
+  });
+  const specDir = join3(repoPath, spec.relative_path);
+  const contents = {};
+  let budget = MAX_BODY_BYTES_PER_SPEC;
+  let truncated = false;
+  for (const filename of BODY_ARTIFACTS) {
+    if (budget <= 0) {
+      truncated = true;
+      break;
+    }
+    const filePath = join3(specDir, filename);
+    const relFromRepo = relative2(repoPath, filePath);
+    const validation = await validatePath(relFromRepo, repoPath);
+    if (!validation.valid) {
+      truncated = true;
+      continue;
+    }
+    let text;
+    try {
+      text = await readFile(filePath);
+    } catch {
+      truncated = true;
+      continue;
+    }
+    if (text === null)
+      continue;
+    if (text.length > budget) {
+      text = `${text.slice(0, budget)}
+
+\u2026[truncated]`;
+      truncated = true;
+    }
+    contents[filename] = text;
+    budget -= text.length;
+  }
+  return { contents, truncated };
+}
+function buildSpecKnowledgeDoc(spec, overlay, outgoing, bodies) {
+  const displayTitle = overlay?.title || spec.title || spec.spec_id;
+  const title = `Spec: ${displayTitle} (${spec.spec_id})`;
+  const tags = (() => {
+    if (!overlay?.tags)
+      return [];
+    try {
+      const parsed = JSON.parse(overlay.tags);
+      return Array.isArray(parsed) ? parsed.filter((t2) => typeof t2 === "string") : [];
+    } catch {
+      return [];
+    }
+  })();
+  const lines = [];
+  lines.push(`# ${displayTitle}`);
+  lines.push("");
+  lines.push(`Spec ID: ${spec.spec_id}`);
+  lines.push(`Repository: ${spec.repository}`);
+  lines.push(`Type: ${spec.type}`);
+  lines.push(`Workflow: ${spec.workflow}`);
+  lines.push(`Lifecycle stage: ${spec.stage}`);
+  lines.push(`Progress: ${spec.completed_tasks}/${spec.total_tasks} tasks complete (${spec.progress}%)`);
+  if (overlay?.owner || spec.owner)
+    lines.push(`Owner: ${overlay?.owner || spec.owner}`);
+  if (overlay?.theme)
+    lines.push(`Theme: ${overlay.theme}`);
+  if (tags.length > 0)
+    lines.push(`Tags: ${tags.join(", ")}`);
+  if (overlay?.target_release)
+    lines.push(`Target release: ${overlay.target_release}`);
+  lines.push("");
+  if (overlay?.summary) {
+    lines.push("## Summary");
+    lines.push("");
+    lines.push(overlay.summary);
+    lines.push("");
+  }
+  if (outgoing.length > 0) {
+    lines.push("## Relationships");
+    lines.push("");
+    for (const rel of outgoing) {
+      lines.push(`- The ${spec.spec_id} spec ${rel.type} the ${rel.targetSpecId} spec` + (rel.targetRepository && rel.targetRepository !== spec.repository ? ` (in repository ${rel.targetRepository}).` : "."));
+    }
+    lines.push("");
+  }
+  const BODY_HEADINGS = {
+    [SPEC_ARTIFACTS.REQUIREMENTS]: "Requirements",
+    [SPEC_ARTIFACTS.BUGFIX]: "Bug analysis",
+    [SPEC_ARTIFACTS.DESIGN]: "Design",
+    [SPEC_ARTIFACTS.TASKS]: "Tasks"
+  };
+  for (const filename of BODY_ARTIFACTS) {
+    const body = bodies?.contents[filename];
+    if (!body)
+      continue;
+    lines.push(`## ${BODY_HEADINGS[filename] ?? filename}`);
+    lines.push("");
+    lines.push(body.trimEnd());
+    lines.push("");
+  }
+  return { title, content: lines.join(`
+`) };
+}
+async function pushSpecDocument(spec, overlay, outgoing, bodies, ctx) {
+  const { title, content } = buildSpecKnowledgeDoc(spec, overlay, outgoing, bodies);
+  let resp;
+  try {
+    resp = await ctx.doFetch(ctx.url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title,
+        content,
+        reason: "Synced from Kiro Spec Library",
+        source_uri: specSourceUri(spec)
+      })
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { kind: "unreachable", error: `gateway unreachable: ${message}` };
+  }
+  if (resp.status === 403) {
+    let body2 = {};
+    try {
+      body2 = await resp.json();
+    } catch {}
+    return {
+      kind: "disabled",
+      error: body2.error || "Knowledge Library rejected the document: knowledge.auto_add_documents is off. " + "Enable it in the gateway config (~/.kiro/crew/config.json) to allow spec sync."
+    };
+  }
+  let body = {};
+  try {
+    body = await resp.json();
+  } catch {}
+  if (!resp.ok || body.error) {
+    return { kind: "failed", error: body.error || `HTTP ${resp.status}` };
+  }
+  return body.status === "duplicate" ? { kind: "duplicate" } : { kind: "added" };
+}
+function repoPathMap(db, dataDir) {
+  const map3 = new Map;
+  for (const source of listSources(db)) {
+    if (source.type === "local" && source.path) {
+      map3.set(source.id, source.path);
+    } else if (source.type === "remote" && dataDir) {
+      map3.set(source.id, join3(dataDir, "clones", source.id));
+    }
+  }
+  return map3;
+}
+function outgoingFor(db, spec) {
+  const out = [];
+  for (const rel of listAllRelationships(db)) {
+    if (rel.source_spec_key !== spec.key)
+      continue;
+    const target = findByKey(db, rel.target_spec_key);
+    if (!target)
+      continue;
+    out.push({
+      targetSpecId: target.spec_id,
+      targetRepository: target.repository,
+      type: rel.type
+    });
+  }
+  return out;
+}
+async function syncOneSpecToKnowledgeLibrary(db, specKey, opts = {}) {
+  const spec = findByKey(db, specKey);
+  if (!spec)
+    return null;
+  const ctx = {
+    doFetch: opts.fetchImpl ?? fetch,
+    url: `${gatewayBaseUrl()}/api/knowledge/agent-document`
+  };
+  const repoPath = repoPathMap(db, opts.dataDir).get(spec.source_id);
+  const bodies = repoPath ? await readSpecArtifactBodies(spec, repoPath, { fileReader: opts.fileReader }) : undefined;
+  const outcome = await pushSpecDocument(spec, getOverlay(db, spec.key), outgoingFor(db, spec), bodies, ctx);
+  const bodiesTruncated = bodies?.truncated ?? false;
+  switch (outcome.kind) {
+    case "added":
+      return { status: "added", specId: spec.spec_id, bodiesTruncated };
+    case "duplicate":
+      return { status: "duplicate", specId: spec.spec_id, bodiesTruncated };
+    case "disabled":
+      return { status: "disabled", specId: spec.spec_id, bodiesTruncated, error: outcome.error };
+    default:
+      return { status: "failed", specId: spec.spec_id, bodiesTruncated, error: outcome.error };
+  }
+}
+async function syncSpecsToKnowledgeLibrary(db, opts = {}) {
+  const ctx = {
+    doFetch: opts.fetchImpl ?? fetch,
+    url: `${gatewayBaseUrl()}/api/knowledge/agent-document`
+  };
+  const specs = listSpecs(db, { limit: Number.MAX_SAFE_INTEGER, offset: 0 });
+  const repoPathBySourceId = repoPathMap(db, opts.dataDir);
+  const byKey = new Map;
+  for (const s of specs)
+    byKey.set(s.key, s);
+  const outgoingByKey = new Map;
+  for (const rel of listAllRelationships(db)) {
+    const target = byKey.get(rel.target_spec_key);
+    if (!target)
+      continue;
+    const list = outgoingByKey.get(rel.source_spec_key) ?? [];
+    list.push({
+      targetSpecId: target.spec_id,
+      targetRepository: target.repository,
+      type: rel.type
+    });
+    outgoingByKey.set(rel.source_spec_key, list);
+  }
+  const result = {
+    attempted: 0,
+    added: 0,
+    duplicate: 0,
+    failed: 0,
+    bodiesTruncated: 0,
+    errors: []
+  };
+  for (const spec of specs) {
+    let bodies;
+    const repoPath = repoPathBySourceId.get(spec.source_id);
+    if (repoPath) {
+      bodies = await readSpecArtifactBodies(spec, repoPath, { fileReader: opts.fileReader });
+      if (bodies.truncated)
+        result.bodiesTruncated++;
+    }
+    result.attempted++;
+    const outcome = await pushSpecDocument(spec, getOverlay(db, spec.key), outgoingByKey.get(spec.key) ?? [], bodies, ctx);
+    switch (outcome.kind) {
+      case "added":
+        result.added++;
+        break;
+      case "duplicate":
+        result.duplicate++;
+        break;
+      case "unreachable":
+        result.failed++;
+        result.errors.push({ specId: spec.spec_id, error: outcome.error });
+        return result;
+      case "disabled":
+        result.disabled = true;
+        result.errors.push({ specId: spec.spec_id, error: outcome.error });
+        return result;
+      default:
+        result.failed++;
+        result.errors.push({ specId: spec.spec_id, error: outcome.error });
+        break;
+    }
+  }
+  return result;
+}
+
+// backend/src/routes/knowledge-sync.ts
+function knowledgeSyncRoutes(deps) {
+  const { db, dataDir } = deps;
+  return new Elysia({ prefix: "" }).post("/knowledge-sync", async ({ set }) => {
+    const result = await syncSpecsToKnowledgeLibrary(db, { dataDir });
+    recordEvent(db, "knowledge_sync_run");
+    if (result.disabled) {
+      set.status = 409;
+    }
+    return result;
+  }).post("/knowledge-sync/spec", async ({ body, set }) => {
+    const key = body?.key;
+    if (typeof key !== "string" || key.length === 0) {
+      set.status = 400;
+      return { code: "BAD_REQUEST", message: "key required" };
+    }
+    const result = await syncOneSpecToKnowledgeLibrary(db, key, { dataDir });
+    if (result === null) {
+      set.status = 404;
+      return { code: "NOT_FOUND", message: `Spec '${key}' not found` };
+    }
+    recordEvent(db, "knowledge_sync_run");
+    if (result.status === "disabled")
+      set.status = 409;
+    else if (result.status === "failed")
+      set.status = 502;
+    return result;
+  });
+}
+
 // backend/src/services/metadata.ts
 function resolveMetadata(spec, overlay, sidecar) {
   const sm = sidecar?.metadata;
@@ -25555,13 +25906,13 @@ function relationshipRoutes(deps) {
 
 // backend/src/routes/settings.ts
 import { existsSync as existsSync2 } from "fs";
-import { readdir, realpath, stat as stat2 } from "fs/promises";
+import { readdir, realpath as realpath2, stat as stat3 } from "fs/promises";
 import { homedir } from "os";
-import { basename, isAbsolute, join as join3, relative, resolve } from "path";
+import { basename, isAbsolute, join as join4, relative as relative3, resolve as resolve2 } from "path";
 function isWithinHome(abs, home) {
   if (abs === home)
     return true;
-  const rel = relative(home, abs);
+  const rel = relative3(home, abs);
   return rel !== "" && !rel.startsWith("..") && !isAbsolute(rel);
 }
 var BLOCKED_DIR_NAMES = new Set([
@@ -25587,7 +25938,7 @@ function settingsRoutes(deps) {
     const requested = query.path?.trim() || home;
     let abs;
     try {
-      abs = resolve(requested);
+      abs = resolve2(requested);
     } catch {
       set.status = 400;
       return { code: "BAD_REQUEST", message: "Invalid path" };
@@ -25595,13 +25946,13 @@ function settingsRoutes(deps) {
     let realAbs;
     let realHome;
     try {
-      realHome = await realpath(home);
+      realHome = await realpath2(home);
     } catch {
       set.status = 500;
       return { code: "INTERNAL", message: "Cannot resolve home directory." };
     }
     try {
-      realAbs = await realpath(abs);
+      realAbs = await realpath2(abs);
     } catch {
       set.status = 404;
       return { code: "NOT_FOUND", message: "Directory not found." };
@@ -25613,13 +25964,13 @@ function settingsRoutes(deps) {
         message: "Browsing is confined to your home directory."
       };
     }
-    const relSegs = relative(realHome, realAbs).split(/[/\\]/).filter(Boolean);
+    const relSegs = relative3(realHome, realAbs).split(/[/\\]/).filter(Boolean);
     if (relSegs.some((s) => BLOCKED_DIR_NAMES.has(s.toLowerCase()))) {
       set.status = 403;
       return { code: "FORBIDDEN", message: "That directory is not browsable." };
     }
     try {
-      const st = await stat2(realAbs);
+      const st = await stat3(realAbs);
       if (!st.isDirectory()) {
         set.status = 400;
         return { code: "BAD_REQUEST", message: "Not a directory." };
@@ -25642,38 +25993,38 @@ function settingsRoutes(deps) {
         continue;
       if (!e.isDirectory() && !e.isSymbolicLink())
         continue;
-      const childAbs = join3(realAbs, name);
+      const childAbs = join4(realAbs, name);
       let childReal;
       try {
-        childReal = await realpath(childAbs);
+        childReal = await realpath2(childAbs);
       } catch {
         continue;
       }
       if (!isWithinHome(childReal, realHome))
         continue;
       try {
-        if (!(await stat2(childReal)).isDirectory())
+        if (!(await stat3(childReal)).isDirectory())
           continue;
       } catch {
         continue;
       }
       let hasSpecs = false;
       try {
-        hasSpecs = existsSync2(join3(childReal, ".kiro", "specs"));
+        hasSpecs = existsSync2(join4(childReal, ".kiro", "specs"));
       } catch {
         hasSpecs = false;
       }
       dirs.push({ name, path: childReal, hasSpecs });
     }
     dirs.sort((a, b) => a.name.localeCompare(b.name));
-    const parentAbs = realAbs === realHome ? null : resolve(realAbs, "..");
+    const parentAbs = realAbs === realHome ? null : resolve2(realAbs, "..");
     const parent = parentAbs !== null && isWithinHome(parentAbs, realHome) ? parentAbs : null;
     return {
       path: realAbs,
       name: basename(realAbs) || realAbs,
       parent,
       home: realHome,
-      hasSpecs: existsSync2(join3(realAbs, ".kiro", "specs")),
+      hasSpecs: existsSync2(join4(realAbs, ".kiro", "specs")),
       directories: dirs
     };
   }, {
@@ -27379,14 +27730,14 @@ function createRouter(deps) {
       return { code: "NOT_FOUND", message: "Spec not found" };
     }
     return { proposals: listPendingProposals(db, spec.key) };
-  }).use(specRoutes({ db })).use(syncRoutes({ db, scanner })).use(settingsRoutes({ db })).use(archiveRoutes({ db, archiver })).use(relationshipRoutes({ db })).use(proposalRoutes({ db })).use(auditRoutes({ db })).use(backupRoutes({ db, dataDir })).use(textExportRoutes({ db }));
+  }).use(specRoutes({ db })).use(syncRoutes({ db, scanner })).use(settingsRoutes({ db })).use(archiveRoutes({ db, archiver })).use(relationshipRoutes({ db })).use(proposalRoutes({ db })).use(auditRoutes({ db })).use(backupRoutes({ db, dataDir })).use(textExportRoutes({ db })).use(knowledgeSyncRoutes({ db, dataDir }));
   return app;
 }
 
 // backend/src/services/archiver.ts
 import { createHash } from "crypto";
 import { chmod, mkdir, readFile, rm, writeFile } from "fs/promises";
-import { join as join4 } from "path";
+import { join as join5 } from "path";
 function sha256(content) {
   return createHash("sha256").update(content).digest("hex");
 }
@@ -27416,7 +27767,7 @@ class ArchiverService {
       return null;
     }
     const snapshotId = crypto.randomUUID();
-    const snapshotDir = join4(this.config.archiveDir, snapshotId);
+    const snapshotDir = join5(this.config.archiveDir, snapshotId);
     try {
       const storedArtifacts = await this.storeArtifacts(snapshotId, snapshotDir, artifactContents);
       const snapshot = {
@@ -27530,7 +27881,7 @@ class ArchiverService {
       throw new Error(`Purge not eligible: ${eligibility.reason}`);
     }
     purgeSnapshot(this.db, snapshotId);
-    const snapshotDir = join4(this.config.archiveDir, snapshotId);
+    const snapshotDir = join5(this.config.archiveDir, snapshotId);
     await rm(snapshotDir, { recursive: true, force: true });
     recordEvent(this.db, "snapshot_purged", {
       snapshotId,
@@ -27572,7 +27923,7 @@ class ArchiverService {
     const stored = [];
     for (const artifact of artifacts) {
       const contentHash = sha256(artifact.content);
-      const storagePath = join4(snapshotDir, artifact.name);
+      const storagePath = join5(snapshotDir, artifact.name);
       const sizeBytes = Buffer.byteLength(artifact.content, "utf-8");
       await writeFile(storagePath, artifact.content, { encoding: "utf-8" });
       await chmod(storagePath, 292);
@@ -27599,25 +27950,25 @@ class ArchiverService {
 
 // backend/src/services/scanner.ts
 import { existsSync as existsSync3, readdirSync as readdirSync2 } from "fs";
-import { join as join5, relative as relative3 } from "path";
+import { join as join6, relative as relative4 } from "path";
 
 // backend/src/security/git-validator.ts
-var ok = { valid: true };
-var reject = (reason) => ({ valid: false, reason });
+var ok2 = { valid: true };
+var reject2 = (reason) => ({ valid: false, reason });
 var SHELL_METACHARACTERS = /[;&|`$(){}!<>\\'"*?\[\]\n\r]/;
 function validateArgs(args) {
   for (const arg of args) {
     const lowerArg = arg.toLowerCase();
     for (const forbidden of FORBIDDEN_GIT_ARGS) {
       if (lowerArg === forbidden || lowerArg.startsWith(forbidden + "=")) {
-        return reject(`Forbidden git argument: ${arg}`);
+        return reject2(`Forbidden git argument: ${arg}`);
       }
     }
     if (SHELL_METACHARACTERS.test(arg)) {
-      return reject(`Git argument contains shell metacharacters: ${arg}`);
+      return reject2(`Git argument contains shell metacharacters: ${arg}`);
     }
   }
-  return ok;
+  return ok2;
 }
 function buildFetchCommand(clonePath, branch) {
   const argsCheck = validateArgs([clonePath, branch]);
@@ -27657,52 +28008,6 @@ function buildCloneCommand(url, destination, branch) {
     url,
     destination
   ];
-}
-
-// backend/src/security/path-validator.ts
-import { realpath as realpath2, stat as stat3 } from "fs/promises";
-import { normalize, relative as relative2, resolve as resolve2 } from "path";
-var ok2 = { valid: true };
-var reject2 = (reason) => ({ valid: false, reason });
-async function validatePath(filePath, sourceRoot) {
-  const normalized = normalize(filePath);
-  if (normalized === "/" || normalized === "\\") {
-    return reject2("Filesystem root is not allowed as a path");
-  }
-  if (filePath.split(/[/\\]/).includes("..")) {
-    return reject2(`Path contains traversal component: ${filePath}`);
-  }
-  const absolute = resolve2(sourceRoot, normalized);
-  const resolvedRoot = resolve2(sourceRoot);
-  const rel = relative2(resolvedRoot, absolute);
-  if (rel.startsWith("..") || resolve2(resolvedRoot, rel) !== absolute) {
-    return reject2(`Path resolves outside source root: ${absolute}`);
-  }
-  const lowerRel = rel.toLowerCase();
-  for (const credPath of CREDENTIAL_PATHS) {
-    if (lowerRel === credPath || lowerRel.startsWith(credPath + "/")) {
-      return reject2(`Access to credential path is forbidden: ${credPath}`);
-    }
-  }
-  try {
-    const realFile = await realpath2(absolute);
-    const realRoot = await realpath2(resolvedRoot);
-    const relFromReal = relative2(realRoot, realFile);
-    if (relFromReal.startsWith("..")) {
-      return reject2(`Symlink escapes source root: ${absolute} -> ${realFile}`);
-    }
-  } catch (err2) {
-    if (err2.code !== "ENOENT") {
-      return reject2(`Cannot resolve path: ${err2.message}`);
-    }
-  }
-  try {
-    const stats = await stat3(absolute);
-    if (stats.isFile() && stats.size > MAX_ARTIFACT_BYTES) {
-      return reject2(`File exceeds maximum size (${stats.size} > ${MAX_ARTIFACT_BYTES} bytes): ${normalized}`);
-    }
-  } catch {}
-  return ok2;
 }
 
 // backend/src/services/auto-metadata.ts
@@ -28519,7 +28824,7 @@ class ScannerService {
     if (source.type === "remote") {
       await this.refreshRemote(source);
     }
-    const repoPath = source.type === "local" ? source.path : join5(this.dataDir, "clones", source.id);
+    const repoPath = source.type === "local" ? source.path : join6(this.dataDir, "clones", source.id);
     const specDirs = this.discoverSpecDirs(repoPath, source.id);
     const results = [];
     for (const specDir of specDirs) {
@@ -28599,7 +28904,7 @@ class ScannerService {
     return results;
   }
   async refreshRemote(source) {
-    const clonePath = join5(this.dataDir, "clones", source.id);
+    const clonePath = join6(this.dataDir, "clones", source.id);
     const branch = source.branch ?? "main";
     if (!existsSync3(clonePath)) {
       const cmd = buildCloneCommand(source.url, clonePath, branch);
@@ -28616,7 +28921,7 @@ class ScannerService {
     }
   }
   discoverSpecDirs(repoPath, sourceId) {
-    const specsRoot = join5(repoPath, ".kiro", "specs");
+    const specsRoot = join6(repoPath, ".kiro", "specs");
     if (!existsSync3(specsRoot)) {
       return [];
     }
@@ -28624,8 +28929,8 @@ class ScannerService {
     const dirs = [];
     for (const entry of entries) {
       if (entry.isDirectory()) {
-        const absolutePath = join5(specsRoot, entry.name);
-        const relativePath = relative3(repoPath, absolutePath);
+        const absolutePath = join6(specsRoot, entry.name);
+        const relativePath = relative4(repoPath, absolutePath);
         dirs.push({
           slug: entry.name,
           absolutePath,
@@ -28637,13 +28942,13 @@ class ScannerService {
     return dirs;
   }
   async readArtifacts(specDir, source) {
-    const repoPath = source.type === "local" ? source.path : join5(this.dataDir, "clones", source.id);
+    const repoPath = source.type === "local" ? source.path : join6(this.dataDir, "clones", source.id);
     const contents = {};
     let config = null;
     const artifactNames = Object.values(SPEC_ARTIFACTS);
     for (const filename of artifactNames) {
-      const filePath = join5(specDir.absolutePath, filename);
-      const relFromRepo = relative3(repoPath, filePath);
+      const filePath = join6(specDir.absolutePath, filename);
+      const relFromRepo = relative4(repoPath, filePath);
       const validation = await validatePath(relFromRepo, repoPath);
       if (!validation.valid) {
         console.warn(`[scanner] Skipping invalid path ${relFromRepo}: ${validation.reason}`);
@@ -28755,15 +29060,15 @@ ${stderr}`);
 
 // backend/src/index.ts
 var port = Number(process.env["PORT"]) || Number(process.env["SPEC_LIBRARY_PORT"]) || 3100;
-var dataDir = process.env["SPEC_LIBRARY_DATA_DIR"] || join6(process.cwd(), "data");
-var archiveDir = join6(dataDir, "archive");
+var dataDir = process.env["SPEC_LIBRARY_DATA_DIR"] || join7(process.cwd(), "data");
+var archiveDir = join7(dataDir, "archive");
 console.log("[startup] Kiro Spec Library backend starting...");
 var mcpToken = crypto.randomUUID();
 console.log(`[startup] MCP token generated: ${mcpToken.slice(0, 8)}...`);
 var enforceMcpAuth = process.env["MCP_AUTH_ENFORCE"] === "1";
 mkdirSync2(dataDir, { recursive: true });
 mkdirSync2(archiveDir, { recursive: true });
-var mcpTokenPath = join6(dataDir, "mcp-token");
+var mcpTokenPath = join7(dataDir, "mcp-token");
 writeFileSync2(mcpTokenPath, mcpToken, { mode: 384 });
 chmodSync(mcpTokenPath, 384);
 console.log("[startup] Opening database...");

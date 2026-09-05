@@ -1,32 +1,31 @@
+import { cors } from "@elysiajs/cors";
+import { MAX_ERROR_MESSAGE_LENGTH } from "@kiro-spec-library/shared";
 // Elysia router — global middleware + health/bootstrap routes (Tasks 11.1, 11.2)
 import { Elysia } from "elysia";
-import { cors } from "@elysiajs/cors";
-import { MAX_ERROR_MESSAGE_LENGTH, } from "@kiro-spec-library/shared";
-import { specRoutes } from "./routes/specs.js";
-import { syncRoutes } from "./routes/sync.js";
-import { settingsRoutes } from "./routes/settings.js";
+import { getOverlay, overlayRowToMetadataOverlay } from "./db/queries/metadata.js";
+import { listPendingProposals } from "./db/queries/proposals.js";
+import { findByKey } from "./db/queries/specs.js";
+import { listPending as listPendingSuggestions } from "./db/queries/suggestions.js";
 import { archiveRoutes } from "./routes/archive.js";
-import { relationshipRoutes } from "./routes/relationships.js";
-import { proposalRoutes } from "./routes/proposals.js";
 import { auditRoutes } from "./routes/audit.js";
 import { backupRoutes } from "./routes/backup.js";
+import { knowledgeSyncRoutes } from "./routes/knowledge-sync.js";
+import { proposalRoutes } from "./routes/proposals.js";
+import { relationshipRoutes } from "./routes/relationships.js";
+import { settingsRoutes } from "./routes/settings.js";
+import { specRoutes } from "./routes/specs.js";
+import { syncRoutes } from "./routes/sync.js";
 import { textExportRoutes } from "./routes/text-export.js";
-import { findByKey } from "./db/queries/specs.js";
-import { getOverlay, overlayRowToMetadataOverlay } from "./db/queries/metadata.js";
 import { resolveMetadata } from "./services/metadata.js";
-import { listPending as listPendingSuggestions } from "./db/queries/suggestions.js";
-import { listPendingProposals } from "./db/queries/proposals.js";
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function truncate(msg, max) {
     return msg.length > max ? msg.slice(0, max - 1) + "…" : msg;
 }
 function isKnownError(err) {
-    return (err instanceof Error &&
-        typeof err.code === "string");
+    return (err instanceof Error && typeof err.code === "string");
 }
 function isValidationError(err) {
-    return (err instanceof Error &&
-        err.code === "VALIDATION_ERROR");
+    return (err instanceof Error && err.code === "VALIDATION_ERROR");
 }
 // ─── Factory ─────────────────────────────────────────────────────────────────
 export function createRouter(deps) {
@@ -99,9 +98,7 @@ export function createRouter(deps) {
             return { status: "starting" };
         }
         // Spec count
-        const specRow = db
-            .query("SELECT COUNT(*) as count FROM specs")
-            .get();
+        const specRow = db.query("SELECT COUNT(*) as count FROM specs").get();
         const specCount = specRow?.count ?? 0;
         // Archive (snapshot) count
         const archiveRow = db
@@ -190,6 +187,7 @@ export function createRouter(deps) {
         .use(proposalRoutes({ db }))
         .use(auditRoutes({ db }))
         .use(backupRoutes({ db, dataDir }))
-        .use(textExportRoutes({ db }));
+        .use(textExportRoutes({ db }))
+        .use(knowledgeSyncRoutes({ db, dataDir }));
     return app;
 }

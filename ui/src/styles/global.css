@@ -1464,6 +1464,22 @@ button.archive-row:hover {
 .spec-actions__primary:hover {
   filter: brightness(1.08);
 }
+.spec-actions__secondary {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--canvas-accent, #9c75ff);
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--canvas-accent, #9c75ff);
+  font-weight: 600;
+  cursor: pointer;
+}
+.spec-actions__secondary:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--canvas-accent, #9c75ff) 12%, transparent);
+}
+.spec-actions__secondary:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
 .spec-actions__permalink {
   display: flex;
   flex-wrap: wrap;

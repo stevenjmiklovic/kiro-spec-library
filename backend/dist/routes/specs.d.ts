@@ -24,6 +24,8 @@ export declare function specRoutes(deps: {
             body: unknown;
             params: {};
             query: {
+                limit?: string | undefined;
+                offset?: string | undefined;
                 type?: string | undefined;
                 stage?: string | undefined;
                 owner?: string | undefined;
@@ -31,8 +33,6 @@ export declare function specRoutes(deps: {
                 repository?: string | undefined;
                 metadataComplete?: string | undefined;
                 q?: string | undefined;
-                limit?: string | undefined;
-                offset?: string | undefined;
             };
             headers: unknown;
             response: {
@@ -163,22 +163,22 @@ export declare function specRoutes(deps: {
             metadata: {
                 patch: {
                     body: {
-                        expectedRevision: number;
                         patch: {
-                            tags?: string[] | undefined;
                             owner?: string | undefined;
                             theme?: string | undefined;
+                            implementationRef?: string | undefined;
                             title?: string | undefined;
-                            summary?: string | undefined;
-                            targetRelease?: string | undefined;
+                            tags?: string[] | undefined;
                             retentionPolicy?: {
                                 customDate?: string | undefined;
                                 type: string;
                             } | undefined;
+                            summary?: string | undefined;
+                            targetRelease?: string | undefined;
                             approvers?: string[] | undefined;
-                            implementationRef?: string | undefined;
                             reviewedAt?: string | undefined;
                         };
+                        expectedRevision: number;
                     };
                     params: {
                         id: string;
