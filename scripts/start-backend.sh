@@ -21,19 +21,30 @@ BUN="${HOME}/.bun/bin/bun"
 #
 # The gateway spawns this script with PORT set to the port it auto-allocated
 # (9100-9200) and proxies traffic there. A legitimate gateway spawn ALWAYS
-# provides PORT. If we are running under the gateway (KIROCREW_BOUND_PORT is
-# set) but PORT is absent, this is the buggy re-spawn path: the process would
-# fall back to SPEC_LIBRARY_PORT/3100, bind a port the proxy never targets,
-# fail the gateway's health check, get SIGTERM'd, and be re-spawned ~every
-# minute — a flapping stray that races the correctly-supervised instance.
-# Refuse to start in that case instead of squatting on the fallback port.
-if [[ -z "${PORT:-}" && -n "${KIROCREW_BOUND_PORT:-}" ]]; then
-  echo "[start-backend] Refusing to start: launched by the gateway (KIROCREW_BOUND_PORT=${KIROCREW_BOUND_PORT}) but no allocated PORT was provided." >&2
-  echo "[start-backend] Binding the SPEC_LIBRARY_PORT fallback here would create a flapping stray on an un-proxied port. Exiting." >&2
-  exit 1
+# provides PORT. Any launch WITHOUT PORT that still binds the hardcoded 3100
+# fallback creates a backend the gateway never allocated, never proxies to, and
+# never supervises or reaps — a second instance that survives gateway restarts
+# and races the correctly-supervised one. This has bitten us twice: a gateway
+# re-spawn with KIROCREW_BOUND_PORT set but no PORT (flapping ~every minute),
+# and an orphaned hand-launch re-parented to launchd that lingered across
+# restarts. Both share one root cause: a silent fallback to a fixed port.
+#
+# So: PORT is REQUIRED. The only way to bind the fallback is an EXPLICIT
+# opt-in (SPEC_LIBRARY_STANDALONE=1), which a human sets for local dev and the
+# gateway never sets. Absent both, refuse — never squat a port nothing proxies.
+if [[ -z "${PORT:-}" ]]; then
+  if [[ "${SPEC_LIBRARY_STANDALONE:-}" == "1" ]]; then
+    PORT="${SPEC_LIBRARY_PORT:-3100}"
+    echo "[start-backend] Standalone dev mode: binding fallback port ${PORT} (SPEC_LIBRARY_STANDALONE=1)." >&2
+  else
+    echo "[start-backend] Refusing to start: no PORT was provided." >&2
+    echo "[start-backend]   - Under the gateway (KIROCREW_BOUND_PORT=${KIROCREW_BOUND_PORT:-<unset>}), PORT is always allocated; its absence means a buggy re-spawn." >&2
+    echo "[start-backend]   - For a standalone dev run, set SPEC_LIBRARY_STANDALONE=1 (optionally with SPEC_LIBRARY_PORT)." >&2
+    echo "[start-backend] Binding a hardcoded fallback here would create an un-proxied, un-supervised second instance. Exiting." >&2
+    exit 1
+  fi
 fi
 
-PORT="${PORT:-${SPEC_LIBRARY_PORT:-3100}}"
 DIST="backend/dist/index.mjs"
 
 # ─── Build if stale ───────────────────────────────────────────────────────────

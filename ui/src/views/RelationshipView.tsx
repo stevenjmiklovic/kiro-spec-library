@@ -354,6 +354,7 @@ export function RelationshipView(): React.ReactElement {
       className="relationship-view"
       aria-label="Specification relationship graph view"
       role="application"
+      tabIndex={0}
       onFocus={handleContainerFocus}
     >
       {/* Header */}
