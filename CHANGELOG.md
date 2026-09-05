@@ -5,6 +5,19 @@ All notable changes to the Kiro Spec Library will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] — 2026-09-04
+
+### Added
+
+- Added a Sources management panel (open from the "Sources" toolbar button) to add local repository paths or remote Git URLs, remove sources, scan a single project on demand, and "Save & rescan" the whole set — plus a first-run getting-started empty state that guides new users to add their first source. Includes a home-confined, credential-path-blocked filesystem folder-picker so a local path can be browsed to instead of typed.
+- Added project-based grouping to the relationship graph: each spec now carries a friendly project name (derived from its source, not the raw absolute repo path), shown as a chip on every node, and "Project" is the default Y-axis grouping so specs cluster by the repository they belong to.
+
+### Fixed
+
+- Fixed the Rescan button, which appeared to do nothing: it now polls the scan to completion, reports how many specs were indexed, refreshes the graph in place, and warns clearly when no sources are configured instead of silently scanning nothing.
+- Fixed the Type filter, whose options (spec/design/adr/runbook/reference) matched no specs; it now offers the actual spec types (Feature, Bugfix, Quick, Unknown).
+- Fixed the Sources panel, where a newly added source appeared ephemeral and "Save & rescan" never scanned. The sources API now returns the canonical camelCase source shape instead of raw database rows, so the payload the panel forwards to the scan endpoint validates and the scan actually runs. Saving now also fully replaces the source list — a source you remove is deleted rather than lingering.
+
 ## [0.2.0] — 2026-08-16
 
 ### Added

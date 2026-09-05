@@ -5,7 +5,7 @@ import { homedir } from "node:os";
 import { basename, isAbsolute, join, relative, resolve } from "node:path";
 import { SourceConfigSchema } from "@kiro-spec-library/shared";
 import { Elysia, t } from "elysia";
-import { listSources, putSource } from "../db/queries/sources.js";
+import { listSources, replaceSources } from "../db/queries/sources.js";
 
 /** True iff `abs` is the home dir or strictly inside it (cross-platform). */
 function isWithinHome(abs: string, home: string): boolean {
@@ -212,9 +212,9 @@ export function settingsRoutes(deps: SettingsDeps) {
             });
           }
 
-          for (const source of validated) {
-            putSource(db, source);
-          }
+          // PUT replaces the entire source set (the UI's "Save & rescan"
+          // promises this). Do it atomically so a removed source can't linger.
+          replaceSources(db, validated);
 
           const sources = listSources(db);
           return { sources };

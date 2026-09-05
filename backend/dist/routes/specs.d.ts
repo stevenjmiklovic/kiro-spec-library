@@ -1,5 +1,5 @@
-import { Elysia } from "elysia";
 import type { Database } from "bun:sqlite";
+import { Elysia } from "elysia";
 import { type SpecRow } from "../db/queries/specs.js";
 export declare function specRoutes(deps: {
     db: Database;
@@ -24,15 +24,15 @@ export declare function specRoutes(deps: {
             body: unknown;
             params: {};
             query: {
-                owner?: string | undefined;
-                theme?: string | undefined;
-                limit?: string | undefined;
-                offset?: string | undefined;
                 type?: string | undefined;
                 stage?: string | undefined;
+                owner?: string | undefined;
+                theme?: string | undefined;
                 repository?: string | undefined;
                 metadataComplete?: string | undefined;
                 q?: string | undefined;
+                limit?: string | undefined;
+                offset?: string | undefined;
             };
             headers: unknown;
             response: {
@@ -165,18 +165,18 @@ export declare function specRoutes(deps: {
                     body: {
                         expectedRevision: number;
                         patch: {
-                            implementationRef?: string | undefined;
-                            title?: string | undefined;
+                            tags?: string[] | undefined;
                             owner?: string | undefined;
                             theme?: string | undefined;
-                            tags?: string[] | undefined;
-                            approvers?: string[] | undefined;
+                            title?: string | undefined;
                             summary?: string | undefined;
                             targetRelease?: string | undefined;
                             retentionPolicy?: {
                                 customDate?: string | undefined;
                                 type: string;
                             } | undefined;
+                            approvers?: string[] | undefined;
+                            implementationRef?: string | undefined;
                             reviewedAt?: string | undefined;
                         };
                     };

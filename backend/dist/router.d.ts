@@ -1,8 +1,8 @@
-import { Elysia } from "elysia";
 import type { Database } from "bun:sqlite";
 import type { FieldError } from "@kiro-spec-library/shared";
-import type { ScannerService } from "./services/scanner.js";
+import { Elysia } from "elysia";
 import type { ArchiverService } from "./services/archiver.js";
+import type { ScannerService } from "./services/scanner.js";
 export interface RouterDeps {
     db: Database;
     scanner: ScannerService;
@@ -450,8 +450,8 @@ export declare function createRouter(deps: RouterDeps): Elysia<"/api", {
                         url?: string | undefined;
                         branch?: string | undefined;
                         webUrlTemplate?: string | undefined;
-                        id: string;
                         type: "local" | "remote";
+                        id: string;
                         addedAt: string;
                     }[];
                 };
@@ -514,7 +514,7 @@ export declare function createRouter(deps: RouterDeps): Elysia<"/api", {
                     headers: unknown;
                     response: {
                         200: {
-                            sources: import("./db/queries/sources.js").SourceRow[];
+                            sources: import("@kiro-spec-library/shared").Source[];
                         };
                     };
                 };
@@ -577,8 +577,8 @@ export declare function createRouter(deps: RouterDeps): Elysia<"/api", {
                         branch?: string | undefined;
                         webUrlTemplate?: string | undefined;
                         addedAt?: string | undefined;
-                        id: string;
                         type: "local" | "remote";
+                        id: string;
                     }[];
                     params: {};
                     query: unknown;
@@ -589,7 +589,7 @@ export declare function createRouter(deps: RouterDeps): Elysia<"/api", {
                             message: string;
                             sources?: undefined;
                         } | {
-                            sources: import("./db/queries/sources.js").SourceRow[];
+                            sources: import("@kiro-spec-library/shared").Source[];
                             code?: undefined;
                             message?: undefined;
                         };

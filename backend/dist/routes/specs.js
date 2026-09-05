@@ -1,12 +1,12 @@
 import { Elysia, t } from "elysia";
-import { listSpecs, countSpecs, findByKey, } from "../db/queries/specs.js";
 import { getOverlay, overlayRowToMetadataOverlay } from "../db/queries/metadata.js";
 import { RevisionConflictError } from "../db/queries/metadata.js";
-import { applyPatch, resolveMetadata, evaluateCompleteness } from "../services/metadata.js";
 import { listBySourceKeys } from "../db/queries/relationships.js";
-import { listPendingBySourceKeys } from "../db/queries/suggestions.js";
 import { listSources } from "../db/queries/sources.js";
+import { countSpecs, findByKey, listSpecs, } from "../db/queries/specs.js";
+import { listPendingBySourceKeys } from "../db/queries/suggestions.js";
 import { recordEvent } from "../services/audit.js";
+import { applyPatch, evaluateCompleteness, resolveMetadata } from "../services/metadata.js";
 /**
  * Derive a friendly, human-readable project name for a spec.
  *
@@ -39,7 +39,7 @@ function attachRelationshipData(db, specs) {
     const keys = specs.map((spec) => spec.key);
     const relationships = listBySourceKeys(db, keys);
     const suggestions = listPendingBySourceKeys(db, keys);
-    const sourceById = new Map(listSources(db).map((s) => [s.id, { id: s.id, path: s.path, url: s.url }]));
+    const sourceById = new Map(listSources(db).map((s) => [s.id, { id: s.id, path: s.path ?? null, url: s.url ?? null }]));
     const relsByKey = new Map();
     for (const rel of relationships) {
         const list = relsByKey.get(rel.source_spec_key) ?? [];

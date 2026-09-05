@@ -2,7 +2,6 @@
 import { chmodSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { DEFAULT_SCAN_INTERVAL_MS } from "@kiro-spec-library/shared";
-import type { Source } from "@kiro-spec-library/shared";
 import { createDatabase } from "./db/connection.js";
 import { runMigrations } from "./db/migrator.js";
 import { listSources } from "./db/queries/sources.js";
@@ -71,7 +70,7 @@ console.log(`[startup] Server listening on port ${server.port}`);
 // 8. Trigger initial scan (non-blocking)
 (async () => {
   try {
-    const sources = listSources(db) as unknown as Source[];
+    const sources = listSources(db);
     if (sources.length > 0) {
       console.log(`[startup] Triggering initial scan of ${sources.length} source(s)...`);
       await scanner.triggerScan(sources);
@@ -90,7 +89,7 @@ console.log(`[startup] Server listening on port ${server.port}`);
 // 9. Schedule periodic scans
 const scanInterval = setInterval(async () => {
   try {
-    const sources = listSources(db) as unknown as Source[];
+    const sources = listSources(db);
     if (sources.length > 0) {
       await scanner.triggerScan(sources);
     }

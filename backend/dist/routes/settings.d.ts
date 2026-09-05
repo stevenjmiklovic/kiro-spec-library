@@ -1,5 +1,5 @@
-import { Elysia } from "elysia";
 import type { Database } from "bun:sqlite";
+import { Elysia } from "elysia";
 export interface SettingsDeps {
     db: Database;
 }
@@ -28,7 +28,7 @@ export declare function settingsRoutes(deps: SettingsDeps): Elysia<"/settings", 
                 headers: unknown;
                 response: {
                     200: {
-                        sources: import("../db/queries/sources.js").SourceRow[];
+                        sources: import("@kiro-spec-library/shared").Source[];
                     };
                 };
             };
@@ -86,13 +86,13 @@ export declare function settingsRoutes(deps: SettingsDeps): Elysia<"/settings", 
         sources: {
             put: {
                 body: {
-                    path?: string | undefined;
                     url?: string | undefined;
+                    path?: string | undefined;
                     branch?: string | undefined;
                     webUrlTemplate?: string | undefined;
                     addedAt?: string | undefined;
                     id: string;
-                    type: "local" | "remote";
+                    type: "remote" | "local";
                 }[];
                 params: {};
                 query: unknown;
@@ -103,7 +103,7 @@ export declare function settingsRoutes(deps: SettingsDeps): Elysia<"/settings", 
                         message: string;
                         sources?: undefined;
                     } | {
-                        sources: import("../db/queries/sources.js").SourceRow[];
+                        sources: import("@kiro-spec-library/shared").Source[];
                         code?: undefined;
                         message?: undefined;
                     };

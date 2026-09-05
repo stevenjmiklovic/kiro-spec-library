@@ -141,12 +141,12 @@ export function buildTextExportZip(db: Database): Uint8Array {
 
   const sources: TextExportSource[] = listSources(db).map((s) => ({
     id: s.id,
-    type: s.type as "local" | "remote",
+    type: s.type,
     path: s.path ?? undefined,
     url: s.url ?? undefined,
     branch: s.branch ?? undefined,
-    webUrlTemplate: s.web_url_template ?? undefined,
-    addedAt: s.added_at,
+    webUrlTemplate: s.webUrlTemplate ?? undefined,
+    addedAt: s.addedAt,
   }));
   putJson(files, "sources.json", sources);
 
