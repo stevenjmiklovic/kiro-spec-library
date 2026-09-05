@@ -83,7 +83,14 @@ kill_port() {
 kill_port
 
 # ─── Exec ─────────────────────────────────────────────────────────────────────
-
+#
+# `exec bun <file>` — NOT `bun run <file>`. `bun run` is a launcher that starts a
+# supervisor process and forks the script as a CHILD; the gateway records the
+# launcher PID, so on SIGTERM the forked child can be orphaned and re-parented to
+# init/launchd, surviving gateway restarts. `_reap_stale_app_backends` only reaps
+# the PID recorded in app_backends.pids.json, so an un-recorded forked child is
+# never reaped. Exec-ing bun directly makes the recorded PID the actual JS runtime
+# and listener — one process, nothing to orphan, always reapable.
 echo "[start-backend] Starting on port $PORT"
 export SPEC_LIBRARY_PORT="$PORT"
-exec "$BUN" run "$DIST"
+exec "$BUN" "$DIST"
