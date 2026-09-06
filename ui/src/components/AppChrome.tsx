@@ -97,6 +97,18 @@ export function AppChrome({
     }
   };
 
+  // Let other surfaces (e.g. the DetailPanel's 404 recovery) request a rescan
+  // through the chrome's single owning handler instead of duplicating the flow.
+  React.useEffect(() => {
+    const onRequest = (): void => {
+      void handleRescan();
+    };
+    window.addEventListener("spec-library:request-rescan", onRequest);
+    return () => window.removeEventListener("spec-library:request-rescan", onRequest);
+    // handleRescan closes over stable api/notify; re-binding each render is harmless
+    // and avoids a stale closure. eslint-disable-next-line react-hooks/exhaustive-deps
+  });
+
   /** Poll GET /sync/:runId until the scan leaves the "running" state (or times out). */
   const pollScan = async (
     runId: string,

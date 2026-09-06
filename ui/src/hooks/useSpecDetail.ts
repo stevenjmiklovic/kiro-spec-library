@@ -81,6 +81,8 @@ export interface UseSpecDetailResult {
   loading: boolean;
   saving: boolean;
   error: string | null;
+  /** HTTP status of a failed detail load (e.g. 404), or null. Lets the UI show cause-specific recovery copy. */
+  errorStatus: number | null;
   /** Apply a metadata patch with optimistic-concurrency retry on conflict. */
   save: (patch: MetadataPatch) => Promise<boolean>;
   acceptSuggestion: (id: string) => Promise<void>;
@@ -214,6 +216,7 @@ export function useSpecDetail(specKey: string | undefined): UseSpecDetailResult 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorStatus, setErrorStatus] = useState<number | null>(null);
 
   const fetchIdRef = useRef(0);
 
@@ -223,18 +226,26 @@ export function useSpecDetail(specKey: string | undefined): UseSpecDetailResult 
       setSuggestions([]);
       setProposals([]);
       setError(null);
+      setErrorStatus(null);
       return;
     }
     const id = ++fetchIdRef.current;
     setLoading(true);
     setError(null);
+    setErrorStatus(null);
     try {
       const [detailRes, sugRes, propRes] = await Promise.all([
         api.fetch(`/spec-detail?key=${encodeURIComponent(specKey)}`),
         api.fetch(`/spec-suggestions?key=${encodeURIComponent(specKey)}`),
         api.fetch(`/spec-proposals?key=${encodeURIComponent(specKey)}`),
       ]);
-      if (!detailRes.ok) throw new Error(`Failed to load spec: ${detailRes.status}`);
+      if (!detailRes.ok) {
+        const statusErr = new Error(`Failed to load spec: ${detailRes.status}`) as Error & {
+          status?: number;
+        };
+        statusErr.status = detailRes.status;
+        throw statusErr;
+      }
       const detailData: unknown = await detailRes.json();
       const sugData: unknown = sugRes.ok ? await sugRes.json() : { suggestions: [] };
       const propData: unknown = propRes.ok ? await propRes.json() : { proposals: [] };
@@ -247,6 +258,11 @@ export function useSpecDetail(specKey: string | undefined): UseSpecDetailResult 
     } catch (err) {
       if (id === fetchIdRef.current) {
         setError(err instanceof Error ? err.message : String(err));
+        setErrorStatus(
+          typeof (err as { status?: unknown })?.status === "number"
+            ? (err as { status: number }).status
+            : null,
+        );
         setDetail(null);
         setSuggestions([]);
         setProposals([]);
@@ -386,6 +402,7 @@ export function useSpecDetail(specKey: string | undefined): UseSpecDetailResult 
       loading,
       saving,
       error,
+      errorStatus,
       save,
       acceptSuggestion,
       rejectSuggestion,
@@ -400,6 +417,7 @@ export function useSpecDetail(specKey: string | undefined): UseSpecDetailResult 
       loading,
       saving,
       error,
+      errorStatus,
       save,
       acceptSuggestion,
       rejectSuggestion,

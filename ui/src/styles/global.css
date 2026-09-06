@@ -1627,6 +1627,55 @@ button.archive-row:hover {
   color: var(--canvas-text-muted, #909296);
 }
 
+/* Error-recovery state — plain cause + inline Retry / Rescan instead of a raw
+   HTTP status with only a close button (Nielsen #9: help users recover). */
+.detail-panel__error {
+  margin-top: 1.75rem;
+  padding: 1rem 1.1rem 1.15rem;
+  border: 1px solid color-mix(in srgb, var(--canvas-accent, #9c75ff) 24%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--canvas-accent, #9c75ff) 8%, transparent);
+}
+.detail-panel__error-title {
+  margin: 0 0 0.35rem;
+  color: var(--canvas-text, #e6e6e9);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.detail-panel__error-body {
+  margin: 0 0 0.9rem;
+  color: var(--canvas-text-muted, #909296);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+.detail-panel__error-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+.detail-panel__error-btn {
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--canvas-border, #33343a);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--canvas-text, #e6e6e9);
+  font-family: var(--font-label);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.detail-panel__error-btn:hover {
+  background: color-mix(in srgb, var(--canvas-text, #e6e6e9) 8%, transparent);
+}
+.detail-panel__error-btn--primary {
+  border-color: transparent;
+  background: var(--canvas-accent, #9c75ff);
+  color: #fff;
+}
+.detail-panel__error-btn--primary:hover {
+  background: color-mix(in srgb, var(--canvas-accent, #9c75ff) 85%, #000);
+}
+
 .detail-panel__header {
   margin-bottom: 1rem;
   padding-right: 2rem;

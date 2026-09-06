@@ -348,6 +348,47 @@ const overrides: Partial<CrewIntegration> = {
         ].filter((e) => !operationFilter || e.operation === operationFilter);
         return json({ events, total: events.length });
       }
+      // Spec detail — the real app fetches /spec-detail?key=...; return the
+      // same real detail shape as /specs/:key above, keyed off the query param.
+      const specDetailMatch = path.match(/^\/spec-detail\?key=([^&]+)/);
+      if (specDetailMatch) {
+        const key = decodeURIComponent(specDetailMatch[1] ?? "");
+        const s = sampleSpecs.find((x) => x.key === key) ?? sampleSpecs[0]!;
+        const overlay = metadataOverlays.get(key) ?? {};
+        const rev = revisionCounters.get(key) ?? 0;
+        return json({
+          spec: {
+            key: s.key,
+            spec_id: s.key,
+            type: s.type,
+            stage: s.stage,
+            progress: s.progress,
+            owner: s.owner,
+            title: s.title,
+            repository: s.repository,
+            relative_path: `.kiro/specs/${s.key}`,
+            branch: "main",
+            commit_hash: "a1b2c3d4e5f6",
+            is_dirty: s.key === "workspace-export" ? 1 : 0,
+            remote_url: "https://github.com/crew-platform/crew.git",
+          },
+          metadata: {
+            title: s.title,
+            summary: `${s.title} — normalized from .kiro/specs/${s.key}.`,
+            owner: s.owner,
+            theme: s.theme,
+            tags: ["kiro", s.type],
+            targetRelease: "2026.09",
+            retentionPolicy: { type: "active_plus_2_years" },
+            approvers: ["Maya Chen", "Daniel Kim"],
+            implementationRef: "https://github.com/crew-platform/crew/pull/847",
+            createdAt: "2026-07-12T09:15:00Z",
+            lastModifiedAt: "2026-08-14T16:30:00Z",
+            ...overlay,
+          },
+          revision: rev,
+        });
+      }
       // Spec listing.
       return json({ specs: sampleSpecs, total: sampleSpecs.length });
     },
