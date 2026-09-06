@@ -111,8 +111,43 @@ function getColumns(specs: GraphSpec[], field: XAxisField): string[] {
 
 const LEFT_GUTTER = 160;
 const COLUMN_WIDTH = 270;
+/** Narrow width for a Status column with zero specs — a thin rail, not dead space. */
+const EMPTY_COLUMN_WIDTH = 96;
 const LANE_GAP = 220;
-const NODE_GAP = 138;
+const NODE_GAP = 152;
+
+/**
+ * Per-column layout for the current X-axis: each column's pixel width and its
+ * cumulative x-offset. Empty Status columns collapse to a thin rail so the
+ * populated middle reclaims the width (findings: dead-space columns). Columns
+ * are never dropped entirely — the full workflow stays legible at a glance.
+ */
+export interface ColumnLayout {
+  column: string;
+  width: number;
+  x: number;
+  occupied: boolean;
+}
+
+export function computeColumnLayout(
+  specs: GraphSpec[],
+  columns: string[],
+  xAxisField: XAxisField,
+): ColumnLayout[] {
+  const occupied = new Set(
+    columns.filter((c) => specs.some((s) => getColumnValue(s, xAxisField) === c)),
+  );
+  let x = LEFT_GUTTER;
+  return columns.map((column) => {
+    // Only the fixed "Status" axis can have known-empty columns worth collapsing;
+    // chronological columns are derived from present data and are always occupied.
+    const isEmpty = xAxisField === "status" && !occupied.has(column);
+    const width = isEmpty ? EMPTY_COLUMN_WIDTH : COLUMN_WIDTH;
+    const entry: ColumnLayout = { column, width, x, occupied: !isEmpty };
+    x += width;
+    return entry;
+  });
+}
 
 const nodeTypes = { spec: NodeComponent };
 const edgeTypes = { spec: EdgeComponent };
@@ -141,6 +176,8 @@ export function placeGraphNodes(
 ): Node<SpecNodeData>[] {
   const lanes = [...new Set(specs.map((spec) => getLaneValue(spec, yAxisField)))].sort();
   const columns = getColumns(specs, xAxisField);
+  const layout = computeColumnLayout(specs, columns, xAxisField);
+  const columnX = new Map(layout.map((c) => [c.column, c.x]));
   const nodes: Node<SpecNodeData>[] = [];
 
   for (const lane of lanes) {
@@ -157,7 +194,7 @@ export function placeGraphNodes(
           id: spec.key,
           type: "spec",
           position: {
-            x: LEFT_GUTTER + columns.indexOf(column) * COLUMN_WIDTH,
+            x: columnX.get(column) ?? LEFT_GUTTER,
             y: laneIndex * LANE_GAP + rowIndex * NODE_GAP,
           },
           draggable: false,
@@ -255,15 +292,21 @@ function GraphOverlays({
 }: { specs: GraphSpec[]; yAxisField: YAxisField; xAxisField: XAxisField }): ReactElement {
   const lanes = [...new Set(specs.map((spec) => getLaneValue(spec, yAxisField)))].sort();
   const columns = getColumns(specs, xAxisField);
+  const layout = computeColumnLayout(specs, columns, xAxisField);
+  // Header column tracks are sized in proportion to the canvas column widths so
+  // an empty (collapsed) Status column reads as a thin rail, not a full column.
+  const templateColumns = layout.map((c) => `${c.width}fr`).join(" ");
   return (
     <>
       <div
         className="graph-stage-header"
         aria-hidden="true"
-        style={{ gridTemplateColumns: `repeat(${columns.length}, 1fr)` }}
+        style={{ gridTemplateColumns: templateColumns }}
       >
-        {columns.map((column) => (
-          <span key={column}>{getColumnLabel(column, xAxisField)}</span>
+        {layout.map((c) => (
+          <span key={c.column} className={c.occupied ? undefined : "graph-stage-header__empty"}>
+            {getColumnLabel(c.column, xAxisField)}
+          </span>
         ))}
       </div>
       <div className="graph-lane-gutter" aria-hidden="true">

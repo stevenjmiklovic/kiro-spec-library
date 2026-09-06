@@ -23,9 +23,27 @@ import type { YAxisField } from "../../ui/src/components/GraphCanvas.js";
 
 const LEFT_GUTTER = 160;
 const STAGE_WIDTH = 270;
+const EMPTY_COLUMN_WIDTH = 96;
 const LANE_GAP = 220;
-const NODE_GAP = 138;
+const NODE_GAP = 152;
 const STAGES = ["new", "scoped", "refined", "in-flight", "done"];
+
+/**
+ * Reproduce GraphCanvas.computeColumnLayout's cumulative x-offsets for the
+ * default "status" X-axis: an empty stage column collapses to a thin rail, so a
+ * node's x is the sum of the widths of the columns before it, not a fixed
+ * columnIndex * STAGE_WIDTH.
+ */
+function expectedColumnX(specs: GraphSpec[]): Map<string, number> {
+  const occupied = new Set(STAGES.filter((c) => specs.some((s) => s.stage === c)));
+  const x = new Map<string, number>();
+  let cursor = LEFT_GUTTER;
+  for (const col of STAGES) {
+    x.set(col, cursor);
+    cursor += occupied.has(col) ? STAGE_WIDTH : EMPTY_COLUMN_WIDTH;
+  }
+  return x;
+}
 
 // ─── UUID v4 regex ───────────────────────────────────────────────────────────
 
@@ -333,13 +351,14 @@ describe("Property 18: Node Placement Determinism", () => {
     fc.assert(
       fc.property(fc.array(graphSpecArb, { minLength: 1, maxLength: 20 }), (specs) => {
         const nodes = placeGraphNodes(specs);
+        const columnX = expectedColumnX(specs);
 
         for (const node of nodes) {
           const spec = specs.find((s) => s.key === node.id);
           if (!spec) continue;
-          const stageIndex = STAGES.indexOf(spec.stage);
-          const expectedX = LEFT_GUTTER + stageIndex * STAGE_WIDTH;
-          expect(node.position.x).toBe(expectedX);
+          const expectedX = columnX.get(spec.stage);
+          expect(expectedX).toBeDefined();
+          expect(node.position.x).toBe(expectedX as number);
         }
       }),
       { numRuns: 100 },

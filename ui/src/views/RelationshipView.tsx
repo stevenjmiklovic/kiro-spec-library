@@ -354,6 +354,7 @@ export function RelationshipView(): React.ReactElement {
       className="relationship-view"
       aria-label="Specification relationship graph view"
       role="application"
+      // biome-ignore lint/a11y/noNoninteractiveTabindex: role="application" delegates keyboard handling to the app; the container must stay focusable for roving arrow-key navigation (PR #9).
       tabIndex={0}
       onFocus={handleContainerFocus}
     >
@@ -436,7 +437,8 @@ export function RelationshipView(): React.ReactElement {
           {/* Graph + detail rail */}
           <div className="graph-with-rail">
             <div className="graph-column">
-              <div className="graph-toolbar">
+              <div className="graph-toolbar" role="group" aria-label="View layout">
+                <span className="graph-toolbar__label">View</span>
                 <label className="x-axis-selector">
                   <span>X-axis:</span>
                   <select

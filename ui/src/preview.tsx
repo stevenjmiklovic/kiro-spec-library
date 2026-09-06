@@ -67,6 +67,30 @@ const sampleSpecs = [
     indexed_at: "2026-08-10T10:00:00Z",
     relationships: [{ targetKey: "agent-memory", type: "blocks" }],
   },
+  {
+    key: "llm-budget-control",
+    title: "LLM Budget Control",
+    type: "feature",
+    stage: "refined",
+    progress: 66,
+    owner: "Priya Shah",
+    theme: "AI Foundations",
+    repository: "/Users/dev/repos/crew-platform",
+    projectName: "crew-platform",
+    indexed_at: "2026-08-18T10:00:00Z",
+  },
+  {
+    key: "sql-injection-in-clause-fix",
+    title: "SQL Injection In Clause Fix",
+    type: "bugfix",
+    stage: "done",
+    progress: 100,
+    owner: "Theo Grant",
+    theme: "Security",
+    repository: "/Users/dev/repos/web-console",
+    projectName: "web-console",
+    indexed_at: "2026-08-22T10:00:00Z",
+  },
 ];
 
 // Representative archive snapshots (backend row shape: JSON string columns).

@@ -314,9 +314,23 @@ select {
 
 .scope-toggle {
   display: inline-flex;
+  align-items: center;
   overflow: hidden;
   border: 1px solid #373a40;
   border-radius: 0.45rem;
+}
+.scope-toggle__label {
+  padding: 0 0.55rem;
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
+  border-right: 1px solid #373a40;
+  color: #909296;
+  font-family: var(--font-label);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 .scope-toggle button {
   border: 0;
@@ -385,6 +399,16 @@ select {
   top: 0;
   z-index: 5;
 }
+.graph-stage-header > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Collapsed (zero-spec) Status column — a thin dimmed rail, not dead space. */
+.graph-stage-header__empty {
+  opacity: 0.4;
+  font-size: 0.6rem;
+}
 
 /* Y-axis: pinned lane gutter on the left */
 .graph-lane-gutter {
@@ -452,9 +476,9 @@ select {
 
 .spec-node {
   display: grid;
-  gap: 0.45rem;
+  gap: 0.55rem;
   width: 14.5rem;
-  padding: 0.8rem 0.9rem;
+  padding: 0.85rem 0.95rem;
   border: 1px solid var(--canvas-border, #3a3843);
   border-left: 3px solid var(--canvas-accent, #9c75ff);
   border-radius: 0.5rem;
@@ -541,9 +565,53 @@ select {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.15rem 0.3rem;
+  gap: 0.4rem 0.5rem;
   color: #adb5bd;
   font-size: 0.72rem;
+}
+/* Stage pill — tinted per lifecycle stage so a card's status label visually
+   matches the column it is plotted under (position ↔ label agree). */
+.spec-node__stage {
+  padding: 0.08rem 0.45rem;
+  border-radius: 999px;
+  font-family: var(--font-label);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #cdd3da;
+  background: #2f2d38;
+  border: 1px solid #45424f;
+}
+.spec-node__stage[data-stage="new"] {
+  color: #ffd8a8;
+  background: color-mix(in srgb, #ff922b 18%, transparent);
+  border-color: color-mix(in srgb, #ff922b 45%, transparent);
+}
+.spec-node__stage[data-stage="scoped"] {
+  color: #a5d8ff;
+  background: color-mix(in srgb, #748ffc 18%, transparent);
+  border-color: color-mix(in srgb, #748ffc 45%, transparent);
+}
+.spec-node__stage[data-stage="refined"] {
+  color: #ffe066;
+  background: color-mix(in srgb, #fcc419 16%, transparent);
+  border-color: color-mix(in srgb, #fcc419 42%, transparent);
+}
+.spec-node__stage[data-stage="in-flight"] {
+  color: #d0bfff;
+  background: color-mix(in srgb, #9c75ff 20%, transparent);
+  border-color: color-mix(in srgb, #9c75ff 48%, transparent);
+}
+.spec-node__stage[data-stage="done"] {
+  color: #b2f2bb;
+  background: color-mix(in srgb, #51cf66 18%, transparent);
+  border-color: color-mix(in srgb, #51cf66 45%, transparent);
+}
+/* Secondary metadata (progress · owner) — muted so the title leads the eye. */
+.spec-node__meta-sub {
+  color: #7c828b;
+  font-size: 0.7rem;
 }
 .spec-edge--accepted path {
   stroke: var(--edge-solid, #9c75ff);
@@ -558,12 +626,28 @@ select {
   stroke-width: 2.5;
 }
 .spec-edge-label {
-  padding: 0.15rem 0.35rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  max-width: none;
+  white-space: nowrap;
+  padding: 0.12rem 0.4rem 0.12rem 0.3rem;
   border: 1px solid #495057;
-  border-radius: 0.25rem;
+  border-radius: 999px;
   color: #dee2e6;
   background: #25262b;
   font-size: .65rem;
+}
+.spec-edge-label__arrow {
+  color: var(--edge-solid, #9c75ff);
+  font-weight: 700;
+  line-height: 1;
+}
+.spec-edge-label[data-status="pending"] .spec-edge-label__arrow {
+  color: #868e96;
+}
+.spec-edge-label__text {
+  white-space: nowrap;
 }
 .graph-legend {
   position: absolute;
@@ -800,6 +884,37 @@ button.archive-row:hover {
 .archive-row .needs-metadata {
   color: #b4520a;
   font-weight: 600;
+}
+/* Type pill — mirrors the relationship-graph type vocabulary so a spec's type
+   reads consistently across the board and the archive ledger (consistency). */
+.archive-type-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.05rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid #dee2e6;
+  background: #f1f3f5;
+  color: #495057;
+  font-family: var(--font-label);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.archive-type-pill[data-type="feature"] {
+  color: #5c39db;
+  background: color-mix(in srgb, #5c39db 12%, #fff);
+  border-color: color-mix(in srgb, #5c39db 30%, #fff);
+}
+.archive-type-pill[data-type="bugfix"] {
+  color: #c92a2a;
+  background: color-mix(in srgb, #e03131 12%, #fff);
+  border-color: color-mix(in srgb, #e03131 30%, #fff);
+}
+.archive-type-pill[data-type="quick"] {
+  color: #2f7a3d;
+  background: color-mix(in srgb, #2f9e44 12%, #fff);
+  border-color: color-mix(in srgb, #2f9e44 30%, #fff);
 }
 
 .archive-month h2 {
@@ -1064,6 +1179,27 @@ button.archive-row:hover {
   align-items: center;
   gap: 0.5rem;
 }
+.chrome-actions__group {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.chrome-actions__divider {
+  width: 1px;
+  align-self: stretch;
+  margin: 0.15rem 0.15rem;
+  background: var(--canvas-border, #3a3843);
+}
+/* Emphasized data action (Rescan) — the heavy operation carries accent weight
+   rather than sitting flat beside the theme toggle. */
+.chrome-icon-btn--emphasis {
+  border-color: var(--canvas-accent, #9c75ff);
+  color: var(--canvas-accent, #9c75ff);
+  font-weight: 600;
+}
+.chrome-icon-btn--emphasis:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--canvas-accent, #9c75ff) 12%, transparent);
+}
 .copy-link-btn,
 .chrome-icon-btn {
   display: inline-flex;
@@ -1151,6 +1287,48 @@ button.archive-row:hover {
 [data-theme="light"] .spec-node__type-label,
 [data-theme="light"] .spec-node__meta {
   color: #868e96;
+}
+[data-theme="light"] .spec-node__meta-sub {
+  color: #adb5bd;
+}
+/* Neutral fallback pill only (mapped stages keep their color-mix tint, which
+   reads fine on the light card surface). */
+[data-theme="light"]
+  .spec-node__stage:not([data-stage="new"]):not([data-stage="scoped"]):not(
+    [data-stage="refined"]
+  ):not([data-stage="in-flight"]):not([data-stage="done"]) {
+  color: #495057;
+  background: #eceef1;
+  border-color: #dee2e6;
+}
+/* Light-mode mapped pills: keep the tinted background but darken the text so it
+   stays legible on white (the dark-mode pale text would wash out). */
+[data-theme="light"] .spec-node__stage[data-stage="new"] {
+  color: #b4520a;
+}
+[data-theme="light"] .spec-node__stage[data-stage="scoped"] {
+  color: #2f4bd6;
+}
+[data-theme="light"] .spec-node__stage[data-stage="refined"] {
+  color: #8a6d00;
+}
+[data-theme="light"] .spec-node__stage[data-stage="in-flight"] {
+  color: #5c39db;
+}
+[data-theme="light"] .spec-node__stage[data-stage="done"] {
+  color: #2b7a3d;
+}
+[data-theme="light"] .graph-toolbar {
+  background: #ffffff;
+  border-color: #dee2e6;
+}
+[data-theme="light"] .graph-toolbar__label {
+  color: #5c39db;
+  border-right-color: #dee2e6;
+}
+[data-theme="light"] .scope-toggle__label {
+  color: #868e96;
+  border-right-color: #dee2e6;
 }
 [data-theme="light"] .spec-node__glyph {
   color: #5c39db;
@@ -1247,6 +1425,26 @@ button.archive-row:hover {
 [data-theme="dark"] .archive-row .needs-metadata {
   color: #ffa94d;
 }
+[data-theme="dark"] .archive-type-pill {
+  border-color: #373a40;
+  background: #2f2d38;
+  color: #cdd3da;
+}
+[data-theme="dark"] .archive-type-pill[data-type="feature"] {
+  color: #d0bfff;
+  background: color-mix(in srgb, #9c75ff 20%, transparent);
+  border-color: color-mix(in srgb, #9c75ff 45%, transparent);
+}
+[data-theme="dark"] .archive-type-pill[data-type="bugfix"] {
+  color: #ffc9c9;
+  background: color-mix(in srgb, #ff6b6b 20%, transparent);
+  border-color: color-mix(in srgb, #ff6b6b 45%, transparent);
+}
+[data-theme="dark"] .archive-type-pill[data-type="quick"] {
+  color: #b2f2bb;
+  background: color-mix(in srgb, #51cf66 18%, transparent);
+  border-color: color-mix(in srgb, #51cf66 45%, transparent);
+}
 [data-theme="dark"] .archive-month h2 {
   color: #909296;
 }
@@ -1320,8 +1518,22 @@ button.archive-row:hover {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.4rem 0.6rem;
+  padding: 0.4rem 0.7rem;
   margin-bottom: 0.3rem;
+  border: 1px solid var(--canvas-border, #373a40);
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--canvas-surface, #1d1d24) 55%, transparent);
+  width: fit-content;
+}
+.graph-toolbar__label {
+  font-family: var(--font-label);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--canvas-accent, #9c75ff);
+  padding-right: 0.35rem;
+  border-right: 1px solid var(--canvas-border, #373a40);
 }
 .x-axis-selector,
 .y-axis-selector {
