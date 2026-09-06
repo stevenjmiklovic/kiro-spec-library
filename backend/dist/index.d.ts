@@ -220,10 +220,10 @@ declare const app: import("elysia").default<"/api", {
                 body: unknown;
                 params: {};
                 query: {
-                    type?: string | undefined;
-                    stage?: string | undefined;
                     owner?: string | undefined;
                     theme?: string | undefined;
+                    type?: string | undefined;
+                    stage?: string | undefined;
                     repository?: string | undefined;
                     metadataComplete?: string | undefined;
                     q?: string | undefined;
@@ -364,8 +364,8 @@ declare const app: import("elysia").default<"/api", {
                                 tags?: string[] | undefined;
                                 owner?: string | undefined;
                                 theme?: string | undefined;
-                                title?: string | undefined;
                                 summary?: string | undefined;
+                                title?: string | undefined;
                                 targetRelease?: string | undefined;
                                 retentionPolicy?: {
                                     customDate?: string | undefined;
@@ -1197,6 +1197,37 @@ declare const app: import("elysia").default<"/api", {
                                 code: string;
                                 message: string;
                             };
+                        };
+                    };
+                };
+            };
+        };
+    };
+} & {
+    api: {
+        "knowledge-sync": {
+            post: {
+                body: unknown;
+                params: {};
+                query: unknown;
+                headers: unknown;
+                response: {
+                    200: import("./services/knowledge-sync.js").KnowledgeSyncResult;
+                };
+            };
+        };
+    } & {
+        "knowledge-sync": {
+            spec: {
+                post: {
+                    body: unknown;
+                    params: {};
+                    query: unknown;
+                    headers: unknown;
+                    response: {
+                        200: import("./services/knowledge-sync.js").SingleSpecSyncResult | {
+                            code: string;
+                            message: string;
                         };
                     };
                 };

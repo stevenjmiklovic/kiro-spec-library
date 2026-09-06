@@ -39,7 +39,8 @@ var AUDIT_OPERATIONS = [
   "backup_created",
   "backup_restored",
   "text_export_created",
-  "text_export_applied"
+  "text_export_applied",
+  "knowledge_sync_run"
 ];
 var SUGGESTION_REASONS = [
   "markdown_link",

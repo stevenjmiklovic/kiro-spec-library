@@ -57,6 +57,7 @@ export const AUDIT_OPERATIONS: readonly AuditOperation[] = [
   "backup_restored",
   "text_export_created",
   "text_export_applied",
+  "knowledge_sync_run",
 ] as const;
 
 export const SUGGESTION_REASONS: readonly SuggestionReason[] = [

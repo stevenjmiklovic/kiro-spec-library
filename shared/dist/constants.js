@@ -1,11 +1,6 @@
 // @kiro-spec-library/shared — Constants and configuration defaults
 // ─── Type Enumerations ───────────────────────────────────────────────────────
-export const SPEC_TYPES = [
-    "feature",
-    "bugfix",
-    "quick",
-    "unknown",
-];
+export const SPEC_TYPES = ["feature", "bugfix", "quick", "unknown"];
 export const WORKFLOW_TYPES = [
     "requirements-first",
     "design-first",
@@ -45,6 +40,7 @@ export const AUDIT_OPERATIONS = [
     "backup_restored",
     "text_export_created",
     "text_export_applied",
+    "knowledge_sync_run",
 ];
 export const SUGGESTION_REASONS = [
     "markdown_link",

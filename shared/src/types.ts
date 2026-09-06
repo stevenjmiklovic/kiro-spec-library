@@ -35,7 +35,8 @@ export type AuditOperation =
   | "backup_created"
   | "backup_restored"
   | "text_export_created"
-  | "text_export_applied";
+  | "text_export_applied"
+  | "knowledge_sync_run";
 
 /** Scan error category */
 export type ScanErrorCategory = "auth" | "network" | "timeout" | "validation" | "io";
