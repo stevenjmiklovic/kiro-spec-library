@@ -119,17 +119,22 @@ export function SpecNode({ data }: NodeProps<SpecNodeType>) {
         </span>
       )}
 
-      {/* Stage / progress / owner line */}
+      {/* Stage / progress / owner line — stage carries a tinted pill so the
+          card's position column and its status label read as the same thing;
+          progress + owner are demoted to muted secondary metadata. */}
       <span className="spec-node__meta">
-        <span className="spec-node__stage">{stage}</span>
-        {" · "}
-        <span className="spec-node__progress">{progress}%</span>
-        {owner && (
-          <>
-            {" · "}
-            <span className="spec-node__owner">{owner}</span>
-          </>
-        )}
+        <span className="spec-node__stage" data-stage={stage}>
+          {stage}
+        </span>
+        <span className="spec-node__meta-sub">
+          <span className="spec-node__progress">{progress}%</span>
+          {owner && (
+            <>
+              {" · "}
+              <span className="spec-node__owner">{owner}</span>
+            </>
+          )}
+        </span>
       </span>
 
       <Handle type="source" position={Position.Right} />

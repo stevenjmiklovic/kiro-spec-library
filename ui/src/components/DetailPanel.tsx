@@ -30,11 +30,13 @@ export function DetailPanel({
     loading,
     saving,
     error,
+    errorStatus,
     save,
     acceptSuggestion,
     rejectSuggestion,
     acceptProposal,
     rejectProposal,
+    refetch,
   } = useSpecDetail(specKey);
 
   // Escape-to-close (works for both rail and drawer variants)
@@ -73,9 +75,32 @@ export function DetailPanel({
       )}
 
       {error && !detail && (
-        <p className="detail-panel__status" role="alert">
-          {error}
-        </p>
+        <div className="detail-panel__error" role="alert">
+          <p className="detail-panel__error-title">
+            {errorStatus === 404 ? "This spec couldn’t be found" : "Couldn’t load this spec"}
+          </p>
+          <p className="detail-panel__error-body">
+            {errorStatus === 404
+              ? "It may have been renamed, moved, or removed since the last scan. Rescanning refreshes the library from your sources."
+              : "The spec detail didn’t load. This is usually a temporary connection issue — retrying often works."}
+          </p>
+          <div className="detail-panel__error-actions">
+            <button
+              type="button"
+              className="detail-panel__error-btn detail-panel__error-btn--primary"
+              onClick={() => refetch()}
+            >
+              Retry
+            </button>
+            <button
+              type="button"
+              className="detail-panel__error-btn"
+              onClick={() => window.dispatchEvent(new CustomEvent("spec-library:request-rescan"))}
+            >
+              Rescan library
+            </button>
+          </div>
+        </div>
       )}
 
       {detail && (

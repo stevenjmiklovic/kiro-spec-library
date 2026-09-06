@@ -10,6 +10,7 @@ import type {
   TaskCounts,
   WorkflowType,
 } from "@kiro-spec-library/shared";
+import { titleCaseSlug } from "@kiro-spec-library/shared";
 
 export interface RawSpecArtifacts {
   slug: string;
@@ -56,10 +57,7 @@ export function extractTitle(content: string | undefined, fallbackSlug: string):
       return match[1].trim();
     }
   }
-  return fallbackSlug
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+  return titleCaseSlug(fallbackSlug);
 }
 
 export function calculateStage(
@@ -135,10 +133,7 @@ export function normalize(raw: RawSpecArtifacts, source: Source): NormalizedSpec
     raw.contents["requirements.md"] ?? raw.contents["bugfix.md"] ?? raw.contents["design.md"];
   // Prefer the spec folder name (slug) as the title — it's the spec's identity.
   // Only use the content heading if the folder name is a UUID or otherwise uninformative.
-  const slugTitle = raw.slug
-    .split("-")
-    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+  const slugTitle = titleCaseSlug(raw.slug);
   const isUuidSlug = /^[0-9a-f]{8}-[0-9a-f]{4}-/.test(raw.slug);
   const title = isUuidSlug ? extractTitle(titleSource, raw.slug) : slugTitle;
 

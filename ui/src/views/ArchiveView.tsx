@@ -474,7 +474,11 @@ export function ArchiveView(): React.ReactElement {
                   <span>
                     <strong>{row.title}</strong>
                   </span>
-                  <span>{row.type}</span>
+                  <span>
+                    <span className="archive-type-pill" data-type={row.type}>
+                      {row.type}
+                    </span>
+                  </span>
                   <span>{row.theme}</span>
                   <span>{row.repository}</span>
                   <span>{row.owner}</span>

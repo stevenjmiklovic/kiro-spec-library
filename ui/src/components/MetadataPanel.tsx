@@ -2,6 +2,7 @@ import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { useCrew } from "../hooks/useCrewIntegration.js";
 import type { MetadataPatch, PendingSuggestion, SpecDetail } from "../hooks/useSpecDetail.js";
+import { titleCaseSlug } from "../lib/text.js";
 
 interface Props {
   detail: SpecDetail;
@@ -406,11 +407,11 @@ export function MetadataPanel({
               const isSource = s.sourceSpecKey === detail.key;
               const otherKey = isSource ? s.targetSpecKey : s.sourceSpecKey;
               // Extract readable name from key: "repo::.kiro/specs/slug" → "Slug"
-              const otherName = otherKey
-                .replace(/^[^:]+::/, "") // strip repo prefix
-                .replace(/^\.kiro\/specs\//, "") // strip .kiro/specs/
-                .replace(/-/g, " ") // hyphens to spaces
-                .replace(/\b\w/g, (c) => c.toUpperCase()); // title case
+              const otherName = titleCaseSlug(
+                otherKey
+                  .replace(/^[^:]+::/, "") // strip repo prefix
+                  .replace(/^\.kiro\/specs\//, ""), // strip .kiro/specs/
+              );
               const directionLabel = isSource ? "→" : "←";
               const directionTitle = isSource
                 ? `This spec relates to "${otherName}"`

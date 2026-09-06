@@ -67,6 +67,30 @@ const sampleSpecs = [
     indexed_at: "2026-08-10T10:00:00Z",
     relationships: [{ targetKey: "agent-memory", type: "blocks" }],
   },
+  {
+    key: "llm-budget-control",
+    title: "LLM Budget Control",
+    type: "feature",
+    stage: "refined",
+    progress: 66,
+    owner: "Priya Shah",
+    theme: "AI Foundations",
+    repository: "/Users/dev/repos/crew-platform",
+    projectName: "crew-platform",
+    indexed_at: "2026-08-18T10:00:00Z",
+  },
+  {
+    key: "sql-injection-in-clause-fix",
+    title: "SQL Injection In Clause Fix",
+    type: "bugfix",
+    stage: "done",
+    progress: 100,
+    owner: "Theo Grant",
+    theme: "Security",
+    repository: "/Users/dev/repos/web-console",
+    projectName: "web-console",
+    indexed_at: "2026-08-22T10:00:00Z",
+  },
 ];
 
 // Representative archive snapshots (backend row shape: JSON string columns).
@@ -323,6 +347,47 @@ const overrides: Partial<CrewIntegration> = {
           },
         ].filter((e) => !operationFilter || e.operation === operationFilter);
         return json({ events, total: events.length });
+      }
+      // Spec detail — the real app fetches /spec-detail?key=...; return the
+      // same real detail shape as /specs/:key above, keyed off the query param.
+      const specDetailMatch = path.match(/^\/spec-detail\?key=([^&]+)/);
+      if (specDetailMatch) {
+        const key = decodeURIComponent(specDetailMatch[1] ?? "");
+        const s = sampleSpecs.find((x) => x.key === key) ?? sampleSpecs[0]!;
+        const overlay = metadataOverlays.get(key) ?? {};
+        const rev = revisionCounters.get(key) ?? 0;
+        return json({
+          spec: {
+            key: s.key,
+            spec_id: s.key,
+            type: s.type,
+            stage: s.stage,
+            progress: s.progress,
+            owner: s.owner,
+            title: s.title,
+            repository: s.repository,
+            relative_path: `.kiro/specs/${s.key}`,
+            branch: "main",
+            commit_hash: "a1b2c3d4e5f6",
+            is_dirty: s.key === "workspace-export" ? 1 : 0,
+            remote_url: "https://github.com/crew-platform/crew.git",
+          },
+          metadata: {
+            title: s.title,
+            summary: `${s.title} — normalized from .kiro/specs/${s.key}.`,
+            owner: s.owner,
+            theme: s.theme,
+            tags: ["kiro", s.type],
+            targetRelease: "2026.09",
+            retentionPolicy: { type: "active_plus_2_years" },
+            approvers: ["Maya Chen", "Daniel Kim"],
+            implementationRef: "https://github.com/crew-platform/crew/pull/847",
+            createdAt: "2026-07-12T09:15:00Z",
+            lastModifiedAt: "2026-08-14T16:30:00Z",
+            ...overlay,
+          },
+          revision: rev,
+        });
       }
       // Spec listing.
       return json({ specs: sampleSpecs, total: sampleSpecs.length });

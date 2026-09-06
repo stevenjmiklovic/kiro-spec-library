@@ -102,6 +102,9 @@ export function FilterBar({ filters, options, onChange, resultCount }: Props): R
       </div>
 
       <div className="scope-toggle" role="group" aria-label="Scope">
+        <span className="scope-toggle__label" aria-hidden="true">
+          Scope
+        </span>
         <button
           type="button"
           aria-pressed={filters.scope === "team"}

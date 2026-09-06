@@ -1,0 +1,1 @@
+The spec detail panel no longer shows a raw "Failed to load spec: 404" with only a close button. A failed load now renders plain recovery copy — what couldn't load and why (a renamed, moved, or removed spec since the last scan) — with inline Retry and Rescan actions so the user can recover in place.

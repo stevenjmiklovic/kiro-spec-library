@@ -67,8 +67,13 @@ export function SpecEdge({
           }}
           aria-label={`${relationshipType} (${pending ? "suggested" : "accepted"})`}
         >
-          {relationshipType}
-          {pending ? " · suggested" : " · accepted"}
+          <span className="spec-edge-label__arrow" aria-hidden="true">
+            →
+          </span>
+          <span className="spec-edge-label__text">
+            {relationshipType}
+            {pending ? " · suggested" : " · accepted"}
+          </span>
         </div>
       </EdgeLabelRenderer>
     </>

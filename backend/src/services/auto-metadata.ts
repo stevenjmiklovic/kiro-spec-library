@@ -1,3 +1,4 @@
+import { titleCaseSlug } from "@kiro-spec-library/shared";
 import { validateArgs } from "../security/git-validator.js";
 /**
  * Agentic auto-population of metadata fields from repository context.
@@ -439,14 +440,7 @@ export async function autoPopulate(
 
   const implementationRef = extractImplementationRef(raw.contents);
   const summary = extractSummary(raw.contents);
-  const tags = inferTags(
-    raw.slug
-      .split("-")
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(" "),
-    raw.relativePath,
-    raw.contents,
-  );
+  const tags = inferTags(titleCaseSlug(raw.slug), raw.relativePath, raw.contents);
 
   return {
     approvers,

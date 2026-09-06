@@ -1,0 +1,1 @@
+Spec titles derived from folder slugs now preserve acronym casing (LLM, SQL, CRDT, API, …) instead of being mangled to "Llm"/"Sql"/"Crdt", and render consistently across the relationship board, the archive ledger, and the metadata panel's relationships list.
