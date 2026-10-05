@@ -9,6 +9,10 @@
 
 set -euo pipefail
 
+# Supervision contract: every command before the final exec is foreground and
+# synchronous. Do not add a watcher, background job, subshell, or launcher
+# wrapper here: once exec replaces this shell, such a child could outlive the
+# PID the gateway records and signals.
 APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$APP_DIR"
 
@@ -71,6 +75,8 @@ fi
 # ─── Port cleanup ────────────────────────────────────────────────────────────
 
 kill_port() {
+  # This pre-exec cleanup is deliberately synchronous. After SIGKILL, allow the
+  # kernel to release the old listener before the exec'd Bun process binds PORT.
   local pids
   pids=$(lsof -ti "tcp:$PORT" 2>/dev/null || true)
   if [[ -n "$pids" ]]; then
@@ -90,7 +96,12 @@ kill_port
 # init/launchd, surviving gateway restarts. `_reap_stale_app_backends` only reaps
 # the PID recorded in app_backends.pids.json, so an un-recorded forked child is
 # never reaped. Exec-ing bun directly makes the recorded PID the actual JS runtime
-# and listener — one process, nothing to orphan, always reapable.
+# and listener — one process, nothing to orphan, always reapable. The exec'd Bun
+# process retains this launcher's process group (and is its supervised leader in
+# the gateway launch contract), so a group-directed gateway signal has no
+# preamble descendant to miss.
+#
+# This MUST remain the final action in this script: no command may follow it.
 echo "[start-backend] Starting on port $PORT"
 export SPEC_LIBRARY_PORT="$PORT"
 exec "$BUN" "$DIST"

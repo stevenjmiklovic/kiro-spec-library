@@ -28,6 +28,8 @@ import type { NormalizedSpec } from "../../shared/src/types.js";
 let tmpDir: string;
 let archiveDir: string;
 let db: Database;
+let scanner: ScannerService;
+let archiver: ArchiverService;
 let app: { handle: (req: Request) => Promise<Response> };
 
 // The Elysia app itself mounts at "/api" (see router.ts); API_PREFIX from
@@ -77,8 +79,8 @@ beforeAll(async () => {
   db = createDatabase(tmpDir);
   await runMigrations(db);
 
-  const archiver = new ArchiverService(db, { archiveDir });
-  const scanner = new ScannerService(db, tmpDir, archiver);
+  archiver = new ArchiverService(db, { archiveDir });
+  scanner = new ScannerService(db, tmpDir, archiver);
 
   // Build the full app: router (health/bootstrap) + sub-routes
   const router = createRouter({
@@ -415,6 +417,32 @@ describe("REST API integration tests", () => {
 
       const data = (await res.json()) as { status: string };
       expect(data.status).toBe("ok");
+    });
+
+    /** Validates: Requirements 2.5 */
+    test("GET /health reports starting before readiness, then remains healthy", async () => {
+      let isReady = false;
+      const readinessApp = createRouter({
+        db,
+        scanner,
+        archiver,
+        ready: () => isReady,
+        dataDir: tmpDir,
+        mcpToken: "test-mcp-token",
+        enforceMcpAuth: false,
+      });
+
+      const starting = await readinessApp.handle(new Request(buildUrl("/health")));
+      expect(starting.status).toBe(503);
+      expect(await starting.json()).toEqual({ status: "starting" });
+
+      isReady = true;
+      const ready = await readinessApp.handle(new Request(buildUrl("/health")));
+      expect(ready.status).toBe(200);
+      expect(await ready.json()).toEqual({ status: "ok" });
+
+      const subsequentGatewayCheck = await readinessApp.handle(new Request(buildUrl("/health")));
+      expect(subsequentGatewayCheck.status).toBe(200);
     });
 
     test("GET /bootstrap returns 200 with spec/archive counts and facets", async () => {
