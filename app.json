@@ -18,8 +18,8 @@
   "agents": ["agents/spectral-librarian.json"],
   "mcpServers": {
     "kiro-spec-library": {
-      "command": "bun",
-      "args": ["run", "mcp/src/index.ts"],
+      "command": "bash",
+      "args": ["scripts/start-mcp.sh"],
       "disabled": false
     }
   },
@@ -51,6 +51,6 @@
     "os": ["macos", "linux"]
   },
   "setup": {
-    "onInstall": "export PATH=\"$HOME/.bun/bin:$PATH\" && bun install && bun build shared/src/index.ts --target=bun --outfile=shared/dist/index.mjs && bun build backend/src/index.ts --target=bun --outfile=backend/dist/index.mjs && cd ui && bun run build"
+    "onInstall": "export PATH=\"$HOME/.bun/bin:$PATH\" && bun install && bun build shared/src/index.ts --target=bun --outfile=shared/dist/index.mjs && bun build backend/src/index.ts --target=bun --outfile=backend/dist/index.mjs && (cd ui && bun run build)"
   }
 }

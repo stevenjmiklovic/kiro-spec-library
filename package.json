@@ -34,6 +34,7 @@
     "app.json",
     "agents/",
     "scripts/start-backend.sh",
+    "scripts/start-mcp.sh",
     "assets/icon-256.png",
     "assets/favicon.ico",
     "mcp/src/",
