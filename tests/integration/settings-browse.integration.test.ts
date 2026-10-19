@@ -16,7 +16,7 @@ import type { Database } from "bun:sqlite";
  *   - `.kiro/specs` detection surfaced as hasSpecs
  */
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { mkdirSync, mkdtempSync, symlinkSync } from "node:fs";
+import { mkdirSync, mkdtempSync, realpathSync, symlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createDatabase } from "../../backend/src/db/connection.js";
@@ -63,7 +63,12 @@ beforeAll(() => {
   //     node_modules/             (blocked)
   //     escape -> <outside>       (symlink escaping home)
   //   <outside>/                  (sibling of home, outside it)
-  const root = mkdtempSync(join(tmpdir(), "browse-test-"));
+  // The route canonicalizes every path through fs.realpath (to close the
+  // check-vs-use gap — see settings.ts), so its responses carry real paths.
+  // On macOS a tmpdir under /var/folders resolves to /private/var/folders, so
+  // we canonicalize our expected home/outside dirs the same way; otherwise
+  // assertions compare a raw path against the route's realpath-resolved one.
+  const root = realpathSync(mkdtempSync(join(tmpdir(), "browse-test-")));
   homeDir = join(root, "home");
   outsideDir = join(root, "outside");
   mkdirSync(homeDir, { recursive: true });
