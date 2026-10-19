@@ -5,11 +5,12 @@ All notable changes to the Kiro Spec Library will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.3] — 2026-09-04
+## [0.2.3] — 2026-10-16
 
 ### Fixed
 
 - Fixed the gateway backend crash loop by hardening the Bun `type: "exec"` launcher so the supervised PID is the real listener, gateway launches require their allocated `PORT`, and the synchronous preamble leaves no orphaned process.
+- Fixed the MCP server failing to start (and being quarantined by Crew) after an install that shipped without `node_modules`. The server now launches through a self-healing `scripts/start-mcp.sh` launcher that anchors to the app root so relative module paths resolve regardless of the gateway's working directory, reinstalls dependencies when `node_modules` or the `@kiro-spec-library/shared` workspace link is missing, and keeps stdout a pure JSON-RPC stream (all diagnostics go to stderr). Hardened `setup.onInstall` so a from-repo or from-library install produces a fully installed and built app.
 
 ## [0.2.2] — 2026-09-04
 
